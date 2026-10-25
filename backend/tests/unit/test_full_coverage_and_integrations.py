@@ -259,13 +259,14 @@ class TestCloudIntegrations:
 
     def test_firestore_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.firestore_service.settings.ENABLE_FIRESTORE", True):
-            with patch("google.cloud.firestore.AsyncClient") as mock_client:
-                mock_client.return_value = MagicMock()
+            mock_module = MagicMock()
+            mock_module.AsyncClient.return_value = MagicMock()
+            with patch.dict("sys.modules", {"google.cloud.firestore": mock_module}):
                 fs = FirestoreService()
                 assert fs.is_connected is True
                 assert fs._db is not None
 
-            with patch("google.cloud.firestore.AsyncClient", side_effect=Exception("Connection refused")):
+            with patch.dict("sys.modules", {"google.cloud.firestore": None}):
                 fs_fail = FirestoreService()
                 assert fs_fail.is_connected is False
                 assert fs_fail._db is None
@@ -334,13 +335,14 @@ class TestCloudIntegrations:
 
     def test_monitoring_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.monitoring_service.settings.ENABLE_CLOUD_MONITORING", True):
-            with patch("google.cloud.monitoring_v3.MetricServiceClient") as mock_client:
-                mock_client.return_value = MagicMock()
+            mock_module = MagicMock()
+            mock_module.MetricServiceClient.return_value = MagicMock()
+            with patch.dict("sys.modules", {"google.cloud.monitoring_v3": mock_module}):
                 ms = CloudMonitoringService()
                 assert ms._is_enabled is True
                 assert ms._metric_client is not None
 
-            with patch("google.cloud.monitoring_v3.MetricServiceClient", side_effect=Exception("GCP auth missing")):
+            with patch.dict("sys.modules", {"google.cloud.monitoring_v3": None}):
                 ms_fail = CloudMonitoringService()
                 assert ms_fail._is_enabled is False
                 assert ms_fail._metric_client is None
@@ -357,13 +359,14 @@ class TestCloudIntegrations:
 
     def test_pubsub_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.pubsub_service.settings.ENABLE_PUBSUB", True):
-            with patch("google.cloud.pubsub_v1.PublisherClient") as mock_pub:
-                mock_pub.return_value = MagicMock()
+            mock_module = MagicMock()
+            mock_module.PublisherClient.return_value = MagicMock()
+            with patch.dict("sys.modules", {"google.cloud.pubsub_v1": mock_module}):
                 ps = PubSubService()
                 assert ps.is_cloud_enabled is True
                 assert ps._publisher is not None
 
-            with patch("google.cloud.pubsub_v1.PublisherClient", side_effect=Exception("PubSub unavailable")):
+            with patch.dict("sys.modules", {"google.cloud.pubsub_v1": None}):
                 ps_fail = PubSubService()
                 assert ps_fail.is_cloud_enabled is False
                 assert ps_fail._publisher is None
