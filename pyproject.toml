@@ -34,9 +34,27 @@ where = ["."]
 include = ["backend*"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B"]
+ignore = ["B008", "BLE001", "E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["backend/tests"]
+markers = [
+    "unit: Unit tests focusing on isolated algorithms, domain logic, and models",
+    "integration: Integration tests verifying agent mesh communication and API routes",
+    "e2e: End-to-end tests validating complete lifecycle workflows from intake to rescue and audit",
+]
+addopts = "--strict-markers -v"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+

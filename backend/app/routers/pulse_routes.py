@@ -4,16 +4,18 @@ Executes deterministic domain calculations upon live field input changes.
 Adheres to @02_system_architect and @04_responsible_ai_ethics.
 """
 
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, status
-from typing import Dict, Any
 from pydantic import BaseModel, Field
-from backend.app.services.storage_service import storage_service
+
 from backend.app.core.engine import (
     calculate_food_sufficiency,
-    rebalance_budget_pareto,
-    propagate_timeline_delay,
     generate_fssai_surplus_manifest,
+    propagate_timeline_delay,
+    rebalance_budget_pareto,
 )
+from backend.app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Event Pulse"])
 
@@ -21,14 +23,14 @@ router = APIRouter(prefix="/api/v1/event", tags=["Event Pulse"])
 class PulseUpdateRequest(BaseModel):
     actual_checked_in: int = Field(default=0, ge=0)
     revised_expected_guests: int = Field(default=250, ge=10)
-    category_inventory_update: Dict[str, Dict[str, int]] = Field(default_factory=dict)
+    category_inventory_update: dict[str, dict[str, int]] = Field(default_factory=dict)
     revised_budget: int = Field(default=0, ge=0)
     delayed_node_id: str = Field(default="")
     delay_minutes: int = Field(default=0, ge=0)
 
 
 @router.post("/{event_id}/pulse")
-async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> Dict[str, Any]:
+async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> dict[str, Any]:
     """Applies live field observations and executes deterministic updates."""
     state = storage_service.get_event(event_id)
     if not state:
@@ -38,21 +40,28 @@ async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> Dict
 
     # 1. Update Food Sufficiency Radar if inventory or attendance changed
     if payload.category_inventory_update or payload.actual_checked_in > 0:
-        inv = payload.category_inventory_update if payload.category_inventory_update else {
-            c.category.value: {
-                "prepared": c.prepared_portions,
-                "served": c.served_portions,
-                "reserved": c.reserved_portions,
-                "inbound": c.confirmed_inbound
-            } for c in state.food_radar.categories
-        } if state.food_radar else {}
+        inv = (
+            payload.category_inventory_update
+            if payload.category_inventory_update
+            else {
+                c.category.value: {
+                    "prepared": c.prepared_portions,
+                    "served": c.served_portions,
+                    "reserved": c.reserved_portions,
+                    "inbound": c.confirmed_inbound,
+                }
+                for c in state.food_radar.categories
+            }
+            if state.food_radar
+            else {}
+        )
 
         state.food_radar = calculate_food_sufficiency(
             event_id,
             payload.revised_expected_guests,
             payload.actual_checked_in,
             state.intake.dietary,
-            inv
+            inv,
         )
         calculations_run.append(
             f"Food Sufficiency Engine: {state.food_radar.total_shortfall_count} shortfalls, "
@@ -75,7 +84,7 @@ async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> Dict
             state.timeline_nodes,
             payload.delayed_node_id,
             payload.delay_minutes,
-            curfew_time=state.intake.preferences.sound_curfew_time
+            curfew_time=state.intake.preferences.sound_curfew_time,
         )
         state.timeline_nodes = timeline_cascade_result.propagated_delays
         calculations_run.append(
@@ -90,7 +99,7 @@ async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> Dict
         "timeline": [t.model_dump() for t in state.timeline_nodes],
         "budget_rebalance": budget_rebalance_result.model_dump() if budget_rebalance_result else None,
         "timeline_cascade": timeline_cascade_result.model_dump() if timeline_cascade_result else None,
-        "calculations_executed": calculations_run
+        "calculations_executed": calculations_run,
     }
 
 
@@ -102,7 +111,7 @@ class FSSAIDispatchRequest(BaseModel):
 
 
 @router.post("/{event_id}/food/fssai-manifest")
-async def generate_fssai_manifest(event_id: str, payload: FSSAIDispatchRequest) -> Dict[str, Any]:
+async def generate_fssai_manifest(event_id: str, payload: FSSAIDispatchRequest) -> dict[str, Any]:
     """Generates official FSSAI certified food-rescue dispatch manifest with ESG carbon impact."""
     state = storage_service.get_event(event_id)
     if not state:
@@ -113,7 +122,7 @@ async def generate_fssai_manifest(event_id: str, payload: FSSAIDispatchRequest) 
         payload.surplus_kg,
         payload.hot_temp_celsius,
         payload.cold_temp_celsius,
-        payload.partner_ngo
+        payload.partner_ngo,
     )
     if state.food_radar:
         state.food_radar.fssai_manifest = manifest
@@ -125,6 +134,6 @@ async def generate_fssai_manifest(event_id: str, payload: FSSAIDispatchRequest) 
         "esg_certificate": {
             "carbon_offset_kg": manifest.carbon_emissions_prevented_kg,
             "csr_tax_deduction_inr": manifest.csr_tax_deduction_inr,
-            "meals_rescued": int(payload.surplus_kg * 3)
-        }
+            "meals_rescued": int(payload.surplus_kg * 3),
+        },
     }

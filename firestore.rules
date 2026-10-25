@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isCelebrationHost(celebrationId) {
+      return isAuthenticated() &&
+        (request.auth.token.email == resource.data.intake.organizer_email ||
+         request.auth.uid == resource.data.blueprint.organizer_id);
+    }
+
+    function isValidCelebrationPayload() {
+      return request.resource.data.keys().hasAll(['blueprint', 'intake', 'version']) &&
+             request.resource.data.blueprint.expected_guests > 0 &&
+             request.resource.data.blueprint.total_budget > 0;
+    }
+
+    function isValidDecisionEntry() {
+      return request.resource.data.keys().hasAll([
+        'entry_id', 'timestamp', 'event_id', 'what_changed',
+        'why_it_changed', 'calculations_executed', 'human_approved'
+      ]) && request.resource.data.human_approved == true;
+    }
+
+    // Celebrations Root Collection - Tenant Sandboxing
+    match /celebrations/{celebrationId} {
+      allow read: if isAuthenticated() || resource.data.intake.organizer_email != null;
+      allow create: if isAuthenticated() && isValidCelebrationPayload();
+      allow update: if isCelebrationHost(celebrationId) && isValidCelebrationPayload();
+      allow delete: if false; // Celebrations cannot be permanently purged during live events
+
+      // Immutable Decision Ledger Subcollection
+      match /decision_ledger/{entryId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && isValidDecisionEntry();
+        allow update, delete: if false; // Append-only immutable ledger
+      }
+
+      // GenAI Observability Telemetry Traces Subcollection
+      match /telemetry_traces/{traceId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && request.resource.data.trace_id != null;
+        allow update, delete: if false; // Append-only telemetry
+      }
+
+      // Incident Logs Subcollection
+      match /incidents/{incidentId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated();
+        allow delete: if false;
+      }
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

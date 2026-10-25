@@ -5,8 +5,9 @@ adhering to @04_responsible_ai_ethics and domain invariants.
 """
 
 from __future__ import annotations
+
 from enum import Enum
-from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -38,7 +39,7 @@ class CategoryPortionStatus(BaseModel):
     confirmed_inbound: int
     net_shortfall_or_surplus: int  # Negative = Shortfall, Positive = Surplus
     burn_rate_plates_per_min: float = 0.0
-    depletion_projected_minutes: Optional[int] = None
+    depletion_projected_minutes: int | None = None
     supplier_lead_time_minutes: int = 30
     is_critical_shortage: bool = False
 
@@ -65,8 +66,8 @@ class FoodSufficiencyRadar(BaseModel):
     timestamp: str
     overall_attendance_expected: int
     actual_checked_in: int
-    categories: List[CategoryPortionStatus]
+    categories: list[CategoryPortionStatus]
     total_shortfall_count: int
     total_surplus_count: int
-    fssai_manifest: Optional[FSSAISurplusManifest] = None
+    fssai_manifest: FSSAISurplusManifest | None = None
     stale_data_warning: bool = False

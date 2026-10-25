@@ -5,10 +5,11 @@ and @10_security_governance.
 """
 
 from __future__ import annotations
-from enum import Enum
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, EmailStr, field_validator
+
 import re
+from enum import Enum
+
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class EventType(str, Enum):
@@ -40,13 +41,17 @@ class EventPreferences(BaseModel):
     cultural_vibe: str = Field(
         default="Traditional South Indian with classical fusion and sustainable decor",
         min_length=3,
-        max_length=300
+        max_length=300,
     )
-    elders_comfort_priority: bool = Field(default=True, description="Wheelchair routes, seating near dais, quiet dining")
-    healthy_lifestyle_focus: bool = Field(default=True, description="Low-sugar, steamed options, millets, organic produce")
+    elders_comfort_priority: bool = Field(
+        default=True, description="Wheelchair routes, seating near dais, quiet dining"
+    )
+    healthy_lifestyle_focus: bool = Field(
+        default=True, description="Low-sugar, steamed options, millets, organic produce"
+    )
     kids_activity_zone: bool = Field(default=True, description="Dedicated play area, craft tables, child-safe menu")
     sound_curfew_time: str = Field(default="22:00", description="Strict police acoustic limit cutoff")
-    special_notes: Optional[str] = Field(default=None, max_length=500)
+    special_notes: str | None = Field(default=None, max_length=500)
 
 
 class EventIntakeRequest(BaseModel):
@@ -112,11 +117,11 @@ class EventBlueprint(BaseModel):
     total_budget: int
     currency: str
     executive_summary: str
-    personalized_themes: List[str]
-    intergenerational_features: List[str]  # Elders, young adults, children specific arrangements
-    milestones: List[MilestoneItem]
-    vendor_slas: List[VendorSLAItem]
-    initial_risks_and_contingencies: List[str]
-    unverified_assumptions: List[str]
+    personalized_themes: list[str]
+    intergenerational_features: list[str]  # Elders, young adults, children specific arrangements
+    milestones: list[MilestoneItem]
+    vendor_slas: list[VendorSLAItem]
+    initial_risks_and_contingencies: list[str]
+    unverified_assumptions: list[str]
     created_at: str
     version: int = 1

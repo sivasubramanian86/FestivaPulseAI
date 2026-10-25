@@ -1,0 +1,364 @@
+"""Unit tests for FestivaPulseAI Services.
+
+Validates GeminiOrchestratorService, MultimodalService, StorageService, and CacheService.
+"""
+
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from backend.app.models.event import (
+    DietaryRequirement,
+    EventIntakeRequest,
+    EventPreferences,
+    EventType,
+)
+from backend.app.models.incident import (
+    IncidentSubmission,
+    IncidentType,
+)
+from backend.app.services.gemini_service import (
+    GeminiOrchestratorService,
+    gemini_service,
+)
+from backend.app.services.multimodal_service import (
+    MultimodalService,
+)
+from backend.app.services.storage_service import (
+    StorageService,
+)
+
+
+def create_sample_intake() -> EventIntakeRequest:
+    return EventIntakeRequest(
+        event_name="Coimbatore Tech & Cultural Gala",
+        event_type=EventType.COMMUNITY_EVENT,
+        organizer_email="organizer@festivapulse.ai",
+        target_date="2026-11-12",
+        location="Coimbatore",
+        expected_guests=300,
+        max_venue_capacity=350,
+        total_budget=800000,
+        currency="INR",
+        dietary=DietaryRequirement(
+            general_veg_pct=50,
+            vegan_pct=15,
+            jain_pct=15,
+            non_veg_pct=20,
+        ),
+        preferences=EventPreferences(
+            cultural_vibe="Kongu Nadu heritage brass lamps & acoustic classical fusion",
+            elders_comfort_priority=True,
+            healthy_lifestyle_focus=True,
+            kids_activity_zone=True,
+            sound_curfew_time="22:00",
+        ),
+    )
+
+
+@pytest.mark.unit
+class TestGeminiServiceBlueprint:
+    def test_synthesize_local_blueprint_fallback(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        raw_json, exec_summary, themes, intergen = service._synthesize_local_blueprint(intake)
+
+        assert "Kongu Nadu" in exec_summary
+        assert len(themes) == 4
+        assert len(intergen) >= 2
+
+    def test_generate_event_blueprint_complete(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        blueprint, telemetry = service.generate_blueprint(intake)
+
+        assert blueprint is not None
+        assert blueprint.event_name == intake.event_name
+        assert blueprint.expected_guests == 300
+        assert blueprint.total_budget == 800000
+        assert len(blueprint.milestones) >= 4
+        assert len(blueprint.vendor_slas) >= 3
+        assert telemetry.latency_ms >= 0
+        assert telemetry.dynamic_diff_summary != ""
+
+    def test_generate_blueprint_with_mock_client_success(self):
+        service = GeminiOrchestratorService()
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = """{
+            "executive_summary": "AI Generated Luxury Wedding Plan",
+            "personalized_themes": ["Royal Grandeur", "Sustainable Chic"],
+            "intergenerational_features": ["Elder Ramp", "Kids Play Area"]
+        }"""
+        mock_client.models.generate_content.return_value = mock_response
+        service._client = mock_client
+
+        intake = create_sample_intake()
+        blueprint, telemetry = service.generate_blueprint(intake)
+        assert blueprint is not None
+        assert telemetry.is_live_call is True
+        assert blueprint.executive_summary == "AI Generated Luxury Wedding Plan"
+
+    def test_generate_blueprint_with_mock_client_exception_falls_back(self):
+        service = GeminiOrchestratorService()
+        mock_client = MagicMock()
+        mock_client.models.generate_content.side_effect = RuntimeError("Vertex AI Quota Exceeded")
+        service._client = mock_client
+
+        intake = create_sample_intake()
+        blueprint, telemetry = service.generate_blueprint(intake)
+        assert blueprint is not None
+        assert blueprint.event_name == intake.event_name
+
+    def test_gemini_service_init_auth_failure_falls_back(self):
+        with patch("backend.app.services.gemini_service.settings") as mock_settings:
+            mock_settings.GEMINI_API_KEY = "live_key"
+            mock_settings.DEMO_MODE = False
+            with patch("google.genai.Client", side_effect=Exception("Auth Fail")):
+                svc = GeminiOrchestratorService()
+                assert svc._client is None
+
+
+@pytest.mark.unit
+class TestGeminiServiceTriage:
+    def test_triage_attendance_surge_incident(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        incident = IncidentSubmission(
+            event_id="test_event",
+            incident_type=IncidentType.ATTENDANCE_SURGE,
+            entered_values={"new_attendance": 380},
+            observation_time="17:00",
+        )
+        comparison, telemetry = service.synthesize_recovery_options(intake, incident, None)
+        assert comparison is not None
+        assert comparison.candidate_lowest_cost is not None
+        assert comparison.candidate_best_experience is not None
+        assert comparison.candidate_lowest_disruption is not None
+        assert len(comparison.rejected_proposals) > 0  # Rejects exceeding 350 max capacity
+
+    def test_triage_food_shortage_incident(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        incident = IncidentSubmission(
+            event_id="test_event",
+            incident_type=IncidentType.FOOD_SHORTAGE,
+            entered_values={"food_shortage_count": 45, "shortage_category": "General Vegetarian"},
+            observation_time="19:30",
+        )
+        comparison, telemetry = service.synthesize_recovery_options(intake, incident, None)
+        assert comparison is not None
+        assert "ZERO-STOCKOUT" in comparison.system_advisory
+        assert comparison.candidate_lowest_cost.additional_cost <= comparison.candidate_best_experience.additional_cost
+
+    def test_triage_budget_cut_incident(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        incident = IncidentSubmission(
+            event_id="test_event",
+            incident_type=IncidentType.BUDGET_CUT,
+            entered_values={"budget_cut": 50000},
+            observation_time="14:00",
+        )
+        comparison, telemetry = service.synthesize_recovery_options(intake, incident, None)
+        assert comparison is not None
+        assert "PARETO RE-OPTIMIZER" in comparison.system_advisory
+        assert len(comparison.candidate_lowest_cost.action_items) >= 2
+
+    def test_triage_timeline_delay_incident(self):
+        service = GeminiOrchestratorService()
+        intake = create_sample_intake()
+        incident = IncidentSubmission(
+            event_id="test_event",
+            incident_type=IncidentType.TIMELINE_DELAY,
+            entered_values={"delay_minutes": 40},
+            observation_time="16:30",
+        )
+        comparison, telemetry = service.synthesize_recovery_options(intake, incident, None)
+        assert comparison is not None
+        assert "CRITICAL PATH ADJUSTMENT" in comparison.system_advisory
+
+    def test_triage_with_mock_client_success(self):
+        service = GeminiOrchestratorService()
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = """{
+            "proposals": [
+                {
+                    "strategy_type": "Lowest Additional Cost",
+                    "summary": "Internal Hall Reconfiguration",
+                    "additional_cost": 5000,
+                    "remaining_budget_projected": 795000,
+                    "guests_covered": 50,
+                    "timeline_impact_minutes": 10,
+                    "vendor_dependencies": ["Venue Manager"],
+                    "unresolved_constraints": [],
+                    "actions_requiring_human_approval": ["Authorize ₹5,000 chair rental"],
+                    "is_feasible": true,
+                    "action_items": ["Open second indoor hall", "Add 50 plastic chairs"]
+                },
+                {
+                    "strategy_type": "Best Guest Experience",
+                    "summary": "Premium Waterproof Canopy",
+                    "additional_cost": 35000,
+                    "remaining_budget_projected": 765000,
+                    "guests_covered": 50,
+                    "timeline_impact_minutes": 0,
+                    "vendor_dependencies": ["Tent Decorator"],
+                    "unresolved_constraints": [],
+                    "actions_requiring_human_approval": ["Authorize ₹35,000 tent contract"],
+                    "is_feasible": true,
+                    "action_items": ["Erect clear German hangar tent", "Install mist fans"]
+                },
+                {
+                    "strategy_type": "Lowest Operational Disruption",
+                    "summary": "Staggered Timeline Shift",
+                    "additional_cost": 10000,
+                    "remaining_budget_projected": 790000,
+                    "guests_covered": 50,
+                    "timeline_impact_minutes": 20,
+                    "vendor_dependencies": ["Caterer"],
+                    "unresolved_constraints": [],
+                    "actions_requiring_human_approval": ["Approve 20-min dinner delay"],
+                    "is_feasible": true,
+                    "action_items": ["Extend photo-op session", "Serve mocktails inside foyer"]
+                }
+            ],
+            "rejected_proposal": {
+                "strategy_type": "Best Guest Experience",
+                "summary": "Cram extra guests into single dining hall",
+                "additional_cost": 0,
+                "remaining_budget_projected": 800000,
+                "guests_covered": 50,
+                "timeline_impact_minutes": 0,
+                "vendor_dependencies": [],
+                "unresolved_constraints": ["Fire exit aisle clearance blocked"],
+                "actions_requiring_human_approval": [],
+                "is_feasible": false,
+                "action_items": [],
+                "infeasibility_reason": "Violates HSE fire capacity codes (0.8 persons/sqm maximum)"
+            },
+            "system_advisory": "Approved recovery proposals generated successfully."
+        }"""
+        mock_client.models.generate_content.return_value = mock_response
+        service._client = mock_client
+
+        intake = create_sample_intake()
+        incident = IncidentSubmission(
+            event_id="test_event",
+            incident_type=IncidentType.ATTENDANCE_SURGE,
+            entered_values={"new_attendance": 350},
+            observation_time="18:00",
+        )
+        comparison, telemetry = service.synthesize_recovery_options(intake, incident, None)
+        assert comparison is not None
+        assert telemetry.is_live_call is True
+        assert comparison.candidate_lowest_cost.summary == "Internal Hall Reconfiguration"
+        assert comparison.rejected_proposals[0].is_feasible is False
+
+
+@pytest.mark.unit
+class TestMultimodalService:
+    def test_extract_vendor_quote(self):
+        svc = MultimodalService()
+        res = svc.extract_vendor_quote("sample_quote.jpg", "Eco-friendly Jasmine Arch 45000")
+        assert res["vendor_name"] is not None
+        assert res["total_extracted_amount"] > 0
+        assert res["requires_human_verification"] is True
+
+    def test_analyze_voice_memo(self):
+        svc = MultimodalService()
+        # 1. Attendance Surge
+        res_surge = svc.parse_voice_memo("There are 50 extra guests arriving at reception")
+        assert res_surge["detected_incident"] == "ATTENDANCE_SURGE"
+        assert res_surge["extracted_parameters"]["new_guests"] == 50
+        assert res_surge["confidence"] > 0.8
+
+        # 2. Timeline Delay
+        res_delay = svc.parse_voice_memo("The priest is late by 45 minutes")
+        assert res_delay["detected_incident"] == "TIMELINE_DELAY"
+        assert res_delay["extracted_parameters"]["delay_minutes"] == 45
+
+        # 3. Food Shortage
+        res_food = svc.parse_voice_memo("We are short by 30 portions of food")
+        assert res_food["detected_incident"] == "FOOD_SHORTAGE"
+        assert res_food["extracted_parameters"]["shortage_count"] == 30
+
+        # 4. General Note
+        res_note = svc.parse_voice_memo("Please check the floral background lighting")
+        assert res_note["detected_incident"] == "GENERAL_NOTE"
+
+    def test_verify_multilingual_compliance(self):
+        svc = MultimodalService()
+        # Supported language
+        res_ta = svc.verify_multilingual_compliance("Mandapam decor verified", "ta")
+        assert res_ta["verified"] is True
+        assert len(res_ta["detected_glossary_terms"]) > 0
+        # Unsupported fallback
+        res_other = svc.verify_multilingual_compliance("Hello world", "french")
+        assert res_other["verified"] is True
+
+
+@pytest.mark.unit
+class TestStorageAndCacheServices:
+    def test_storage_service_lifecycle(self):
+        storage = StorageService()
+        intake = create_sample_intake()
+        bp, tel = gemini_service.generate_blueprint(intake)
+        state = storage.save_event(bp, intake)
+        assert state.blueprint.id == bp.id
+        assert storage.get_event(bp.id) is not None
+        assert len(storage.list_events()) >= 1
+
+        # Record decision
+        entry = storage.record_decision(
+            event_id=bp.id,
+            what_changed="Added chairs",
+            why_it_changed="Surge",
+            original_values={"chairs": 100},
+            revised_values={"chairs": 150},
+            calculation_proof="100+50",
+            gemini_recommendation="Add chairs",
+        )
+        assert entry.entry_id.startswith("DEC-")
+
+        # Record telemetry
+        storage.record_telemetry(bp.id, tel)
+        assert len(storage.get_event(bp.id).telemetry_traces) >= 1
+
+    def test_storage_service_missing_event_raises(self):
+        storage = StorageService()
+        with pytest.raises(ValueError, match="not found"):
+            storage.record_decision(
+                event_id="DOES_NOT_EXIST",
+                what_changed="X",
+                why_it_changed="Y",
+                original_values={},
+                revised_values={},
+                calculation_proof="Z",
+                gemini_recommendation="W",
+            )
+
+    def test_cache_service(self):
+        from backend.app.services.cache_service import MemoryCacheService
+
+        cache = MemoryCacheService(max_entries=2, ttl_seconds=10)
+        cache.set("events", {"id": "test_1"}, {"data": 123})
+        assert cache.get("events", {"id": "test_1"}) == {"data": 123}
+        assert cache.get("events", {"id": "missing"}) is None
+
+        # Test capacity eviction
+        cache.set("events", {"id": "test_2"}, {"data": 456})
+        cache.set("events", {"id": "test_3"}, {"data": 789})
+        # test_1 should be evicted because max_entries=2
+        assert cache.get("events", {"id": "test_1"}) is None
+        assert cache.get("events", {"id": "test_3"}) == {"data": 789}
+
+        # Test TTL expiration
+        cache_expired = MemoryCacheService(ttl_seconds=-1)
+        cache_expired.set("events", {"id": "expired"}, {"data": 999})
+        assert cache_expired.get("events", {"id": "expired"}) is None
+
+        # Clear
+        cache.clear()
+        assert cache.get("events", {"id": "test_2"}) is None

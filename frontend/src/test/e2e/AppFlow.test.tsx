@@ -1,0 +1,140 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { App } from '../../App';
+import { api } from '../../services/api';
+
+vi.mock('../../services/api', () => ({
+  api: {
+    createEvent: vi.fn().mockResolvedValue({
+      event_id: 'EVT-APP-E2E',
+      blueprint: {
+        id: 'EVT-APP-E2E',
+        event_name: 'Tirunelveli Tamil-English Community Celebration',
+        event_type: 'Community Event',
+        location: 'Tirunelveli Town Hall & Lawns',
+        target_date: '2026-11-12',
+        expected_guests: 250,
+        max_venue_capacity: 350,
+        total_budget: 500000,
+        currency: 'INR',
+        executive_summary: 'Harmonious eco celebration',
+        personalized_themes: ['Heritage'],
+        intergenerational_features: ['Kids zone'],
+        milestones: [
+          {
+            phase: 'Day of Event',
+            task_name: 'Traditional Feast Service',
+            owner: 'Catering Head',
+            is_completed: false,
+            deadline: '19:45',
+          },
+        ],
+        vendor_slas: [],
+        initial_risks_and_contingencies: [],
+        unverified_assumptions: [],
+        created_at: new Date().toISOString(),
+        version: 1,
+      },
+      ledger: {
+        event_id: 'EVT-APP-E2E',
+        approved_total_budget: 500000,
+        currency: 'INR',
+        categories: [],
+        total_spent: 100000,
+        total_committed_unpaid: 150000,
+        total_uncommitted_planned: 250000,
+        total_accounted_funds: 500000,
+        remaining_unallocated_funds: 0,
+        is_balanced: true,
+      },
+      food_radar: {
+        event_id: 'EVT-APP-E2E',
+        timestamp: new Date().toISOString(),
+        overall_attendance_expected: 250,
+        actual_checked_in: 0,
+        categories: [],
+        total_shortfall_count: 0,
+        total_surplus_count: 0,
+        fssai_manifest: null,
+        stale_data_warning: false,
+      },
+      timeline: [],
+      telemetry: {
+        trace_id: 'TEL-123',
+        timestamp: new Date().toISOString(),
+        task_type: 'BLUEPRINT_SYNTHESIS',
+        input_hash: 'abc',
+        token_count: 850,
+        prompt_tokens: 450,
+        completion_tokens: 400,
+        estimated_cost_usd: 0.0003,
+        latency_ms: 120,
+        model_name: 'gemini-2.5-flash',
+        is_live_call: true,
+        grounding_score: 0.98,
+        arithmetic_operations_delegated: 4,
+      },
+    }),
+    updatePulse: vi.fn(),
+    proposeRecovery: vi.fn(),
+    approveRecovery: vi.fn(),
+    generateFssaiManifest: vi.fn(),
+    runQATestSuite: vi.fn().mockResolvedValue({
+      all_passed: true,
+      passed_tests: 7,
+      failed_tests: 0,
+      total_tests: 7,
+      total_duration_ms: 10.0,
+      results: [],
+    }),
+  },
+}));
+
+describe('App End-to-End User Flow Tests', () => {
+  it('initializes default celebration and enables full navigation across all modules', async () => {
+    render(<App />);
+
+    // 1. App Header and default Blueprint loaded
+    await waitFor(() => {
+      expect(screen.getByText('FestivaPulseAI')).toBeInTheDocument();
+      expect(api.createEvent).toHaveBeenCalled();
+      expect(
+        screen.getByText('Tirunelveli Tamil-English Community Celebration')
+      ).toBeInTheDocument();
+    });
+
+    // 2. Navigate to Live Pulse tab
+    const pulseTab = screen.getByRole('button', { name: /Live Event Pulse/i });
+    fireEvent.click(pulseTab);
+    expect(screen.getByText(/Event Pulse & Live Field Cockpit/i)).toBeInTheDocument();
+
+    // 3. Navigate to Rescue Studio tab
+    const rescueTab = screen.getByRole('button', { name: /Rescue Studio/i });
+    fireEvent.click(rescueTab);
+    expect(screen.getByText('Rescue Studio Ready')).toBeInTheDocument();
+
+    // 4. Navigate to Decision Ledger tab
+    const ledgerTab = screen.getByRole('button', { name: /Decision Ledger/i });
+    fireEvent.click(ledgerTab);
+    expect(screen.getByText('Decision Ledger Empty')).toBeInTheDocument();
+
+    // 5. Navigate to Scenario Lab tab
+    const scenarioTab = screen.getByRole('button', { name: /Stress Lab|Scenario Lab/i });
+    fireEvent.click(scenarioTab);
+    expect(screen.getByText(/Scenario Lab: Reversible What-If Sandbox/i)).toBeInTheDocument();
+
+    // 6. Open QA Verification Modal from header
+    const qaBtn = screen.getByRole('button', { name: /Run QA/i });
+    fireEvent.click(qaBtn);
+    expect(
+      screen.getByText(/Automated Domain Invariant & Edge-Case Test Runner/i)
+    ).toBeInTheDocument();
+
+    // Close QA Modal
+    const closeBtn = screen.getByRole('button', { name: 'Close' });
+    fireEvent.click(closeBtn);
+    expect(
+      screen.queryByText(/Automated Domain Invariant & Edge-Case Test Runner/i)
+    ).not.toBeInTheDocument();
+  });
+});

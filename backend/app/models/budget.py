@@ -5,7 +5,7 @@ spent and committed amounts, adhering to @02_system_architect.
 """
 
 from __future__ import annotations
-from typing import List
+
 from pydantic import BaseModel, Field
 
 
@@ -15,7 +15,9 @@ class BudgetCategoryItem(BaseModel):
     spent_amount: int
     committed_unpaid: int
     uncommitted_planned: int
-    is_protected_anchor: bool = Field(default=False, description="Protected from cuts (e.g. Accessibility, Security, Core Food)")
+    is_protected_anchor: bool = Field(
+        default=False, description="Protected from cuts (e.g. Accessibility, Security, Core Food)"
+    )
     notes: str = ""
 
 
@@ -30,7 +32,7 @@ class BudgetLedger(BaseModel):
     projected_final_cost: int
     variance: int  # approved_total - projected_final_cost (Negative = Deficit)
     is_in_deficit: bool = False
-    categories: List[BudgetCategoryItem]
+    categories: list[BudgetCategoryItem]
 
 
 class BudgetParetoRebalance(BaseModel):
@@ -40,6 +42,6 @@ class BudgetParetoRebalance(BaseModel):
     protected_anchor_total: int
     pruned_elastic_total: int
     rationale: str
-    rebalanced_categories: List[BudgetCategoryItem]
+    rebalanced_categories: list[BudgetCategoryItem]
     is_feasible: bool
     unresolved_deficit: int = 0

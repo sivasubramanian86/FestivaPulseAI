@@ -120,13 +120,13 @@ export const EventPulse: React.FC<EventPulseProps> = ({
               <span className="font-semibold text-emerald-700">Protected</span>
             </div>
             <div className="text-xl font-bold text-slate-900">
-              ₹{ledger?.spent_total.toLocaleString() || '120,000'}{' '}
+              ₹{ledger?.spent_total?.toLocaleString() ?? '120,000'}{' '}
               <span className="text-xs font-normal text-slate-500">
                 / ₹{blueprint.total_budget.toLocaleString()} Approved
               </span>
             </div>
             <span className="text-[11px] text-slate-500 block mt-1">
-              Committed: ₹{ledger?.committed_unpaid_total.toLocaleString() || '180,000'} | Contingency: ₹{ledger?.contingency_allocation.toLocaleString() || '25,000'}
+              Committed: ₹{ledger?.committed_unpaid_total?.toLocaleString() ?? '180,000'} | Contingency: ₹{ledger?.contingency_allocation?.toLocaleString() ?? '25,000'}
             </span>
           </div>
 

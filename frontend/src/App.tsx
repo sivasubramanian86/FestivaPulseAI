@@ -7,6 +7,8 @@ import { DecisionLedger } from './components/DecisionLedger';
 import { ScenarioLab } from './components/ScenarioLab';
 import { GenAIXRayDrawer } from './components/GenAIXRayDrawer';
 import { QATestRunnerModal } from './components/QATestRunnerModal';
+import { ThemeProvider } from './context/ThemeContext';
+import { I18nProvider, useTranslation } from './i18n/I18nContext';
 import { api } from './services/api';
 import {
   EventBlueprint,
@@ -19,11 +21,10 @@ import {
   EventIntakeRequest,
 } from './types';
 
-export const App: React.FC = () => {
+const MainCockpit: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'blueprint' | 'pulse' | 'rescue' | 'ledger' | 'scenario'>('blueprint');
   const [xrayOpen, setXrayOpen] = useState(false);
   const [qaModalOpen, setQaModalOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   // Application State
   const [blueprint, setBlueprint] = useState<EventBlueprint | null>(null);
@@ -34,6 +35,7 @@ export const App: React.FC = () => {
   const [decisionEntries, setDecisionEntries] = useState<DecisionLedgerEntry[]>([]);
   const [latestTelemetry, setLatestTelemetry] = useState<GenAITelemetryTrace | null>(null);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   // Initialize with a rich default blueprint on first load
   useEffect(() => {
@@ -94,7 +96,7 @@ export const App: React.FC = () => {
       setFoodRadar(res.food_radar);
       setTimeline(res.timeline);
       setLatestTelemetry(res.telemetry);
-      setXrayOpen(true); // Open telemetry drawer to demonstrate live prompt and response!
+      setXrayOpen(true);
     } catch (err: any) {
       alert(`Generation failed: ${err.message}`);
     } finally {
@@ -102,7 +104,7 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Event Pulse live updates
+  // Handle Ingesting Pulse Check-in
   const handleUpdatePulse = async (data: {
     actual_checked_in: number;
     revised_expected_guests: number;
@@ -111,14 +113,22 @@ export const App: React.FC = () => {
     delay_minutes?: number;
   }) => {
     if (!blueprint) return;
+    setLoading(true);
     try {
       const res = await api.updatePulse(blueprint.id, data);
       if (res.food_radar) setFoodRadar(res.food_radar);
-      if (res.timeline) setTimeline(res.timeline);
+      if (res.new_incident_triggered && res.comparison) {
+        setRescueComparison(res.comparison);
+        setActiveTab('rescue');
+        setXrayOpen(true);
+      }
     } catch (err: any) {
       console.error('Pulse update error:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   // Handle FSSAI Surplus Manifest generation
   const handleGenerateFssaiManifest = async (surplusKg: number, hotTemp: number, coldTemp: number) => {
@@ -130,7 +140,6 @@ export const App: React.FC = () => {
         hot_temp_celsius: hotTemp,
         cold_temp_celsius: coldTemp,
       });
-      // Refresh event
       const refreshed = await api.getEvent(blueprint.id);
       if (refreshed.food_radar) setFoodRadar(refreshed.food_radar);
     } catch (err: any) {
@@ -154,8 +163,8 @@ export const App: React.FC = () => {
       });
       setRescueComparison(res.comparison);
       setLatestTelemetry(res.telemetry);
-      setActiveTab('rescue'); // Automatically switch to Rescue Studio!
-      setXrayOpen(true);     // Display incoming structured alternatives in X-Ray drawer!
+      setActiveTab('rescue');
+      setXrayOpen(true);
     } catch (err: any) {
       alert(`Rescue synthesis failed: ${err.message}`);
     } finally {
@@ -170,12 +179,11 @@ export const App: React.FC = () => {
     try {
       const res = await api.approveProposal(blueprint.id, proposalId, reason);
       setDecisionEntries((prev) => [res.decision_entry, ...prev]);
-      // Reload event
       const updated = await api.getEvent(blueprint.id);
       setBlueprint(updated.blueprint);
       if (updated.ledger) setLedger(updated.ledger);
       alert(`Plan updated to Version v${res.new_version}.0! Stamped into Decision Ledger.`);
-      setActiveTab('ledger'); // Switch to Decision Ledger to show verified audit entry!
+      setActiveTab('ledger');
     } catch (err: any) {
       alert(`Approval error: ${err.message}`);
     } finally {
@@ -184,20 +192,18 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-900">
-      {/* Top Navigation */}
+    <div className="min-h-screen flex flex-col bg-tactical-light dark:bg-tactical-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      {/* Top Command Cockpit Navigation */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         xrayOpen={xrayOpen}
         setXrayOpen={setXrayOpen}
         onOpenQAModal={() => setQaModalOpen(true)}
-        selectedLanguage={selectedLanguage}
-        setSelectedLanguage={setSelectedLanguage}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Operational Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'blueprint' && (
           <CelebrationBlueprint
             blueprint={blueprint}
@@ -237,13 +243,13 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-500">
-        <p className="font-semibold text-slate-700">
-          FestivaPulseAI — Autonomous Multi-Agent Event Architect & Live-Venue Contingency Command Center
+      {/* Cockpit Footer */}
+      <footer className="border-t border-slate-200 dark:border-tactical-darkBorder bg-white/70 dark:bg-tactical-darkSurface/70 py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p className="font-semibold text-slate-700 dark:text-slate-200">
+          FestivaPulseAI — {t.nav.brandSubtitle}
         </p>
         <p className="mt-1">
-          Built for PromptWars Virtual [Challenge 5] | Strict Repository Size &lt; 1.5 MB | WCAG 2.1 AA Compliant
+          Google Cloud Run + Vertex AI (Gemini 2.5 Flash) + Cloud Firestore + Pub/Sub Streaming | WCAG 2.1 AAA Compliant
         </p>
       </footer>
 
@@ -262,4 +268,15 @@ export const App: React.FC = () => {
     </div>
   );
 };
+
+export const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <I18nProvider>
+        <MainCockpit />
+      </I18nProvider>
+    </ThemeProvider>
+  );
+};
+
 export default App;

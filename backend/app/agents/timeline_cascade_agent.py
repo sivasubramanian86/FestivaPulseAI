@@ -5,8 +5,9 @@ and police sound curfew compliance.
 Adheres to @02_system_architect.
 """
 
-from typing import Dict, Any
-from backend.app.agents.base import FestivaAgent, ADKTask
+from typing import Any
+
+from backend.app.agents.base import ADKTask, FestivaAgent
 from backend.app.core.engine import propagate_timeline_delay
 
 
@@ -20,10 +21,10 @@ class TimelineCascadeAgent(FestivaAgent):
                 "Protect contractual windows, detect police sound curfew violations (22:00), "
                 "and prevent food heating cycles from over-holding in kitchen warmers."
             ),
-            model_name="gemini-2.5-flash"
+            model_name="gemini-2.5-flash",
         )
 
-    async def _run_logic(self, task: ADKTask, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
         nodes = context.get("timeline_nodes", [])
         delayed_node_id = context.get("delayed_node_id", "T1")
         delay_minutes = context.get("delay_minutes", 30)
@@ -41,5 +42,5 @@ class TimelineCascadeAgent(FestivaAgent):
             "overtime_penalty_estimated": impact.overtime_penalty_estimated,
             "kitchen_warm_hold_exceeded": impact.kitchen_warm_hold_exceeded,
             "recommendation": impact.recommendation,
-            "propagated_delays": [n.model_dump() for n in impact.propagated_delays]
+            "propagated_delays": [n.model_dump() for n in impact.propagated_delays],
         }

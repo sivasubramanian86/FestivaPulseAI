@@ -1,18 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    background-color: #FAF8F5;
-    color: #1E293B;
+    @apply font-sans antialiased bg-tactical-light text-slate-900 transition-colors duration-200;
+  }
+
+  html.dark body {
+    @apply bg-tactical-dark text-slate-100;
   }
 
   /* Accessible focus rings */
   :focus-visible {
-    outline: 2px solid #0D9488;
+    outline: 2px solid #06B6D4;
     outline-offset: 2px;
   }
+
+  /* Monospace tabular numbers */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Tactical Glassmorphism Card Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+}
+
+html.dark .glass-panel {
+  background: rgba(16, 25, 46, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Custom subtle scrollbar */
@@ -21,12 +44,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1EFEA;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+html.dark ::-webkit-scrollbar-thumb {
+  background: #233252;
 }

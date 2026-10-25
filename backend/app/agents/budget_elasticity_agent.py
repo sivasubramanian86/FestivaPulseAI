@@ -5,8 +5,9 @@ and pruning elastic line items during budget shocks.
 Adheres to @02_system_architect and @19_cost_efficiency_architect.
 """
 
-from typing import Dict, Any
-from backend.app.agents.base import FestivaAgent, ADKTask
+from typing import Any
+
+from backend.app.agents.base import ADKTask, FestivaAgent
 from backend.app.core.engine import rebalance_budget_pareto
 
 
@@ -21,10 +22,10 @@ class BudgetElasticityAgent(FestivaAgent):
                 "prune elastic line items (decor upgrades, extra photography, optional gifts). "
                 "Explicitly refuse deficits that exceed all uncommitted funds."
             ),
-            model_name="gemini-2.5-flash"
+            model_name="gemini-2.5-flash",
         )
 
-    async def _run_logic(self, task: ADKTask, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
         ledger = context.get("ledger")
         revised_budget = context.get("revised_budget", 0)
 
@@ -40,5 +41,5 @@ class BudgetElasticityAgent(FestivaAgent):
             "pruned_elastic_total": rebalance.pruned_elastic_total,
             "rationale": rebalance.rationale,
             "unresolved_deficit": rebalance.unresolved_deficit,
-            "rebalanced_categories": [c.model_dump() for c in rebalance.rebalanced_categories]
+            "rebalanced_categories": [c.model_dump() for c in rebalance.rebalanced_categories],
         }

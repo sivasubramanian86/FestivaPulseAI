@@ -3,16 +3,18 @@
 Adheres to @10_security_governance and @15_ai_evaluator_100.
 """
 
-from fastapi import APIRouter
-from typing import Dict, Any
-from backend.app.config import settings
 import time
+from typing import Any
+
+from fastapi import APIRouter
+
+from backend.app.config import settings
 
 router = APIRouter(tags=["Health"])
 
 
 @router.get("/api/v1/health")
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> dict[str, Any]:
     """Returns system status, active Gemini model, and runtime indicators."""
     return {
         "status": "HEALTHY",
@@ -27,6 +29,6 @@ async def health_check() -> Dict[str, Any]:
             "deterministic_math": True,
             "fssai_compliance": True,
             "rescue_studio_comparison": True,
-            "hitl_approval_required": True
-        }
+            "hitl_approval_required": True,
+        },
     }

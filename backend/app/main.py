@@ -4,29 +4,33 @@ Adheres to @02_system_architect, @07_modern_polyglot_standards, and @10_security
 """
 
 import time
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
 from backend.app.config import settings
 from backend.app.routers.event_routes import router as event_router
-from backend.app.routers.pulse_routes import router as pulse_router
-from backend.app.routers.rescue_routes import router as rescue_router
-from backend.app.routers.qa_routes import router as qa_router
 from backend.app.routers.health_routes import router as health_router
+from backend.app.routers.pulse_routes import router as pulse_router
+from backend.app.routers.qa_routes import router as qa_router
+from backend.app.routers.rescue_routes import router as rescue_router
 
 app = FastAPI(
     title="FestivaPulseAI",
     description="Autonomous Event Resilience Copilot & Day-of-Event Operating System for PromptWars Virtual [Challenge 5]",
-    version="1.0.0"
+    version="1.0.0",
 )
 
-# CORS configuration
+# Standard-compliant CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.ENVIRONMENT == "development" else settings.cors_origin_list,
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["X-Response-Time-Ms", "X-Trace-ID"],
+    max_age=600,
 )
 
 
@@ -55,11 +59,12 @@ async def global_exception_handler(request: Request, exc: Exception):
             "success": False,
             "error_type": type(exc).__name__,
             "message": str(exc),
-            "path": request.url.path
-        }
+            "path": request.url.path,
+        },
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import uvicorn
+
     uvicorn.run("backend.app.main:app", host=settings.HOST, port=settings.PORT, reload=True)

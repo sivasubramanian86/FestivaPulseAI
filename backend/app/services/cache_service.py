@@ -7,12 +7,12 @@ Adheres to @19_cost_efficiency_architect and @02_system_architect.
 import hashlib
 import json
 import time
-from typing import Any, Optional, Dict
+from typing import Any
 
 
 class MemoryCacheService:
     def __init__(self, max_entries: int = 200, ttl_seconds: int = 3600):
-        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._cache: dict[str, dict[str, Any]] = {}
         self._max_entries = max_entries
         self._ttl_seconds = ttl_seconds
 
@@ -21,17 +21,17 @@ class MemoryCacheService:
         hash_digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
         return f"{namespace}:{hash_digest}"
 
-    def get(self, namespace: str, payload: Any) -> Optional[Any]:
+    def get(self, namespace: str, payload: Any) -> Any | None:
         key = self._generate_key(namespace, payload)
         entry = self._cache.get(key)
         if not entry:
             return None
-        
+
         # Check TTL
         if time.time() > entry["expires_at"]:
             del self._cache[key]
             return None
-        
+
         return entry["value"]
 
     def set(self, namespace: str, payload: Any, value: Any) -> None:
@@ -45,7 +45,7 @@ class MemoryCacheService:
         self._cache[key] = {
             "value": value,
             "created_at": now,
-            "expires_at": now + self._ttl_seconds
+            "expires_at": now + self._ttl_seconds,
         }
 
     def clear(self) -> None:
