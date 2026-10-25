@@ -1,0 +1,2 @@
+# FestivaPulseAI Backend Dependencies
+-r ../requirements.txt

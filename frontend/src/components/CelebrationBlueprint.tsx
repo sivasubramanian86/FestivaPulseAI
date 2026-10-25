@@ -151,7 +151,11 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
       setExpectedGuests(0);
       setMaxCapacity(50);
       setTotalBudget(-5000);
-      validateInputs();
+      setValidationErrors([
+        'Organizer email "bad-email-format" is invalid. Please enter an RFC-compliant email.',
+        'Expected guests (0) must be at least 10.',
+        'Total budget (₹-5000) is invalid. Must be at least ₹1,000.',
+      ]);
     }
   };
 

@@ -59,6 +59,7 @@ out/
 # IDE and OS files
 .vscode/
 .idea/
+.codegraph/
 *.swp
 *.swo
 *~
