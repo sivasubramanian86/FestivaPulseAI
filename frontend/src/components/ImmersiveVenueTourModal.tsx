@@ -40,6 +40,7 @@ interface CelebrationTheme {
   category: string;
   tagline: string;
   imageSrc: string;
+  gcsUrl: string;
   imageAlt: string;
   audioName: string;
   audioFrequencies: number[];
@@ -56,7 +57,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Raja Rani Rajasthan Palace Wedding',
     category: 'Royal Heritage',
     tagline: 'Opulent Rajput Fort Grandeur with Marigold Arches, Golden Torches & Royal Fanfare',
-    imageSrc: '/assets/cultural_themes.jpg',
+    imageSrc: '/assets/theme_raja_rani.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_raja_rani.jpg',
     imageAlt: 'Raja Rani Royal Wedding Theme',
     audioName: 'Royal Shehnai Fanfare & Nagada Drone',
     audioFrequencies: [130.81, 196.0, 261.63, 392.0],
@@ -76,7 +78,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Tamil Brahmin Grand Temple Kalyanam',
     category: 'Vedic Temple Heritage',
     tagline: 'Sacred Gopuram Sanctum, Brass Kuthuvilakku Lamps, Vedic Chants & Fresh Lotus Arches',
-    imageSrc: '/assets/cultural_themes.jpg',
+    imageSrc: '/assets/theme_tamil_brahmin.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_tamil_brahmin.jpg',
     imageAlt: 'Tamil Brahmin Kalyanam Theme',
     audioName: 'Temple Nadaswaram & Thavil Drone (Sa-Pa-Sa)',
     audioFrequencies: [138.59, 207.65, 277.18],
@@ -96,7 +99,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Grand Church Cathedral Nuptial Mass',
     category: 'Christian Nuptials',
     tagline: 'Majestic Stained Glass Gothic Sanctuary, White Floral Aisle & Angelic Choral Harmony',
-    imageSrc: '/assets/cultural_themes.jpg',
+    imageSrc: '/assets/theme_church_cathedral.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_church_cathedral.jpg',
     imageAlt: 'Grand Church Cathedral Wedding',
     audioName: 'Cathedral Pipe Organ & Choral Resonance',
     audioFrequencies: [130.81, 164.81, 196.0, 261.63, 329.63],
@@ -116,7 +120,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Royal Muslim Maharaja Nikah & Walima',
     category: 'Mughal Aristocracy',
     tagline: 'Emerald & Ivory Jaali Pavilion, Scented Oudh Misting & Devotional Sufi Qawwali',
-    imageSrc: '/assets/cultural_themes.jpg',
+    imageSrc: '/assets/theme_muslim_nikah.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_muslim_nikah.jpg',
     imageAlt: 'Royal Muslim Nikah Theme',
     audioName: 'Sufi Harmonium & Rubab Devotional Drone',
     audioFrequencies: [146.83, 220.0, 293.66, 440.0],
@@ -136,7 +141,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Ultra-Modern Billionaire Extravaganza',
     category: 'Limitless Luxury',
     tagline: 'Tiered Crystal Chandeliers, Drone Light Show, Floating Floral Fountains & Global Couture',
-    imageSrc: '/assets/modern_themes.jpg',
+    imageSrc: '/assets/theme_ambani_luxury.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_ambani_luxury.jpg',
     imageAlt: 'Ambani Style Billionaire Wedding',
     audioName: 'Symphonic Strings & Philharmonic Resonance',
     audioFrequencies: [130.81, 196.0, 246.94, 329.63, 493.88],
@@ -156,7 +162,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Gen Z Neon Techno After-Party & Sangeet',
     category: 'Trendsetter & Party',
     tagline: 'Cyberpunk Laser Light Shows, LED Cocktail Bar, 128 BPM Sound System & Silent Disco',
-    imageSrc: '/assets/modern_themes.jpg',
+    imageSrc: '/assets/theme_genz_neon.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_genz_neon.jpg',
     imageAlt: 'Gen Z Neon Techno Party Theme',
     audioName: 'Electronic 808 Synth Bassline & Rhythmic Pulse',
     audioFrequencies: [55.0, 110.0, 220.0],
@@ -176,7 +183,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Eco-Friendly Community Harvest Festival',
     category: 'Sustainable & Folk',
     tagline: 'Zero-Waste Bamboo Pavilions, Banana Leaf Dining, Earthen Matkas & Live Folk Flute',
-    imageSrc: '/assets/modern_themes.jpg',
+    imageSrc: '/assets/theme_eco_harvest.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_eco_harvest.jpg',
     imageAlt: 'Eco Harvest Community Theme',
     audioName: 'Earthen Bamboo Flute & Folk Whistle Harmonics',
     audioFrequencies: [174.61, 261.63, 349.23],
@@ -196,7 +204,8 @@ const CELEBRATION_THEMES: CelebrationTheme[] = [
     name: 'Smart Economy / Intimate Courtyard Wedding',
     category: 'Budget-Optimized Dignity',
     tagline: 'Warm Brass Diyas, Rustic Stone Archways, Intimate 80-Guest Banquet & Acoustic Melody',
-    imageSrc: '/assets/modern_themes.jpg',
+    imageSrc: '/assets/theme_economy_courtyard.jpg',
+    gcsUrl: 'https://storage.googleapis.com/festivapulse-cloud-assets/themes/theme_economy_courtyard.jpg',
     imageAlt: 'Economy Intimate Courtyard Theme',
     audioName: 'Acoustic Courtyard Guitar & Sitar Resonance',
     audioFrequencies: [146.83, 196.0, 293.66],
@@ -553,11 +562,18 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
               <div className="rounded-3xl border-2 border-amber-400/50 overflow-hidden shadow-xl bg-gradient-to-b from-white to-[#FDFBF7] dark:from-[#1D1630] dark:to-[#140F22]">
                 <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full overflow-hidden bg-slate-950">
                   <img
+                    key={selectedTheme.id}
                     src={selectedTheme.imageSrc}
                     alt={selectedTheme.imageAlt}
-                    className="w-full h-full object-cover object-center filter brightness-[0.9] hover:scale-102 transition-transform duration-700"
+                    className="w-full h-full object-cover object-center filter brightness-[0.9] hover:scale-102 transition-all duration-500 animate-in fade-in"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+
+                  {/* GCS Bucket Synced Badge */}
+                  <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-amber-400/30 text-[10px] text-amber-200 font-mono flex items-center gap-1.5 shadow-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>GCS Bucket Synced: gs://festivapulse-cloud-assets/themes/{selectedTheme.id}.jpg</span>
+                  </div>
 
                   <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
                     <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500 text-slate-950 inline-block mb-2">

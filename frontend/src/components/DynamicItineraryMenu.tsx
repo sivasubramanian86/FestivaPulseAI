@@ -171,7 +171,9 @@ export const DynamicItineraryMenu: React.FC<DynamicItineraryMenuProps> = ({
   initialGuests = 250,
   dietary,
 }) => {
-  const [selectedLocation, setSelectedLocation] = useState<LocationProfile>(REGIONAL_LOCATIONS[0]);
+  const [selectedLocation, setSelectedLocation] = useState<LocationProfile>(
+    REGIONAL_LOCATIONS.find((l) => l.id === 'bangalore') || REGIONAL_LOCATIONS[3]
+  );
   const [duration, setDuration] = useState<DurationTier>('1d');
   const [budgetTier, setBudgetTier] = useState<BudgetTier>('royal');
   const [guestCount, setGuestCount] = useState<number>(initialGuests);

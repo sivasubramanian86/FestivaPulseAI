@@ -9,13 +9,13 @@ vi.mock('../../services/api', () => ({
       event_id: 'EVT-APP-E2E',
       blueprint: {
         id: 'EVT-APP-E2E',
-        event_name: 'Tirunelveli Tamil-English Community Celebration',
+        event_name: 'Bengaluru Grand Palace Grounds Royal Celebration',
         event_type: 'Community Event',
-        location: 'Tirunelveli Town Hall & Lawns',
+        location: 'Palace Grounds Botanical Glasshouse & Lawns, Bengaluru',
         target_date: '2026-11-12',
-        expected_guests: 250,
-        max_venue_capacity: 350,
-        total_budget: 500000,
+        expected_guests: 350,
+        max_venue_capacity: 500,
+        total_budget: 1200000,
         currency: 'INR',
         executive_summary: 'Harmonious eco celebration',
         personalized_themes: ['Heritage'],
@@ -99,7 +99,7 @@ describe('App End-to-End User Flow Tests', () => {
       expect(screen.getByText('FestivaPulseAI')).toBeInTheDocument();
       expect(api.createEvent).toHaveBeenCalled();
       expect(
-        screen.getByText('Tirunelveli Tamil-English Community Celebration')
+        screen.getByText('Bengaluru Grand Palace Grounds Royal Celebration')
       ).toBeInTheDocument();
     });
 

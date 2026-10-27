@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from backend.app.config import settings
 from backend.app.models.incident import IncidentSubmission
 from backend.app.services.firestore_service import firestore_service
+from backend.app.agents.supervisor import supervisor_agent
 from backend.app.services.gemini_service import gemini_service
 from backend.app.services.monitoring_service import monitoring_service
 from backend.app.services.pubsub_service import pubsub_service
@@ -34,10 +35,16 @@ async def propose_recovery_options(event_id: str, incident: IncidentSubmission) 
     await pubsub_service.publish_chaos_incident(event_id, incident.model_dump())
     monitoring_service.record_gemini_latency(telemetry.latency_ms, settings.GEMINI_MODEL, "rescue_triage")
 
+    # ADK Multi-Agent Swarm Crisis Orchestration
+    adk_crisis_output = await supervisor_agent.coordinate_crisis_recovery(
+        incident.incident_type, incident.entered_values, state.intake.model_dump()
+    )
+
     return {
         "success": True,
         "comparison": comparison.model_dump(),
         "telemetry": telemetry.model_dump(),
+        "adk_crisis_output": adk_crisis_output,
     }
 
 

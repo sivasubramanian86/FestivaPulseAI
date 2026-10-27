@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, status
 
+from backend.app.agents.supervisor import EventSupervisorAgent
 from backend.app.config import settings
 from backend.app.core.engine import (
     calculate_budget_ledger,
@@ -22,6 +23,7 @@ from backend.app.services.monitoring_service import monitoring_service
 from backend.app.services.storage_service import EventState, storage_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Event"])
+adk_supervisor = EventSupervisorAgent()
 
 
 def _initialize_event_state(state: EventState) -> None:
@@ -156,13 +158,16 @@ def _initialize_event_state(state: EventState) -> None:
 async def create_event(intake: EventIntakeRequest) -> dict[str, Any]:
     """Creates a new celebration from natural-language structured intake."""
     try:
-        # 1. Generate blueprint and telemetry
+        # 1. Coordinate through ADK Supervisor Agent
+        adk_plan = await adk_supervisor.coordinate_plan_generation(intake.model_dump())
+
+        # 2. Generate blueprint and telemetry
         blueprint, telemetry = gemini_service.generate_blueprint(intake)
 
-        # 2. Save in storage
+        # 3. Save in storage
         state = storage_service.save_event(blueprint, intake)
 
-        # 3. Initialize initial state (deterministic ledger, food radar, timeline)
+        # 4. Initialize initial state (deterministic ledger, food radar, timeline)
         _initialize_event_state(state)
 
         # Record telemetry
@@ -179,6 +184,7 @@ async def create_event(intake: EventIntakeRequest) -> dict[str, Any]:
             "food_radar": state.food_radar.model_dump(),
             "timeline": [t.model_dump() for t in state.timeline_nodes],
             "telemetry": telemetry.model_dump(),
+            "adk_swarm_output": adk_plan,
         }
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
@@ -227,15 +233,15 @@ async def list_presets() -> list[dict[str, Any]]:
     return [
         {
             "id": "PRESET-1",
-            "name": "Grand Community Diwali & Cultural Fest",
+            "name": "Bengaluru Grand Palace Grounds Royal Celebration",
             "type": "Community Event",
-            "location": "Tirunelveli Town Hall & Lawns",
+            "location": "Palace Grounds Botanical Glasshouse & Lawns, Bengaluru",
             "date": "2026-11-12",
-            "guests": 250,
-            "max_capacity": 350,
-            "budget": 500000,
+            "guests": 350,
+            "max_capacity": 500,
+            "budget": 1200000,
             "currency": "INR",
-            "vibe": "Eco-friendly Tamil heritage with live classical fusion & organic banana leaf feast",
+            "vibe": "Eco-friendly royal Karnataka heritage with live Carnatic-Western fusion & authentic Mysore Pak banquet",
         },
         {
             "id": "PRESET-2",

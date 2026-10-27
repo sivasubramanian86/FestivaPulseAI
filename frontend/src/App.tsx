@@ -38,6 +38,46 @@ const MainCockpit: React.FC = () => {
   const [decisionEntries, setDecisionEntries] = useState<DecisionLedgerEntry[]>([]);
   const [latestTelemetry, setLatestTelemetry] = useState<GenAITelemetryTrace | null>(null);
   const [loading, setLoading] = useState(false);
+  const [gpsLocation, setGpsLocation] = useState<string>('Palace Grounds Botanical Glasshouse & Lawns, Bengaluru');
+  const [gpsDetecting, setGpsDetecting] = useState<boolean>(false);
+  const [gpsCoords, setGpsCoords] = useState<string | null>('12.9716° N, 77.5946° E');
+
+  const handleDetectGpsVenue = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+    setGpsDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setGpsCoords(`${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E`);
+        let venue = `GPS Local Venue (${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E)`;
+        if (Math.abs(latitude - 12.97) < 0.8 && Math.abs(longitude - 77.59) < 0.8) {
+          venue = 'Palace Grounds Botanical Glasshouse & Lawns, Bengaluru';
+        } else if (Math.abs(latitude - 13.08) < 0.8 && Math.abs(longitude - 80.27) < 0.8) {
+          venue = 'Chennai Heritage Kalyana Mandapam, T. Nagar';
+        } else if (Math.abs(latitude - 19.07) < 0.8 && Math.abs(longitude - 72.87) < 0.8) {
+          venue = 'Jio World Convention Centre, BKC, Mumbai';
+        } else if (Math.abs(latitude - 28.61) < 0.8 && Math.abs(longitude - 77.20) < 0.8) {
+          venue = 'The Grand Ballroom & Haveli Lawns, New Delhi';
+        } else if (Math.abs(latitude - 8.73) < 0.8 && Math.abs(longitude - 77.70) < 0.8) {
+          venue = 'Tirunelveli Town Hall & Lawns';
+        }
+        setGpsLocation(venue);
+        if (blueprint) {
+          setBlueprint({ ...blueprint, location: venue });
+        }
+        setGpsDetecting(false);
+      },
+      (err) => {
+        console.warn('GPS detection fallback:', err.message);
+        setGpsDetecting(false);
+        setGpsCoords('12.9716° N, 77.5946° E (Default)');
+      },
+      { timeout: 8000 }
+    );
+  };
 
   // Initialize with a rich default blueprint on first load
   useEffect(() => {
@@ -45,14 +85,14 @@ const MainCockpit: React.FC = () => {
       setLoading(true);
       try {
         const initialIntake: EventIntakeRequest = {
-          event_name: 'Tirunelveli Tamil-English Community Celebration',
+          event_name: 'Bengaluru Grand Palace Grounds Royal Celebration',
           event_type: 'Community Event',
           organizer_email: 'siva@festivapulse.org',
           target_date: '2026-11-12',
-          location: 'Tirunelveli Town Hall & Lawns',
-          expected_guests: 250,
-          max_venue_capacity: 350,
-          total_budget: 500000,
+          location: 'Palace Grounds Botanical Glasshouse & Lawns, Bengaluru',
+          expected_guests: 350,
+          max_venue_capacity: 500,
+          total_budget: 1200000,
           currency: 'INR',
           dietary: {
             general_veg_pct: 70,
@@ -64,7 +104,7 @@ const MainCockpit: React.FC = () => {
             staff_vendor_meals_count: 20,
           },
           preferences: {
-            cultural_vibe: 'Eco-friendly Tamil heritage with live classical fusion & organic banana leaf feast',
+            cultural_vibe: 'Eco-friendly royal Karnataka heritage with live Carnatic-Western fusion & authentic Mysore Pak banquet',
             elders_comfort_priority: true,
             healthy_lifestyle_focus: true,
             kids_activity_zone: true,
@@ -232,20 +272,30 @@ const MainCockpit: React.FC = () => {
                 Where timeless cultural grandeur meets autonomous multi-agent chaos resilience. Zero math hallucinations, zero food waste, and 100% serene celebrations for families and coordinators.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-amber-200/90 font-mono">
+              <div className="flex flex-wrap items-center gap-3 pt-2 text-xs font-mono">
                 <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
                   <Calendar className="w-3.5 h-3.5 text-amber-400" />
                   <span>Target: Nov 12, 2026 (Shubh Muhurtham)</span>
                 </span>
+                
+                {/* 1-Click Live GPS Venue Detection Bar */}
                 <button
                   type="button"
-                  onClick={() => setTourOpen(true)}
-                  className="flex items-center gap-1.5 bg-black/40 hover:bg-black/60 px-2.5 py-1 rounded-md border border-amber-400/20 hover:border-amber-400 text-amber-200 transition-colors"
-                  title="Click to detect GPS or simulate regional location"
+                  onClick={handleDetectGpsVenue}
+                  disabled={gpsDetecting}
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/40 hover:to-rose-500/40 px-3 py-1 rounded-md border border-amber-400/50 hover:border-amber-300 text-amber-200 transition-all cursor-pointer shadow-sm active:scale-95"
+                  title="Click to detect current celebration venue via browser GPS geolocation"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                  <span>{blueprint?.location || 'Auto-Detecting GPS Venue...'}</span>
+                  <MapPin className={`w-3.5 h-3.5 text-rose-400 ${gpsDetecting ? 'animate-bounce' : ''}`} />
+                  <span className="font-semibold">{gpsDetecting ? 'Acquiring GPS...' : '📍 Detect Live GPS Venue'}</span>
+                  {gpsCoords && <span className="text-[10px] text-amber-300/80 font-mono">[{gpsCoords}]</span>}
                 </button>
+
+                <span className="flex items-center gap-1.5 bg-black/50 px-2.5 py-1 rounded-md border border-amber-400/20 text-amber-100 font-sans">
+                  <span className="text-amber-300/80 font-bold">Venue:</span>
+                  <span className="truncate max-w-[220px] sm:max-w-xs">{blueprint?.location || gpsLocation}</span>
+                </span>
+
                 <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Chaos Resilience: 99.8%</span>
