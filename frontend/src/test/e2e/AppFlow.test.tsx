@@ -123,16 +123,30 @@ describe('App End-to-End User Flow Tests', () => {
     fireEvent.click(scenarioTab);
     expect(screen.getByText(/Scenario Lab: Reversible What-If Sandbox/i)).toBeInTheDocument();
 
-    // 6. Open QA Verification Modal from header
-    const qaBtn = screen.getByRole('button', { name: /Run QA/i });
+    // 6. Open Guided Tour Modal from Navbar
+    const tourBtn = screen.getByRole('button', { name: /Guided Tour/i });
+    fireEvent.click(tourBtn);
+    expect(
+      screen.getByText(/4DX Immersive Venue Experience/i)
+    ).toBeInTheDocument();
+
+    // Close Tour Modal
+    const closeBtn = screen.getByRole('button', { name: 'Close Tour Modal' });
+    fireEvent.click(closeBtn);
+    expect(
+      screen.queryByText(/4DX Immersive Venue Experience/i)
+    ).not.toBeInTheDocument();
+
+    // 7. Open QA Verification Modal from footer
+    const qaBtn = screen.getByRole('button', { name: /Run Automated QA Suite/i });
     fireEvent.click(qaBtn);
     expect(
       screen.getByText(/Automated Domain Invariant & Edge-Case Test Runner/i)
     ).toBeInTheDocument();
 
     // Close QA Modal
-    const closeBtn = screen.getByRole('button', { name: 'Close' });
-    fireEvent.click(closeBtn);
+    const closeQaBtn = screen.getByRole('button', { name: 'Close' });
+    fireEvent.click(closeQaBtn);
     expect(
       screen.queryByText(/Automated Domain Invariant & Edge-Case Test Runner/i)
     ).not.toBeInTheDocument();

@@ -61,32 +61,40 @@
 
   /* Typography Scale */
   .heading-hero {
-    @apply font-display text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-[#FAF7F2];
+    @apply font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-amber-700 via-rose-700 to-amber-900 dark:from-[#F5E6CA] dark:via-[#FBBF24] dark:to-[#E11D48] bg-clip-text text-transparent drop-shadow-sm;
   }
 
   .heading-card {
-    @apply font-display text-lg sm:text-xl font-bold text-slate-900 dark:text-[#FAF7F2];
+    @apply font-display text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-[#FAF7F2];
   }
 
   .heading-section {
-    @apply text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 font-mono;
+    @apply text-xs sm:text-sm font-extrabold uppercase tracking-widest text-amber-900 dark:text-[#FBBF24] font-mono flex items-center gap-2;
   }
 
   .text-sub {
-    @apply text-xs text-slate-600 dark:text-slate-300;
+    @apply text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal;
+  }
+
+  .metric-number {
+    @apply font-mono text-2xl sm:text-3xl font-black text-slate-900 dark:text-[#FAF7F2] tracking-tight;
+  }
+
+  .metric-gold {
+    @apply font-mono text-2xl sm:text-3xl font-black bg-gradient-to-r from-amber-600 via-amber-700 to-amber-900 dark:from-amber-200 dark:via-amber-400 dark:to-amber-500 bg-clip-text text-transparent;
   }
 
   /* Royal Gradient Buttons */
   .btn-gold {
-    @apply px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F59E0B] to-[#D97706] hover:from-[#C59F4E] hover:to-[#B45309] text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2;
+    @apply px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#F59E0B] to-[#D97706] hover:from-[#C59F4E] hover:to-[#B45309] text-slate-950 font-black text-xs tracking-wider uppercase shadow-md shadow-amber-500/30 hover:shadow-lg hover:shadow-amber-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2;
   }
 
   .btn-ruby {
-    @apply px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 hover:from-rose-500 hover:to-amber-600 text-white font-bold text-xs shadow-md shadow-rose-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5;
+    @apply px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 hover:from-rose-500 hover:to-amber-600 text-white font-black text-xs tracking-wider uppercase shadow-md shadow-rose-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5;
   }
 
   .btn-emerald {
-    @apply px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs shadow-md shadow-emerald-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5;
+    @apply px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-black text-xs tracking-wider uppercase shadow-md shadow-emerald-500/30 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5;
   }
 }
 

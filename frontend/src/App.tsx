@@ -7,9 +7,11 @@ import { DecisionLedger } from './components/DecisionLedger';
 import { ScenarioLab } from './components/ScenarioLab';
 import { GenAIXRayDrawer } from './components/GenAIXRayDrawer';
 import { QATestRunnerModal } from './components/QATestRunnerModal';
+import { ImmersiveVenueTourModal } from './components/ImmersiveVenueTourModal';
 import { ThemeProvider } from './context/ThemeContext';
-import { I18nProvider, useTranslation } from './i18n/I18nContext';
+import { I18nProvider } from './i18n/I18nContext';
 import { api } from './services/api';
+import { Sparkles, Compass, ShieldCheck, Calendar, MapPin, Eye, CheckCircle2 } from 'lucide-react';
 import {
   EventBlueprint,
   FoodSufficiencyRadar,
@@ -25,6 +27,7 @@ const MainCockpit: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'blueprint' | 'pulse' | 'rescue' | 'ledger' | 'scenario'>('blueprint');
   const [xrayOpen, setXrayOpen] = useState(false);
   const [qaModalOpen, setQaModalOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Application State
   const [blueprint, setBlueprint] = useState<EventBlueprint | null>(null);
@@ -35,7 +38,6 @@ const MainCockpit: React.FC = () => {
   const [decisionEntries, setDecisionEntries] = useState<DecisionLedgerEntry[]>([]);
   const [latestTelemetry, setLatestTelemetry] = useState<GenAITelemetryTrace | null>(null);
   const [loading, setLoading] = useState(false);
-  const { t } = useTranslation();
 
   // Initialize with a rich default blueprint on first load
   useEffect(() => {
@@ -129,7 +131,6 @@ const MainCockpit: React.FC = () => {
     }
   };
 
-
   // Handle FSSAI Surplus Manifest generation
   const handleGenerateFssaiManifest = async (surplusKg: number, hotTemp: number, coldTemp: number) => {
     if (!blueprint) return;
@@ -200,7 +201,75 @@ const MainCockpit: React.FC = () => {
         xrayOpen={xrayOpen}
         setXrayOpen={setXrayOpen}
         onOpenQAModal={() => setQaModalOpen(true)}
+        onOpenGuidedTour={() => setTourOpen(true)}
       />
+
+      {/* Opulent Celebration Hero Header Layer with Generated Indian Royal Decor */}
+      <section className="relative overflow-hidden border-b border-amber-300/40 dark:border-amber-700/30">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/assets/royal_hero.jpg"
+            alt="Royal Celebration Palace"
+            className="w-full h-full object-cover object-center filter brightness-[0.75] dark:brightness-[0.45] transform scale-105 transition-transform duration-1000 ease-out hover:scale-100"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/85 via-slate-950/70 to-purple-950/80 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] dark:from-[#0E0918] via-transparent to-transparent" />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Google Cloud ADK Swarm + Vertex AI Gemini 2.5 Flash</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-display drop-shadow-md">
+                The Royal Celebration Atelier
+              </h1>
+
+              <p className="text-amber-100/90 text-sm sm:text-base leading-relaxed drop-shadow font-sans">
+                Where timeless cultural grandeur meets autonomous multi-agent chaos resilience. Zero math hallucinations, zero food waste, and 100% serene celebrations for families and coordinators.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-amber-200/90 font-mono">
+                <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Target: Nov 12, 2026 (Shubh Muhurtham)</span>
+                </span>
+                <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
+                  <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Tirunelveli Town Hall & Lawns</span>
+                </span>
+                <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Chaos Resilience: 99.8%</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 self-start lg:self-center">
+              <button
+                type="button"
+                onClick={() => setTourOpen(true)}
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#FBBF24] to-[#B8860B] text-slate-950 font-black text-sm tracking-wide shadow-xl hover:shadow-amber-500/30 flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5 active:translate-y-0 transition-all border border-amber-300"
+              >
+                <Compass className="w-4 h-4 text-slate-950" />
+                <span>3D Transformation & 4DX Tour</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setXrayOpen(true)}
+                className="px-5 py-2.5 rounded-2xl bg-black/50 hover:bg-black/70 backdrop-blur-md text-amber-200 hover:text-white border border-amber-400/40 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md"
+              >
+                <Eye className="w-3.5 h-3.5 text-amber-400" />
+                <span>Open GenAI Telemetry X-Ray</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Main Operational Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -243,15 +312,97 @@ const MainCockpit: React.FC = () => {
         )}
       </main>
 
-      {/* Cockpit Footer */}
-      <footer className="border-t border-[#E8DFD1] dark:border-[#352952] bg-white/70 dark:bg-[#140F22]/70 backdrop-blur-md py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400">
-        <p className="font-semibold text-slate-800 dark:text-slate-200 font-display">
-          FestivaPulseAI — {t.nav.brandSubtitle}
-        </p>
-        <p className="mt-1">
-          Google Cloud Run + Vertex AI (Gemini 2.5 Flash) + Cloud Firestore + Pub/Sub Streaming | WCAG 2.1 AAA Compliant
-        </p>
+      {/* Opulent Royal Footer Layer with Generated Heritage Art */}
+      <footer className="relative border-t border-amber-300/40 dark:border-amber-700/30 bg-gradient-to-b from-[#FFFDF9] to-[#F5ECE0] dark:from-[#110B1E] dark:to-[#07040D] overflow-hidden py-10 mt-12 transition-colors">
+        <div className="absolute inset-0 opacity-10 dark:opacity-15 pointer-events-none flex justify-center items-center">
+          <img
+            src="/assets/royal_footer_mandala.jpg"
+            alt="Decorative Mandala"
+            className="w-full h-full object-cover object-bottom"
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-xs">
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-gradient-to-r from-amber-500 to-rose-600 animate-pulse" />
+                <h4 className="font-display font-black text-base text-amber-950 dark:text-amber-200">
+                  FestivaPulseAI — Autonomous Event Resilience
+                </h4>
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed font-sans">
+                Engineered for Google Cloud APAC AI Builder Cup. Powered by Google ADK multi-agent swarm, Vertex AI Gemini 2.5 Flash, Cloud Firestore, and real-time Pub/Sub live event sensory streaming.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h5 className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px]">
+                Engineering Invariants
+              </h5>
+              <ul className="space-y-1.5 text-slate-600 dark:text-slate-400">
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Zero Arithmetic Hallucination</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>FSSAI Surplus Redistribution</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>HSE Fire & Crowd Capacity Bounds</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Human-in-the-Loop Signoff</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h5 className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider text-[11px]">
+                Interactive Tools
+              </h5>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTourOpen(true)}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-semibold text-left flex items-center gap-2 border border-amber-400/30 transition-colors"
+                >
+                  <Compass className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Launch 3D & 4DX Experience</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQaModalOpen(true)}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-semibold text-left flex items-center gap-2 border border-emerald-400/30 transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Run Automated QA Suite</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-amber-300/30 dark:border-amber-800/30 pt-6 text-center text-[11px] text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span>FestivaPulseAI v2.4 Enterprise | WCAG 2.1 AAA Compliant</span>
+            <span className="font-mono text-amber-700 dark:text-amber-400">
+              Vertex AI Model: gemini-2.5-flash | Footprint: &lt; 10 MB (Clean Git Gate)
+            </span>
+          </div>
+        </div>
       </footer>
+
+      {/* Immersive 3D Digital Twin & 4DX Sensory Transformation Modal */}
+      <ImmersiveVenueTourModal
+        isOpen={tourOpen}
+        onClose={() => setTourOpen(false)}
+        onOpenQAModal={() => {
+          setTourOpen(false);
+          setQaModalOpen(true);
+        }}
+      />
 
       {/* Dockable Live GenAI X-Ray Telemetry Drawer */}
       <GenAIXRayDrawer

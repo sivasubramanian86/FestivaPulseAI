@@ -3,7 +3,7 @@ import {
   Sparkles,
   Activity,
   ShieldCheck,
-  PlayCircle,
+  Compass,
   Eye,
   Globe,
   Sun,
@@ -20,7 +20,8 @@ interface NavbarProps {
   setActiveTab: (tab: 'blueprint' | 'pulse' | 'rescue' | 'ledger' | 'scenario') => void;
   xrayOpen: boolean;
   setXrayOpen: (open: boolean) => void;
-  onOpenQAModal: () => void;
+  onOpenQAModal?: () => void;
+  onOpenGuidedTour: () => void;
 }
 
 const LANGUAGES: { code: SupportedLanguage; name: string }[] = [
@@ -38,13 +39,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   xrayOpen,
   setXrayOpen,
-  onOpenQAModal,
+  onOpenGuidedTour,
 }) => {
   const { language, setLanguage, t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 transition-colors duration-300 bg-white/85 dark:bg-[#140F22]/90 backdrop-blur-md text-slate-800 dark:text-slate-100 border-b border-[#E8DFD1] dark:border-[#352952] shadow-sm">
+    <header className="sticky top-0 z-40 transition-colors duration-300 bg-white/90 dark:bg-[#140F22]/90 backdrop-blur-md text-slate-800 dark:text-slate-100 border-b border-[#E8DFD1] dark:border-[#352952] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Auspicious Beacon */}
@@ -54,12 +55,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-xl font-bold tracking-tight bg-gradient-to-r from-amber-700 via-rose-700 to-amber-600 dark:from-[#F5E6CA] dark:via-[#FBBF24] dark:to-[#E11D48] bg-clip-text text-transparent">
+                <span className="font-display text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-amber-700 via-rose-700 to-amber-600 dark:from-[#F5E6CA] dark:via-[#FBBF24] dark:to-[#E11D48] bg-clip-text text-transparent">
                   FestivaPulseAI
-                </span>
-                <span className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-mono font-semibold rounded bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                  GCP RUN READY
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 hidden sm:block">
@@ -159,14 +156,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               </select>
             </div>
 
-            {/* In-App QA Test Runner Modal Trigger */}
+            {/* Guided Tour & 3D/4DX Venue Experience Trigger */}
             <button
-              onClick={onOpenQAModal}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all"
-              title="Run Automated QA Verification Suite"
+              onClick={onOpenGuidedTour}
+              className="btn-gold px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+              title="Launch Guided Tour & 3D/4DX Venue Transformation Experience"
             >
-              <PlayCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Run QA (100%)</span>
+              <Compass className="w-3.5 h-3.5 text-slate-950 font-bold" />
+              <span>Guided Tour</span>
             </button>
 
             {/* GenAI X-Ray Split-Pane Toggle */}

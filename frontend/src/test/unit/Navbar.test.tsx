@@ -17,6 +17,7 @@ describe('Navbar Component Unit Tests', () => {
     const setActiveTab = vi.fn();
     const setXrayOpen = vi.fn();
     const onOpenQAModal = vi.fn();
+    const onOpenGuidedTour = vi.fn();
 
     renderWithProviders(
       <Navbar
@@ -25,11 +26,12 @@ describe('Navbar Component Unit Tests', () => {
         xrayOpen={false}
         setXrayOpen={setXrayOpen}
         onOpenQAModal={onOpenQAModal}
+        onOpenGuidedTour={onOpenGuidedTour}
       />
     );
 
     expect(screen.getByText('FestivaPulseAI')).toBeInTheDocument();
-    expect(screen.getByText('GCP RUN READY')).toBeInTheDocument();
+    expect(screen.queryByText('GCP RUN READY')).not.toBeInTheDocument();
 
     // Verify navigation tabs
     const pulseTab = screen.getByRole('button', { name: /Live Event Pulse/i });
@@ -37,11 +39,11 @@ describe('Navbar Component Unit Tests', () => {
     fireEvent.click(pulseTab);
     expect(setActiveTab).toHaveBeenCalledWith('pulse');
 
-    // Verify QA Test Runner modal button
-    const qaBtn = screen.getByRole('button', { name: /Run QA/i });
-    expect(qaBtn).toBeInTheDocument();
-    fireEvent.click(qaBtn);
-    expect(onOpenQAModal).toHaveBeenCalled();
+    // Verify Guided Tour button
+    const tourBtn = screen.getByRole('button', { name: /Guided Tour/i });
+    expect(tourBtn).toBeInTheDocument();
+    fireEvent.click(tourBtn);
+    expect(onOpenGuidedTour).toHaveBeenCalled();
 
     // Verify Telemetry X-Ray button
     const xrayBtn = screen.getByRole('button', { name: /Telemetry X-Ray/i });
@@ -58,6 +60,7 @@ describe('Navbar Component Unit Tests', () => {
         xrayOpen={false}
         setXrayOpen={vi.fn()}
         onOpenQAModal={vi.fn()}
+        onOpenGuidedTour={vi.fn()}
       />
     );
 
