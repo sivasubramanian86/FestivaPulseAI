@@ -9,8 +9,12 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
+from backend.app.config import settings
 from backend.app.models.incident import IncidentSubmission
+from backend.app.services.firestore_service import firestore_service
 from backend.app.services.gemini_service import gemini_service
+from backend.app.services.monitoring_service import monitoring_service
+from backend.app.services.pubsub_service import pubsub_service
 from backend.app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Rescue Studio"])
@@ -26,6 +30,9 @@ async def propose_recovery_options(event_id: str, incident: IncidentSubmission) 
     comparison, telemetry = gemini_service.synthesize_recovery_options(state.intake, incident, state)
     state.latest_rescue_comparison = comparison
     storage_service.record_telemetry(event_id, telemetry)
+    await firestore_service.record_telemetry(event_id, telemetry)
+    await pubsub_service.publish_chaos_incident(event_id, incident.model_dump())
+    monitoring_service.record_gemini_latency(telemetry.latency_ms, settings.GEMINI_MODEL, "rescue_triage")
 
     return {
         "success": True,
@@ -82,7 +89,7 @@ async def approve_recovery_proposal(event_id: str, request: ApproveProposalReque
         "applied_strategy": approved_proposal.strategy_type.value,
     }
 
-    decision_entry = storage_service.record_decision(
+    decision_entry = await firestore_service.record_decision(
         event_id=event_id,
         what_changed=f"Applied {approved_proposal.strategy_type.value}: {approved_proposal.summary}",
         why_it_changed=request.reason_for_approval,
@@ -94,6 +101,10 @@ async def approve_recovery_proposal(event_id: str, request: ApproveProposalReque
 
     # 2. Update Blueprint
     state.blueprint.total_budget += approved_proposal.additional_cost
+    monitoring_service.record_incident_triage(
+        comp.incident_summary,
+        approved_proposal.strategy_type.value,
+    )
 
     return {
         "success": True,

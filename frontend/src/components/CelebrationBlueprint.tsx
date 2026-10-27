@@ -10,6 +10,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { EventIntakeRequest, EventBlueprint, EventType } from '../types';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface CelebrationBlueprintProps {
   blueprint: EventBlueprint | null;
@@ -22,6 +23,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   onGenerateBlueprint,
   loading,
 }) => {
+  const { t } = useTranslation();
   // Form State
   const [eventName, setEventName] = useState('Tirunelveli Tamil-English Community Celebration');
   const [eventType, setEventType] = useState<EventType>('Community Event');
@@ -162,48 +164,48 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   return (
     <div className="space-y-8">
       {/* Step Header */}
-      <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
+      <div className="tactical-card">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono bg-cyan-500/10 text-cyan-600 dark:text-tactical-cyan border border-cyan-500/20">
                 Phase 1: Blueprinting
               </span>
-              <h1 className="text-xl font-bold text-slate-900">Celebration Blueprint & Constraint Intake</h1>
+              <h1 className="heading-hero">{t.blueprint.title}</h1>
             </div>
-            <p className="text-sm text-slate-600 mt-1">
-              Natural-language brief synthesis balancing traditions, multi-generational comfort, budgets, and HSE safety limits.
+            <p className="text-sub mt-1">
+              {t.blueprint.subtitle}
             </p>
           </div>
 
           {/* Quick Preset Buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">Quick Presets:</span>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Quick Presets:</span>
             <button
               type="button"
               onClick={() => loadPreset('diwali')}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800/60 transition-colors"
             >
               Diwali Fest (₹5L)
             </button>
             <button
               type="button"
               onClick={() => loadPreset('wedding')}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition-colors"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800/60 transition-colors"
             >
               Wedding (₹18L)
             </button>
             <button
               type="button"
               onClick={() => loadPreset('birthday')}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800/60 transition-colors"
             >
               Birthday (₹3.5L)
             </button>
             <button
               type="button"
               onClick={() => loadPreset('invalid')}
-              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-800 hover:bg-red-200 border border-red-300 transition-colors"
+              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60 border border-red-300 dark:border-red-800/60 transition-colors"
               title="Test Invalid Inputs to trigger error rubric on video"
             >
               Test Error State
@@ -238,22 +240,22 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Celebration Name *</label>
+              <label className="tactical-label">{t.blueprint.eventName} *</label>
               <input
                 type="text"
                 value={eventName}
                 onChange={(e) => setEventName(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="tactical-input"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Event Type *</label>
+              <label className="tactical-label">Event Type *</label>
               <select
                 value={eventType}
                 onChange={(e) => setEventType(e.target.value as EventType)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="tactical-input"
               >
                 <option value="Community Event">Community Event</option>
                 <option value="Wedding">Wedding</option>
@@ -262,74 +264,74 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Organizer Email *</label>
+              <label className="tactical-label">Organizer Email *</label>
               <input
                 type="email"
                 value={organizerEmail}
                 onChange={(e) => setOrganizerEmail(e.target.value)}
                 required
-                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:bg-white focus:outline-none ${
+                className={`tactical-input ${
                   validationErrors.some((e) => e.includes('email'))
-                    ? 'border-red-500 bg-red-50 focus:ring-red-400'
-                    : 'border-slate-300 focus:ring-2 focus:ring-teal-500'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20'
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Target Date *</label>
+              <label className="tactical-label">{t.blueprint.date} *</label>
               <input
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="tactical-input"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Venue & Location *</label>
+              <label className="tactical-label">{t.blueprint.location} *</label>
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="tactical-input"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Total Budget (₹ INR) *</label>
+              <label className="tactical-label">{t.blueprint.budget} *</label>
               <input
                 type="number"
                 value={totalBudget}
                 onChange={(e) => setTotalBudget(Number(e.target.value))}
                 required
-                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:bg-white focus:outline-none ${
+                className={`tactical-input font-mono ${
                   totalBudget < 1000
-                    ? 'border-red-500 bg-red-50 focus:ring-red-400'
-                    : 'border-slate-300 focus:ring-2 focus:ring-teal-500'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20'
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Expected Guests *</label>
+              <label className="tactical-label">{t.blueprint.guests} *</label>
               <input
                 type="number"
                 value={expectedGuests}
                 onChange={(e) => setExpectedGuests(Number(e.target.value))}
                 required
-                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:bg-white focus:outline-none ${
+                className={`tactical-input font-mono ${
                   expectedGuests < 10
-                    ? 'border-red-500 bg-red-50 focus:ring-red-400'
-                    : 'border-slate-300 focus:ring-2 focus:ring-teal-500'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20'
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="tactical-label">
                 Approved Venue Fire Capacity *
               </label>
               <input
@@ -337,52 +339,52 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 value={maxCapacity}
                 onChange={(e) => setMaxCapacity(Number(e.target.value))}
                 required
-                className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:bg-white focus:outline-none ${
+                className={`tactical-input font-mono ${
                   maxCapacity < expectedGuests
-                    ? 'border-red-500 bg-red-50 focus:ring-red-400'
-                    : 'border-slate-300 focus:ring-2 focus:ring-teal-500'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950/20'
+                    : ''
                 }`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="tactical-label">
                 Acoustic Curfew Limit (Police)
               </label>
               <input
                 type="text"
                 value={soundCurfew}
                 onChange={(e) => setSoundCurfew(e.target.value)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                className="tactical-input font-mono"
               />
             </div>
           </div>
 
           {/* Cultural Vibe & Theme */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Cultural Traditions & Aesthetic Preferences
+            <label className="tactical-label">
+              {t.blueprint.culturalVibe} *
             </label>
             <input
               type="text"
               value={culturalVibe}
               onChange={(e) => setCulturalVibe(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+              className="tactical-input"
             />
           </div>
 
           {/* Intergenerational Comfort Toggles */}
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+          <div className="tactical-subcard">
+            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">
               Intergenerational & Wellbeing Priorities
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={eldersPriority}
                   onChange={(e) => setEldersPriority(e.target.checked)}
-                  className="rounded text-teal-600 focus:ring-teal-500"
+                  className="rounded text-cyan-600 focus:ring-tactical-cyan"
                 />
                 <span className="flex items-center gap-1.5">
                   <Heart className="w-3.5 h-3.5 text-rose-500" />
@@ -390,12 +392,12 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={healthyLifestyle}
                   onChange={(e) => setHealthyLifestyle(e.target.checked)}
-                  className="rounded text-teal-600 focus:ring-teal-500"
+                  className="rounded text-cyan-600 focus:ring-tactical-cyan"
                 />
                 <span className="flex items-center gap-1.5">
                   <Smile className="w-3.5 h-3.5 text-emerald-500" />
@@ -403,12 +405,12 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={kidsZone}
                   onChange={(e) => setKidsZone(e.target.checked)}
-                  className="rounded text-teal-600 focus:ring-teal-500"
+                  className="rounded text-cyan-600 focus:ring-tactical-cyan"
                 />
                 <span className="flex items-center gap-1.5">
                   <Baby className="w-3.5 h-3.5 text-amber-500" />
@@ -423,17 +425,18 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 rounded-xl bg-[#1E1B4B] hover:bg-indigo-900 text-white font-semibold text-sm shadow-md flex items-center gap-2 transition-all disabled:opacity-50"
+              aria-label="Generate Celebration Blueprint"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-semibold text-sm shadow-md flex items-center gap-2 transition-all disabled:opacity-50"
             >
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Synthesizing Blueprint...</span>
+                  <span>{t.blueprint.generating}</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>Generate Celebration Blueprint</span>
+                  <span>{t.blueprint.generateButton}</span>
                 </>
               )}
             </button>
@@ -445,84 +448,90 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
       {blueprint && (
         <div className="space-y-6">
           {/* Executive Summary */}
-          <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
+          <div className="tactical-card">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <h2 className="text-lg font-bold text-slate-900">{blueprint.event_name}</h2>
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                <h2 className="heading-card">{blueprint.event_name}</h2>
               </div>
-              <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-700">
-                Plan Version {blueprint.version}
+              <span className="px-2.5 py-1 text-xs font-semibold font-mono rounded-full bg-slate-100 dark:bg-tactical-darkCard text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-tactical-darkBorder">
+                Plan Version v{blueprint.version}.0
               </span>
             </div>
-            <p className="mt-3 text-sm text-slate-700 leading-relaxed bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+            <p className="mt-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-tactical-darkCard p-4 rounded-xl border border-slate-200 dark:border-tactical-darkBorder">
               {blueprint.executive_summary}
             </p>
 
             {/* Quick Metrics Bar */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-xs text-slate-500 block">Total Budget</span>
-                <span className="text-base font-bold text-slate-900">
+              <div className="tactical-subcard">
+                <span className="text-sub block">Total Budget</span>
+                <span className="text-base font-bold font-mono tabular-nums text-slate-900 dark:text-slate-100">
                   ₹{blueprint.total_budget.toLocaleString()}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-xs text-slate-500 block">Expected Attendance</span>
-                <span className="text-base font-bold text-slate-900">{blueprint.expected_guests} Guests</span>
+              <div className="tactical-subcard">
+                <span className="text-sub block">Expected Attendance</span>
+                <span className="text-base font-bold font-mono tabular-nums text-slate-900 dark:text-slate-100">
+                  {blueprint.expected_guests} Guests
+                </span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-xs text-slate-500 block">Target Date</span>
-                <span className="text-base font-bold text-slate-900">{blueprint.target_date}</span>
+              <div className="tactical-subcard">
+                <span className="text-sub block">Target Date</span>
+                <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">
+                  {blueprint.target_date}
+                </span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-xs text-slate-500 block">Location</span>
-                <span className="text-base font-bold text-slate-900 truncate block">{blueprint.location}</span>
+              <div className="tactical-subcard">
+                <span className="text-sub block">Location</span>
+                <span className="text-base font-bold text-slate-900 dark:text-slate-100 truncate block">
+                  {blueprint.location}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Personalized Theme Ideas */}
-          <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <div className="tactical-card">
+            <h3 className="heading-section mb-4 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-500" />
               Culturally Tailored Theme & Experience Concepts
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {blueprint.personalized_themes.map((theme, i) => (
-                <div key={i} className="p-4 rounded-xl bg-[#FAF8F5] border border-festiva-border hover:border-indigo-300 transition-colors">
-                  <p className="text-sm font-medium text-slate-800">{theme}</p>
+                <div key={i} className="tactical-subcard hover:border-cyan-500/50 transition-colors">
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{theme}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Intergenerational Features */}
-          <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <div className="tactical-card">
+            <h3 className="heading-section mb-4 flex items-center gap-2">
               <Heart className="w-4 h-4 text-rose-500" />
               Intergenerational & Healthy Lifestyle Blueprint
             </h3>
             <div className="space-y-2">
               {blueprint.intergenerational_features.map((feat, i) => (
-                <div key={i} className="p-3 rounded-lg bg-emerald-50/50 border border-emerald-100 flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-emerald-950 font-medium">{feat}</p>
+                <div key={i} className="p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-emerald-950 dark:text-emerald-200 font-medium">{feat}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Vendor SLA Checklist */}
-          <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-indigo-600" />
+          <div className="tactical-card">
+            <h3 className="heading-section mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-cyan-500" />
               Vendor SLA Contracts & Arrival Call-Sheets
             </h3>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <table className="min-w-full divide-y divide-slate-200 dark:divide-tactical-darkBorder text-xs">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-600">
+                  <tr className="bg-slate-50 dark:bg-tactical-darkCard text-slate-600 dark:text-slate-300">
                     <th className="px-3 py-2 text-left font-semibold">Vendor & Category</th>
                     <th className="px-3 py-2 text-left font-semibold">SLA Requirement</th>
                     <th className="px-3 py-2 text-left font-semibold">Call Time</th>
@@ -531,18 +540,18 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                     <th className="px-3 py-2 text-left font-semibold">Backup Contact</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-800">
+                <tbody className="divide-y divide-slate-100 dark:divide-tactical-darkBorder text-slate-800 dark:text-slate-200">
                   {blueprint.vendor_slas.map((v, i) => (
-                    <tr key={i} className="hover:bg-slate-50/80">
+                    <tr key={i} className="hover:bg-slate-50/80 dark:hover:bg-tactical-darkCard/50">
                       <td className="px-3 py-2.5">
-                        <span className="font-semibold block">{v.vendor_name}</span>
-                        <span className="text-[11px] text-slate-500">{v.vendor_type}</span>
+                        <span className="font-semibold block text-slate-900 dark:text-slate-100">{v.vendor_name}</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">{v.vendor_type}</span>
                       </td>
-                      <td className="px-3 py-2.5 text-slate-600 max-w-xs">{v.sla_requirement}</td>
-                      <td className="px-3 py-2.5 font-medium">{v.arrival_time}</td>
-                      <td className="px-3 py-2.5 text-right font-semibold">₹{v.quote_amount.toLocaleString()}</td>
-                      <td className="px-3 py-2.5 text-right text-emerald-600">₹{v.advance_paid.toLocaleString()}</td>
-                      <td className="px-3 py-2.5 text-slate-500">{v.backup_vendor_contact}</td>
+                      <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300 max-w-xs">{v.sla_requirement}</td>
+                      <td className="px-3 py-2.5 font-medium font-mono">{v.arrival_time}</td>
+                      <td className="px-3 py-2.5 text-right font-semibold font-mono tabular-nums">₹{v.quote_amount.toLocaleString()}</td>
+                      <td className="px-3 py-2.5 text-right text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">₹{v.advance_paid.toLocaleString()}</td>
+                      <td className="px-3 py-2.5 text-slate-500 dark:text-slate-400 font-mono">{v.backup_vendor_contact}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -551,22 +560,22 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
           </div>
 
           {/* Preparation Milestones */}
-          <div className="bg-white rounded-2xl p-6 border border-festiva-border shadow-sm">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-teal-600" />
+          <div className="tactical-card">
+            <h3 className="heading-section mb-4 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-teal-500" />
               Preparation Milestones & Critical Run-Sheet
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {blueprint.milestones.map((m, i) => (
-                <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div key={i} className="tactical-subcard flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">
+                    <span className="text-[11px] font-bold font-mono text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800/40">
                       {m.phase}
                     </span>
-                    <p className="text-xs font-semibold text-slate-900 mt-1">{m.task_name}</p>
-                    <span className="text-[11px] text-slate-500">Owner: {m.owner}</span>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 mt-1">{m.task_name}</p>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">Owner: {m.owner}</span>
                   </div>
-                  <span className="text-xs font-medium text-slate-600 bg-white px-2 py-1 rounded border">
+                  <span className="text-xs font-medium font-mono text-slate-600 dark:text-slate-300 bg-white dark:bg-tactical-darkSurface px-2 py-1 rounded border border-slate-200 dark:border-tactical-darkBorder">
                     {m.deadline}
                   </span>
                 </div>

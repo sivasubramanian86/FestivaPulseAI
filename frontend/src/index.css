@@ -25,6 +25,45 @@
   }
 }
 
+@layer components {
+  /* Tactical Enterprise Card */
+  .tactical-card {
+    @apply bg-white dark:bg-tactical-darkSurface border border-slate-200 dark:border-tactical-darkBorder rounded-2xl p-6 shadow-sm transition-colors duration-200;
+  }
+
+  /* Tactical Subcard / Section Well */
+  .tactical-subcard {
+    @apply bg-slate-50 dark:bg-tactical-darkCard border border-slate-200/80 dark:border-tactical-darkBorder rounded-xl p-4 transition-colors duration-200;
+  }
+
+  /* Tactical Form Input */
+  .tactical-input {
+    @apply w-full px-3 py-2 text-sm bg-slate-50 dark:bg-tactical-darkCard text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-tactical-darkBorder rounded-lg focus:bg-white dark:focus:bg-tactical-darkSurface focus:ring-2 focus:ring-tactical-cyan focus:outline-none transition-colors duration-200;
+  }
+
+  /* Tactical Field Label */
+  .tactical-label {
+    @apply block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1;
+  }
+
+  /* Typography Scale */
+  .heading-hero {
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100;
+  }
+
+  .heading-card {
+    @apply text-base font-bold text-slate-900 dark:text-slate-100;
+  }
+
+  .heading-section {
+    @apply text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400;
+  }
+
+  .text-sub {
+    @apply text-xs text-slate-500 dark:text-slate-400;
+  }
+}
+
 /* Tactical Glassmorphism Card Utility */
 .glass-panel {
   background: rgba(255, 255, 255, 0.85);

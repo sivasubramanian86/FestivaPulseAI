@@ -259,9 +259,20 @@ class TestCloudIntegrations:
 
     def test_firestore_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.firestore_service.settings.ENABLE_FIRESTORE", True):
+            mock_google = MagicMock()
+            mock_cloud = MagicMock()
             mock_module = MagicMock()
             mock_module.AsyncClient.return_value = MagicMock()
-            with patch.dict("sys.modules", {"google.cloud.firestore": mock_module}):
+            mock_cloud.firestore = mock_module
+            mock_google.cloud = mock_cloud
+            with patch.dict(
+                "sys.modules",
+                {
+                    "google": mock_google,
+                    "google.cloud": mock_cloud,
+                    "google.cloud.firestore": mock_module,
+                },
+            ):
                 fs = FirestoreService()
                 assert fs.is_connected is True
                 assert fs._db is not None
@@ -335,9 +346,20 @@ class TestCloudIntegrations:
 
     def test_monitoring_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.monitoring_service.settings.ENABLE_CLOUD_MONITORING", True):
+            mock_google = MagicMock()
+            mock_cloud = MagicMock()
             mock_module = MagicMock()
             mock_module.MetricServiceClient.return_value = MagicMock()
-            with patch.dict("sys.modules", {"google.cloud.monitoring_v3": mock_module}):
+            mock_cloud.monitoring_v3 = mock_module
+            mock_google.cloud = mock_cloud
+            with patch.dict(
+                "sys.modules",
+                {
+                    "google": mock_google,
+                    "google.cloud": mock_cloud,
+                    "google.cloud.monitoring_v3": mock_module,
+                },
+            ):
                 ms = CloudMonitoringService()
                 assert ms._is_enabled is True
                 assert ms._metric_client is not None
@@ -359,9 +381,20 @@ class TestCloudIntegrations:
 
     def test_pubsub_service_init_enabled_success_and_failure(self):
         with patch("backend.app.services.pubsub_service.settings.ENABLE_PUBSUB", True):
+            mock_google = MagicMock()
+            mock_cloud = MagicMock()
             mock_module = MagicMock()
             mock_module.PublisherClient.return_value = MagicMock()
-            with patch.dict("sys.modules", {"google.cloud.pubsub_v1": mock_module}):
+            mock_cloud.pubsub_v1 = mock_module
+            mock_google.cloud = mock_cloud
+            with patch.dict(
+                "sys.modules",
+                {
+                    "google": mock_google,
+                    "google.cloud": mock_cloud,
+                    "google.cloud.pubsub_v1": mock_module,
+                },
+            ):
                 ps = PubSubService()
                 assert ps.is_cloud_enabled is True
                 assert ps._publisher is not None

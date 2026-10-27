@@ -49,7 +49,9 @@ class FirestoreService:
     async def save_celebration(self, blueprint: EventBlueprint, intake: EventIntakeRequest) -> EventState:
         """Persists celebration blueprint and intake data to Firestore with tenant isolation."""
         # 1. Primary in-memory / SQLite state
-        state = storage_service.save_event(blueprint, intake)
+        state = storage_service.get_event(blueprint.id)
+        if not state:
+            state = storage_service.save_event(blueprint, intake)
 
         # 2. Cloud Firestore remote write if connected
         if self._is_connected and self._db:

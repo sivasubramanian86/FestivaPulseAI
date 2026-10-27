@@ -7,6 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, status
 
+from backend.app.config import settings
 from backend.app.core.engine import (
     calculate_budget_ledger,
     calculate_food_sufficiency,
@@ -15,7 +16,9 @@ from backend.app.models.budget import BudgetCategoryItem
 from backend.app.models.event import EventIntakeRequest
 from backend.app.models.inventory import MealCategory
 from backend.app.models.timeline import TimelineNode
+from backend.app.services.firestore_service import firestore_service
 from backend.app.services.gemini_service import gemini_service
+from backend.app.services.monitoring_service import monitoring_service
 from backend.app.services.storage_service import EventState, storage_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Event"])
@@ -164,6 +167,9 @@ async def create_event(intake: EventIntakeRequest) -> dict[str, Any]:
 
         # Record telemetry
         storage_service.record_telemetry(blueprint.id, telemetry)
+        await firestore_service.save_celebration(blueprint, intake)
+        await firestore_service.record_telemetry(blueprint.id, telemetry)
+        monitoring_service.record_gemini_latency(telemetry.latency_ms, settings.GEMINI_MODEL, "blueprint_synthesis")
 
         return {
             "success": True,

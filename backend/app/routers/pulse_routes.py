@@ -15,6 +15,8 @@ from backend.app.core.engine import (
     propagate_timeline_delay,
     rebalance_budget_pareto,
 )
+from backend.app.services.monitoring_service import monitoring_service
+from backend.app.services.pubsub_service import pubsub_service
 from backend.app.services.storage_service import storage_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Event Pulse"])
@@ -92,6 +94,8 @@ async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> dict
             f"Curfew Breached={timeline_cascade_result.curfew_breached}."
         )
 
+    await pubsub_service.publish_telemetry(event_id, payload.model_dump())
+
     return {
         "success": True,
         "event_id": event_id,
@@ -126,6 +130,8 @@ async def generate_fssai_manifest(event_id: str, payload: FSSAIDispatchRequest) 
     )
     if state.food_radar:
         state.food_radar.fssai_manifest = manifest
+
+    monitoring_service.record_fssai_redistribution(payload.surplus_kg, payload.partner_ngo)
 
     return {
         "success": True,
