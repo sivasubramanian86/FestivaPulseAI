@@ -97,6 +97,45 @@ class TestEventRoutesIntegration:
         response = client.post("/api/v1/event/create", json=invalid_payload)
         assert response.status_code == 422
 
+    def test_venues_search_endpoint(self):
+        res = client.get("/api/v1/event/venues/search?location=Bengaluru&guests=350&budget=1200000")
+        assert res.status_code == 200
+        body = res.json()
+        assert body["location"] == "Bengaluru"
+        assert body["count"] > 0
+        assert len(body["venues"]) > 0
+
+    def test_apply_venue_to_event_success_and_errors(self):
+        payload = {
+            "event_name": "Venue Apply Test",
+            "event_type": "Wedding",
+            "organizer_email": "venue@festiva.ai",
+            "target_date": "2026-11-28",
+            "location": "Bengaluru",
+            "expected_guests": 300,
+            "max_venue_capacity": 450,
+            "total_budget": 1000000,
+            "currency": "INR",
+        }
+        res_create = client.post("/api/v1/event/create", json=payload)
+        event_id = res_create.json()["event_id"]
+
+        # Valid apply
+        res_apply = client.post(f"/api/v1/event/{event_id}/venues/apply/blr-palace-glasshouse")
+        assert res_apply.status_code == 200
+        apply_data = res_apply.json()
+        assert apply_data["success"] is True
+        assert apply_data["hall"]["id"] == "blr-palace-glasshouse"
+        assert apply_data["ledger"]["approved_total"] > 0
+
+        # Hall not found
+        res_bad_hall = client.post(f"/api/v1/event/{event_id}/venues/apply/invalid-hall-xyz")
+        assert res_bad_hall.status_code == 404
+
+        # Event not found
+        res_bad_evt = client.post("/api/v1/event/non-existent-evt/venues/apply/blr-palace-glasshouse")
+        assert res_bad_evt.status_code == 404
+
 
 @pytest.mark.integration
 class TestPulseRoutesIntegration:

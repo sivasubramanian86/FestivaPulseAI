@@ -17,15 +17,22 @@ import {
   Music,
 } from 'lucide-react';
 import { DynamicItineraryMenu } from './DynamicItineraryMenu';
+import { GroundedVenueMapExplorer } from './GroundedVenueMapExplorer';
 
 interface ImmersiveVenueTourModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenQAModal?: () => void;
+  eventId?: string;
+  currentLocation?: string;
+  expectedGuests?: number;
+  totalBudget?: number;
+  onApplyVenue?: (hall: any, investmentPlan?: any) => void;
 }
 
 export type TourTab =
   | 'themes_atelier'
+  | 'venues_radar'
   | 'dynamic_itinerary'
   | 'digital_twin'
   | 'transformation'
@@ -296,6 +303,11 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
   isOpen,
   onClose,
   onOpenQAModal,
+  eventId,
+  currentLocation = 'Bengaluru',
+  expectedGuests = 350,
+  totalBudget = 1200000,
+  onApplyVenue,
 }) => {
   const [activeTab, setActiveTab] = useState<TourTab>('themes_atelier');
   const [selectedTheme, setSelectedTheme] = useState<CelebrationTheme>(CELEBRATION_THEMES[0]);
@@ -452,6 +464,18 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
             </button>
 
             <button
+              onClick={() => setActiveTab('venues_radar')}
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                activeTab === 'venues_radar'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5 text-rose-400" />
+              <span>Grounded Venue & Party Hall Radar</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('dynamic_itinerary')}
               className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === 'dynamic_itinerary'
@@ -558,99 +582,145 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                 </div>
               </div>
 
-              {/* Active Theme Grand Visual & Operational Panel */}
-              <div className="rounded-3xl border-2 border-amber-400/50 overflow-hidden shadow-xl bg-gradient-to-b from-white to-[#FDFBF7] dark:from-[#1D1630] dark:to-[#140F22]">
-                <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full overflow-hidden bg-slate-950">
-                  <img
-                    key={selectedTheme.id}
-                    src={selectedTheme.imageSrc}
-                    alt={selectedTheme.imageAlt}
-                    className="w-full h-full object-cover object-center filter brightness-[0.9] hover:scale-102 transition-all duration-500 animate-in fade-in"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              {/* Active Theme Grand Visual & Operational Showcase (Crisp Split Layout) */}
+              <div className="rounded-3xl border-2 border-amber-400/50 overflow-hidden shadow-xl bg-gradient-to-br from-white via-[#FDFBF7] to-amber-50/20 dark:from-[#1D1630] dark:via-[#140F22] dark:to-[#171126] p-5 sm:p-6">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                  {/* Left Column: Crisp Portrait Showcase Frame */}
+                  <div className="relative w-full md:w-5/12 max-w-sm h-[440px] rounded-2xl overflow-hidden bg-slate-950 border border-amber-400/40 shadow-2xl flex-shrink-0 group mx-auto md:mx-0">
+                    <img
+                      key={selectedTheme.id}
+                      src={selectedTheme.imageSrc}
+                      alt={selectedTheme.imageAlt}
+                      className="w-full h-full object-cover object-center filter brightness-[0.94] group-hover:scale-105 transition-transform duration-700 animate-in fade-in"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
 
-                  {/* GCS Bucket Synced Badge */}
-                  <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-amber-400/30 text-[10px] text-amber-200 font-mono flex items-center gap-1.5 shadow-md">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>GCS Bucket Synced: gs://festivapulse-cloud-assets/themes/{selectedTheme.id}.jpg</span>
-                  </div>
+                    {/* GCS Bucket Synced Badge */}
+                    <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-amber-400/40 text-[10px] text-amber-200 font-mono flex items-center gap-1.5 shadow-md">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>GCS: {selectedTheme.id}.jpg</span>
+                    </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500 text-slate-950 inline-block mb-2">
-                      {selectedTheme.category}
-                    </span>
-                    <h3 className="text-xl sm:text-3xl font-black text-white font-display drop-shadow-md">
-                      {selectedTheme.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-amber-100/90 font-sans max-w-2xl mt-1 drop-shadow">
-                      {selectedTheme.tagline}
-                    </p>
-                  </div>
+                    {/* Soundscape Audio Button */}
+                    <div className="absolute top-3 right-3">
+                      <button
+                        type="button"
+                        onClick={toggleAudio}
+                        className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/40 text-amber-300 hover:text-white text-[11px] font-bold flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
+                      >
+                        <Music className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{audioPlaying ? 'Sound On' : 'Play Soundscape'}</span>
+                      </button>
+                    </div>
 
-                  {/* Soundscape Badge */}
-                  <div className="absolute top-4 right-4">
-                    <button
-                      type="button"
-                      onClick={toggleAudio}
-                      className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-amber-400/40 text-amber-300 hover:text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition-all"
-                    >
-                      <Music className="w-3.5 h-3.5 text-amber-400" />
-                      <span>{selectedTheme.audioName}</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Theme Highlights & Specifications */}
-                <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2 md:col-span-2">
-                    <h5 className="heading-section text-xs font-bold">Timeless Cultural Protocols</h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                      {selectedTheme.culturalElements.map((elem, i) => (
-                        <div
-                          key={i}
-                          className="p-2.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 flex items-center gap-2"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                          <span className="text-slate-800 dark:text-slate-200">{elem}</span>
-                        </div>
-                      ))}
+                    {/* Bottom Caption on Image */}
+                    <div className="absolute bottom-3 left-3 right-3 pointer-events-none">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500 text-slate-950 inline-block mb-1 shadow-sm">
+                        {selectedTheme.category}
+                      </span>
+                      <h4 className="text-base font-bold text-white drop-shadow font-display">
+                        {selectedTheme.name}
+                      </h4>
+                      <p className="text-[11px] text-amber-200/90 font-mono drop-shadow">
+                        Audio: {selectedTheme.audioName}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 space-y-3 text-xs">
+                  {/* Right Column: Theme Details, Specifications & Grounded Navigation */}
+                  <div className="w-full md:w-7/12 space-y-4">
                     <div>
-                      <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
-                        Recommended Investment Band
-                      </span>
-                      <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">
-                        {selectedTheme.recommendedBudget}
-                      </span>
+                      <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                        <span>Theme Concept #{CELEBRATION_THEMES.findIndex((t) => t.id === selectedTheme.id) + 1} of 8</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 font-display mt-1">
+                        {selectedTheme.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mt-1">
+                        {selectedTheme.tagline}
+                      </p>
                     </div>
 
-                    <div>
-                      <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
-                        Sound Curfew Ordinance
-                      </span>
-                      <span className="text-xs font-semibold text-rose-700 dark:text-rose-400">
-                        {selectedTheme.curfewProfile}
-                      </span>
+                    {/* Timeless Cultural Protocols */}
+                    <div className="space-y-2">
+                      <h5 className="heading-section text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Timeless Cultural Protocols & Ritual Highlights</span>
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        {selectedTheme.culturalElements.map((elem, i) => (
+                          <div
+                            key={i}
+                            className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 flex items-start gap-2"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-slate-800 dark:text-slate-200 font-medium">{elem}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('dynamic_itinerary')}
-                      className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <span>Customize Location & Menu</span>
-                      <Compass className="w-3.5 h-3.5" />
-                    </button>
+                    {/* Financial & Curfew Metrics */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-xs">
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
+                          Recommended Investment Band
+                        </span>
+                        <span className="text-sm sm:text-base font-bold font-mono text-slate-900 dark:text-slate-100">
+                          {selectedTheme.recommendedBudget}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
+                          Sound Curfew Ordinance
+                        </span>
+                        <span className="text-xs font-semibold text-rose-700 dark:text-rose-400">
+                          {selectedTheme.curfewProfile}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('venues_radar')}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-slate-950 font-black text-xs shadow-md hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-slate-950" />
+                        <span>Find Surrounding Party Halls for this Theme</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('dynamic_itinerary')}
+                        className="py-2.5 px-4 rounded-xl bg-white dark:bg-[#1D1630] border border-amber-400/50 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Customize Menu & Itinerary</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 2: Dynamic Itinerary & Regional Menu */}
+          {/* TAB 2: Grounded Spatial RAG Venue & Party Hall Radar */}
+          {activeTab === 'venues_radar' && (
+            <div className="space-y-6">
+              <GroundedVenueMapExplorer
+                eventId={eventId}
+                currentLocation={currentLocation}
+                expectedGuests={expectedGuests}
+                totalBudget={totalBudget}
+                onApplyVenue={onApplyVenue}
+              />
+            </div>
+          )}
+
+          {/* TAB 3: Dynamic Itinerary & Regional Menu */}
           {activeTab === 'dynamic_itinerary' && (
             <DynamicItineraryMenu />
           )}

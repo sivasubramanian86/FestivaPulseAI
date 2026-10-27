@@ -21,6 +21,7 @@ from backend.app.services.firestore_service import firestore_service
 from backend.app.services.gemini_service import gemini_service
 from backend.app.services.monitoring_service import monitoring_service
 from backend.app.services.storage_service import EventState, storage_service
+from backend.app.services.venue_rag_service import venue_rag_service
 
 router = APIRouter(prefix="/api/v1/event", tags=["Event"])
 adk_supervisor = EventSupervisorAgent()
@@ -268,3 +269,97 @@ async def list_presets() -> list[dict[str, Any]]:
             "vibe": "Retro 1970s acoustic lounge with kids play zone and diabetic-friendly dessert station",
         },
     ]
+
+
+@router.get("/venues/search")
+async def search_venues(
+    location: str = "Bengaluru",
+    guests: int = 350,
+    budget: int = 1200000,
+) -> dict[str, Any]:
+    """Retrieves grounded celebration halls matching location, capacity, and budget."""
+    halls = venue_rag_service.search_halls(location, guests, budget)
+    return {
+        "success": True,
+        "location": location,
+        "count": len(halls),
+        "venues": [h.model_dump() for h in halls],
+    }
+
+
+@router.post("/{event_id}/venues/apply/{venue_id}")
+async def apply_venue_selection(event_id: str, venue_id: str) -> dict[str, Any]:
+    """Applies a selected grounded venue to the active celebration and recalibrates the plan."""
+    state = storage_service.get_event(event_id)
+    if not state:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Event {event_id} not found")
+
+    hall = venue_rag_service.get_hall_by_id(venue_id)
+    if not hall:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Venue hall {venue_id} not found")
+
+    # 1. Update location & capacity in blueprint and intake
+    venue_full_title = f"{hall.name}, {hall.city}"
+    state.blueprint.location = venue_full_title
+    state.blueprint.max_venue_capacity = hall.capacity_max
+    state.intake.location = venue_full_title
+    state.intake.max_venue_capacity = hall.capacity_max
+
+    # 2. Recalculate financial investment plan
+    guests = state.blueprint.expected_guests
+    inv_plan = venue_rag_service.calculate_hall_investment_plan(hall, guests, state.blueprint.currency)
+
+    # 3. Rebalance categories
+    categories = [
+        BudgetCategoryItem(
+            category_name="Venue & Hospitality",
+            approved_budget=inv_plan["base_rental_inr"],
+            spent_amount=inv_plan["base_rental_inr"],
+            committed_unpaid=0,
+            uncommitted_planned=0,
+            is_protected_anchor=True,
+            notes=f"Authorized hall lease for {hall.name} ({hall.area})",
+        ),
+        BudgetCategoryItem(
+            category_name="Catering & Feast",
+            approved_budget=inv_plan["catering_cost_inr"],
+            spent_amount=int(inv_plan["catering_cost_inr"] * 0.35),
+            committed_unpaid=int(inv_plan["catering_cost_inr"] * 0.50),
+            uncommitted_planned=int(inv_plan["catering_cost_inr"] * 0.15),
+            is_protected_anchor=True,
+            notes=f"40/30/30 batch feast with zero food waste protocol @ ₹{hall.per_plate_veg_inr}/plate",
+        ),
+        BudgetCategoryItem(
+            category_name="Eco-Decor & Florals",
+            approved_budget=inv_plan["decor_cost_inr"],
+            spent_amount=int(inv_plan["decor_cost_inr"] * 0.25),
+            committed_unpaid=int(inv_plan["decor_cost_inr"] * 0.50),
+            uncommitted_planned=int(inv_plan["decor_cost_inr"] * 0.25),
+            is_protected_anchor=False,
+            notes="Eco-friendly venue floral styling & ambient stage arch",
+        ),
+        BudgetCategoryItem(
+            category_name="Acoustic AV & Entertainment",
+            approved_budget=inv_plan["av_sound_cost_inr"],
+            spent_amount=int(inv_plan["av_sound_cost_inr"] * 0.25),
+            committed_unpaid=int(inv_plan["av_sound_cost_inr"] * 0.50),
+            uncommitted_planned=int(inv_plan["av_sound_cost_inr"] * 0.25),
+            is_protected_anchor=False,
+            notes=f"Calibrated under 75dB; curfew strictly locked at {hall.sound_curfew_time}",
+        ),
+    ]
+
+    total_calc = inv_plan["total_estimated_inr"]
+    state.blueprint.total_budget = total_calc
+    state.intake.total_budget = total_calc
+    state.ledger = calculate_budget_ledger(state.blueprint.id, total_calc, categories, state.blueprint.currency)
+    state.version += 1
+
+    return {
+        "success": True,
+        "message": f"Celebration re-anchored to {hall.name} ({hall.city})",
+        "hall": hall.model_dump(),
+        "investment_plan": inv_plan,
+        "blueprint": state.blueprint.model_dump(),
+        "ledger": state.ledger.model_dump(),
+    }

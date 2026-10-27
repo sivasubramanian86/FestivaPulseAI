@@ -232,6 +232,28 @@ const MainCockpit: React.FC = () => {
     }
   };
 
+  // Handle Applying Grounded Venue Selection from Spatial RAG
+  const handleApplyVenue = async (hall: any, _investmentPlan?: any) => {
+    if (!blueprint) return;
+    setLoading(true);
+    try {
+      const res = await api.applyVenue(blueprint.id, hall.id);
+      if (res.blueprint) setBlueprint(res.blueprint);
+      if (res.ledger) setLedger(res.ledger);
+      const updatedLoc = `${res.hall.name}, ${res.hall.city}`;
+      setGpsLocation(updatedLoc);
+      if (res.hall?.latitude && res.hall?.longitude) {
+        setGpsCoords(`${res.hall.latitude}° N, ${res.hall.longitude}° E`);
+      }
+      alert(`Applied Grounded Venue: ${res.hall.name}! Itinerary & budget re-calibrated.`);
+    } catch (err: any) {
+      console.error('Failed to apply venue:', err);
+      alert(`Could not apply venue: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {/* Top Command Cockpit Navigation */}
@@ -333,6 +355,7 @@ const MainCockpit: React.FC = () => {
             blueprint={blueprint}
             onGenerateBlueprint={handleGenerateBlueprint}
             loading={loading}
+            onApplyVenue={handleApplyVenue}
           />
         )}
 
@@ -457,6 +480,11 @@ const MainCockpit: React.FC = () => {
           setTourOpen(false);
           setQaModalOpen(true);
         }}
+        eventId={blueprint?.id}
+        currentLocation={blueprint?.location || gpsLocation}
+        expectedGuests={blueprint?.expected_guests || 350}
+        totalBudget={blueprint?.total_budget || 1200000}
+        onApplyVenue={handleApplyVenue}
       />
 
       {/* Dockable Live GenAI X-Ray Telemetry Drawer */}

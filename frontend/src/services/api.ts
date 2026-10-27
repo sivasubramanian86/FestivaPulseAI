@@ -145,4 +145,18 @@ export const api = {
     const data = await res.json();
     return data.languages || {};
   },
+
+  async searchVenues(location: string = 'Bengaluru', guests: number = 350, budget: number = 1200000): Promise<any> {
+    const res = await fetch(`${API_BASE}/event/venues/search?location=${encodeURIComponent(location)}&guests=${guests}&budget=${budget}`);
+    if (!res.ok) throw new Error('Failed to retrieve grounded venue halls');
+    return res.json();
+  },
+
+  async applyVenue(eventId: string, venueId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/event/${eventId}/venues/apply/${venueId}`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error('Failed to apply venue selection');
+    return res.json();
+  },
 };
