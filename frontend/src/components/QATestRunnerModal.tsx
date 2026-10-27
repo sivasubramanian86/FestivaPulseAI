@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PlayCircle, CheckCircle2, X, ShieldCheck, Clock, RefreshCw } from 'lucide-react';
 import { api } from '../services/api';
 import { QATestSuiteResponse } from '../types';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface QATestRunnerModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface QATestRunnerModalProps {
 }
 
 export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [suiteResult, setSuiteResult] = useState<QATestSuiteResponse | null>(null);
 
@@ -33,18 +35,18 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
       aria-labelledby="qa-modal-title"
       className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
     >
-      <div className="bg-white dark:bg-tactical-darkSurface rounded-2xl w-full max-w-2xl border border-slate-200 dark:border-tactical-darkBorder shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white/95 dark:bg-[#140F22]/95 backdrop-blur-xl rounded-2xl w-full max-w-2xl border border-[#E8DFD1] dark:border-[#352952] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-5 border-b border-slate-200 dark:border-tactical-darkBorder flex items-center justify-between bg-slate-50 dark:bg-tactical-darkCard">
+        <div className="p-5 border-b border-[#E8DFD1] dark:border-[#352952] flex items-center justify-between bg-[#FDFBF7] dark:bg-[#1D1630]">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="qa-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Automated Domain Invariant & Edge-Case Test Runner
+              <h2 id="qa-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100 font-display">
+                {t.qa.title}
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Live evaluation evidence verifying zero fake arithmetic</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t.qa.subtitle}</p>
             </div>
           </div>
 
@@ -61,23 +63,22 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
         <div className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <p className="text-xs text-slate-600 dark:text-slate-300">
-              Click below to execute all deterministic assertions programmatically across budget reconciliation,
-              FSSAI compliance, HSE capacity limits, and timeline DAG shifts:
+              {t.qa.prompt}
             </p>
             <button
               onClick={handleRunTests}
               disabled={loading}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow flex items-center gap-1.5 transition-colors disabled:opacity-50 flex-shrink-0"
+              className="btn-emerald px-4 py-2 rounded-xl text-white font-semibold text-xs shadow flex items-center gap-1.5 transition-colors disabled:opacity-50 flex-shrink-0"
             >
               {loading ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Executing Tests...</span>
+                  <span>{t.qa.running}</span>
                 </>
               ) : (
                 <>
                   <PlayCircle className="w-3.5 h-3.5" />
-                  <span>Run All Test Cases</span>
+                  <span>{t.qa.runBtn}</span>
                 </>
               )}
             </button>
@@ -112,12 +113,12 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
                 {suiteResult.results.map((t) => (
                   <div
                     key={t.id}
-                    className="p-3 rounded-xl border border-slate-200 dark:border-tactical-darkBorder bg-slate-50 dark:bg-tactical-darkCard flex items-start justify-between text-xs"
+                    className="p-3 rounded-xl border border-[#E8DFD1] dark:border-[#352952] bg-[#FDFBF7] dark:bg-[#1D1630] flex items-start justify-between text-xs"
                   >
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-slate-900 dark:text-slate-100">{t.id}: {t.name}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300">
                           {t.category}
                         </span>
                       </div>
@@ -144,12 +145,12 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 dark:border-tactical-darkBorder bg-slate-50 dark:bg-tactical-darkCard flex justify-end">
+        <div className="p-4 border-t border-[#E8DFD1] dark:border-[#352952] bg-[#FDFBF7] dark:bg-[#1D1630] flex justify-end">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors"
           >
-            Close
+            {t.qa.closeBtn}
           </button>
         </div>
       </div>

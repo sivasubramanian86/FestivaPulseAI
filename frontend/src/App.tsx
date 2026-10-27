@@ -192,7 +192,7 @@ const MainCockpit: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-tactical-light dark:bg-tactical-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-transparent text-slate-900 dark:text-slate-100 transition-colors duration-300">
       {/* Top Command Cockpit Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -244,8 +244,8 @@ const MainCockpit: React.FC = () => {
       </main>
 
       {/* Cockpit Footer */}
-      <footer className="border-t border-slate-200 dark:border-tactical-darkBorder bg-white/70 dark:bg-tactical-darkSurface/70 py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400">
-        <p className="font-semibold text-slate-700 dark:text-slate-200">
+      <footer className="border-t border-[#E8DFD1] dark:border-[#352952] bg-white/70 dark:bg-[#140F22]/70 backdrop-blur-md py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p className="font-semibold text-slate-800 dark:text-slate-200 font-display">
           FestivaPulseAI — {t.nav.brandSubtitle}
         </p>
         <p className="mt-1">

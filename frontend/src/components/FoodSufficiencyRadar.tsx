@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { FoodSufficiencyRadar as FoodRadarType } from '../types';
+import { useTranslation } from '../i18n';
 
 interface FoodSufficiencyRadarProps {
   radar: FoodRadarType | null;
@@ -21,6 +22,7 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
   onGenerateFssaiManifest,
   loading,
 }) => {
+  const { t } = useTranslation();
   const [surplusKg, setSurplusKg] = useState(35);
   const [hotTemp, setHotTemp] = useState(68);
   const [coldTemp, setColdTemp] = useState(4);
@@ -28,9 +30,9 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
 
   if (!radar) {
     return (
-      <div className="tactical-card text-center py-12">
-        <UtensilsCrossed className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-        <p className="text-sub">Initialize an event to view the live Food Sufficiency Radar.</p>
+      <div className="tactical-card text-center py-16">
+        <UtensilsCrossed className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+        <p className="text-sub max-w-md mx-auto">{t.radar.emptySub}</p>
       </div>
     );
   }
@@ -46,80 +48,80 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
       <div className="tactical-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                <UtensilsCrossed className="w-4 h-4" />
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-700 text-white shadow-sm">
+                <UtensilsCrossed className="w-5 h-5" />
               </span>
-              <h3 className="heading-card">FestivaFoodGuard: Category-Level Sufficiency Radar</h3>
+              <h3 className="heading-card">{t.radar.title}</h3>
             </div>
-            <p className="text-sub mt-1">
-              Real-time consumption curves, tray burn rates, and zero-stockout monitoring by dietary category.
+            <p className="text-sub mt-1.5 max-w-2xl">
+              {t.radar.subtitle}
             </p>
           </div>
 
           {/* Quick Summary Pill */}
           <div className="flex items-center gap-3 flex-wrap">
             {radar.total_shortfall_count > 0 ? (
-              <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800 flex items-center gap-1.5 animate-pulse">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold font-mono bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800 flex items-center gap-1.5 animate-pulse">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                {radar.total_shortfall_count} Portion Shortfall
+                {radar.total_shortfall_count} {t.radar.shortfall}
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                Zero Shortfall Guaranteed
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold font-mono bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                {t.radar.zeroShortfall}
               </span>
             )}
-            <span className="text-xs font-medium font-mono text-slate-500 dark:text-slate-400">
-              {radar.total_surplus_count} Surplus Portions
+            <span className="text-xs font-medium font-mono text-slate-600 dark:text-slate-300 bg-amber-50 dark:bg-[#1D1630] px-3 py-1.5 rounded-full border border-amber-200 dark:border-[#352952]">
+              {radar.total_surplus_count} {t.radar.surplusPortions}
             </span>
           </div>
         </div>
 
         {/* Category Breakdown Table */}
-        <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 dark:border-tactical-darkBorder">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-tactical-darkBorder text-xs">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-[#E8DFD1] dark:border-[#352952] shadow-sm">
+          <table className="min-w-full divide-y divide-[#E8DFD1] dark:divide-[#352952] text-xs">
             <thead>
-              <tr className="bg-slate-50 dark:bg-tactical-darkCard text-slate-600 dark:text-slate-300">
-                <th className="px-3 py-2.5 text-left font-semibold">Dietary Category</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Required</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Prepared</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Served</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Available</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Burn Rate</th>
-                <th className="px-3 py-2.5 text-center font-semibold">Depletion Time</th>
-                <th className="px-3 py-2.5 text-center font-semibold">Net Balance</th>
+              <tr className="bg-[#FAF7F2] dark:bg-[#1D1630] text-slate-700 dark:text-[#E8DFD1]">
+                <th className="px-3.5 py-3 text-left font-bold">{t.radar.categoryCol}</th>
+                <th className="px-3.5 py-3 text-right font-bold">{t.radar.requiredCol}</th>
+                <th className="px-3.5 py-3 text-right font-bold">{t.radar.preparedCol}</th>
+                <th className="px-3.5 py-3 text-right font-bold">{t.radar.servedCol}</th>
+                <th className="px-3.5 py-3 text-right font-bold">{t.radar.availableCol}</th>
+                <th className="px-3.5 py-3 text-right font-bold">{t.radar.burnRateCol}</th>
+                <th className="px-3.5 py-3 text-center font-bold">{t.radar.depletionCol}</th>
+                <th className="px-3.5 py-3 text-center font-bold">{t.radar.netBalanceCol}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-tactical-darkBorder text-slate-800 dark:text-slate-200">
+            <tbody className="divide-y divide-[#EFE8DD] dark:divide-[#352952] text-slate-800 dark:text-slate-200 bg-white/70 dark:bg-[#140F22]/70">
               {radar.categories.map((c, i) => (
                 <tr
                   key={i}
                   className={
                     c.is_critical_shortage
-                      ? 'bg-red-50/70 dark:bg-red-950/30'
-                      : 'hover:bg-slate-50/60 dark:hover:bg-tactical-darkCard/50 transition-colors'
+                      ? 'bg-red-50/80 dark:bg-red-950/40'
+                      : 'hover:bg-amber-50/40 dark:hover:bg-[#1D1630]/60 transition-colors'
                   }
                 >
-                  <td className="px-3 py-2.5 font-semibold flex items-center gap-2">
+                  <td className="px-3.5 py-3 font-semibold flex items-center gap-2">
                     {c.is_critical_shortage && (
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                      <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
                     )}
                     <span>{c.category}</span>
                   </td>
-                  <td className="px-3 py-2.5 text-right font-mono text-slate-600 dark:text-slate-400">{c.required_portions}</td>
-                  <td className="px-3 py-2.5 text-right font-mono font-medium">{c.prepared_portions}</td>
-                  <td className="px-3 py-2.5 text-right font-mono text-slate-600 dark:text-slate-400">{c.served_portions}</td>
-                  <td className="px-3 py-2.5 text-right font-mono font-bold text-slate-900 dark:text-slate-100">{c.available_portions}</td>
-                  <td className="px-3 py-2.5 text-right font-mono font-medium text-amber-700 dark:text-amber-400">
+                  <td className="px-3.5 py-3 text-right font-mono text-slate-600 dark:text-slate-400">{c.required_portions}</td>
+                  <td className="px-3.5 py-3 text-right font-mono font-medium">{c.prepared_portions}</td>
+                  <td className="px-3.5 py-3 text-right font-mono text-slate-600 dark:text-slate-400">{c.served_portions}</td>
+                  <td className="px-3.5 py-3 text-right font-mono font-bold text-slate-900 dark:text-slate-100">{c.available_portions}</td>
+                  <td className="px-3.5 py-3 text-right font-mono font-medium text-amber-700 dark:text-amber-400">
                     {c.burn_rate_plates_per_min} pl/min
                   </td>
-                  <td className="px-3 py-2.5 text-center font-mono font-medium">
+                  <td className="px-3.5 py-3 text-center font-mono font-medium">
                     {c.depletion_projected_minutes !== null ? (
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
+                      <span className={`px-2.5 py-0.5 rounded text-[11px] font-semibold ${
                         c.depletion_projected_minutes < 25
                           ? 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                          : 'bg-amber-100/70 dark:bg-slate-800 text-amber-900 dark:text-amber-300'
                       }`}>
                         ~{c.depletion_projected_minutes} mins
                       </span>
@@ -127,9 +129,9 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
                       <span className="text-slate-400 dark:text-slate-500 font-sans">Stable</span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-center font-mono">
+                  <td className="px-3.5 py-3 text-center font-mono">
                     <span
-                      className={`px-2 py-0.5 rounded-full font-bold text-[11px] ${
+                      className={`px-3 py-0.5 rounded-full font-bold text-[11px] ${
                         c.net_shortfall_or_surplus < 0
                           ? 'bg-red-600 text-white'
                           : c.net_shortfall_or_surplus === 0
@@ -151,33 +153,33 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
       <div className="tactical-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
-                <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center gap-2.5">
+              <span className="p-2 rounded-xl bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300/40">
+                <ShieldCheck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </span>
               <h3 className="heading-card">
-                FSSAI Regulatory Food-Surplus Rescue & ESG Manifest
+                {t.radar.fssaiTitle}
               </h3>
             </div>
-            <p className="text-sub mt-1">
-              Certified handoff workflow matching Feeding India & Robin Hood Army with ESG carbon offset certificates.
+            <p className="text-sub mt-1.5 max-w-2xl">
+              {t.radar.fssaiSub}
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setShowManifestForm(!showManifestForm)}
-            className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto shadow-sm"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-500 hover:to-emerald-600 text-white text-xs font-semibold flex items-center gap-1.5 transition-all self-start sm:self-auto shadow-sm"
           >
-            <Leaf className="w-3.5 h-3.5 text-emerald-300" />
-            <span>{showManifestForm ? 'Close Dispatch Form' : 'Generate FSSAI Dispatch Pass'}</span>
+            <Leaf className="w-4 h-4 text-emerald-300" />
+            <span>{showManifestForm ? t.radar.fssaiCloseBtn : t.radar.fssaiGenerateBtn}</span>
           </button>
         </div>
 
         {/* FSSAI Form */}
         {showManifestForm && (
           <form onSubmit={handleManifestSubmit} className="mt-6 tactical-subcard space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
                 <label className="tactical-label">Surplus Quantity (kg)</label>
                 <input
@@ -223,10 +225,10 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white text-xs font-semibold shadow transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 hover:from-emerald-500 hover:to-teal-600 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 disabled:opacity-50 active:scale-[0.99]"
               >
-                <Truck className="w-3.5 h-3.5" />
-                <span>Verify & Issue FSSAI Food Rescue Pass</span>
+                <Truck className="w-4 h-4" />
+                <span>{t.radar.fssaiIssueBtn}</span>
               </button>
             </div>
           </form>
@@ -234,7 +236,7 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
 
         {/* Active Generated Manifest Certificate */}
         {radar.fssai_manifest && (
-          <div className="mt-6 p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
+          <div className="mt-6 p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-800/60 space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
@@ -242,7 +244,7 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
                   Official FSSAI Chain-of-Custody Manifest: {radar.fssai_manifest.manifest_id}
                 </span>
               </div>
-              <span className={`px-2 py-0.5 rounded text-[11px] font-bold font-mono ${
+              <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold font-mono ${
                 radar.fssai_manifest.is_temperature_compliant
                   ? 'bg-emerald-200 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200'
                   : 'bg-red-200 dark:bg-red-900/60 text-red-900 dark:text-red-200'

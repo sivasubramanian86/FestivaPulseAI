@@ -3,12 +3,18 @@ import { SupportedLanguage, TranslationDictionary } from './types';
 import { en } from './locales/en';
 import { ta } from './locales/ta';
 import { hi } from './locales/hi';
+import { te } from './locales/te';
+import { kn } from './locales/kn';
+import { ml } from './locales/ml';
 import { es } from './locales/es';
 
 const dictionaries: Record<SupportedLanguage, TranslationDictionary> = {
   en,
   ta,
   hi,
+  te,
+  kn,
+  ml,
   es,
 };
 
