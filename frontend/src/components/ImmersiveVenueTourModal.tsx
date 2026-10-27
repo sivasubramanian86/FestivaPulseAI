@@ -12,7 +12,11 @@ import {
   CheckCircle2,
   Layers,
   ShieldCheck,
+  Calendar,
+  Heart,
+  Music,
 } from 'lucide-react';
+import { DynamicItineraryMenu } from './DynamicItineraryMenu';
 
 interface ImmersiveVenueTourModalProps {
   isOpen: boolean;
@@ -20,8 +24,194 @@ interface ImmersiveVenueTourModalProps {
   onOpenQAModal?: () => void;
 }
 
-type TourTab = 'digital_twin' | 'transformation' | 'sensory_4dx' | 'guided_walkthrough';
+export type TourTab =
+  | 'themes_atelier'
+  | 'dynamic_itinerary'
+  | 'digital_twin'
+  | 'transformation'
+  | 'sensory_4dx'
+  | 'guided_walkthrough';
+
 type LightingMode = 'daylight' | 'candlelight' | 'sangeet';
+
+interface CelebrationTheme {
+  id: string;
+  name: string;
+  category: string;
+  tagline: string;
+  imageSrc: string;
+  imageAlt: string;
+  audioName: string;
+  audioFrequencies: number[];
+  audioWaveType: OscillatorType;
+  culturalElements: string[];
+  recommendedBudget: string;
+  curfewProfile: string;
+  colorGradient: string;
+}
+
+const CELEBRATION_THEMES: CelebrationTheme[] = [
+  {
+    id: 'raja_rani',
+    name: 'Raja Rani Rajasthan Palace Wedding',
+    category: 'Royal Heritage',
+    tagline: 'Opulent Rajput Fort Grandeur with Marigold Arches, Golden Torches & Royal Fanfare',
+    imageSrc: '/assets/cultural_themes.jpg',
+    imageAlt: 'Raja Rani Royal Wedding Theme',
+    audioName: 'Royal Shehnai Fanfare & Nagada Drone',
+    audioFrequencies: [130.81, 196.0, 261.63, 392.0],
+    audioWaveType: 'sawtooth',
+    culturalElements: [
+      'Carved Teak Mandap with 24k Gold Accents',
+      'Ceremonial Agni Kund with Sandalwood Logs',
+      'Live Shehnai & Nagada Auspicious Procession',
+      'Grand Royal Thali Feast on Brassware',
+    ],
+    recommendedBudget: '₹35,00,000 - ₹80,00,000',
+    curfewProfile: 'Sound Curfew 22:30 (Acoustic Folk After)',
+    colorGradient: 'from-amber-600 via-rose-700 to-amber-900',
+  },
+  {
+    id: 'tamil_brahmin',
+    name: 'Tamil Brahmin Grand Temple Kalyanam',
+    category: 'Vedic Temple Heritage',
+    tagline: 'Sacred Gopuram Sanctum, Brass Kuthuvilakku Lamps, Vedic Chants & Fresh Lotus Arches',
+    imageSrc: '/assets/cultural_themes.jpg',
+    imageAlt: 'Tamil Brahmin Kalyanam Theme',
+    audioName: 'Temple Nadaswaram & Thavil Drone (Sa-Pa-Sa)',
+    audioFrequencies: [138.59, 207.65, 277.18],
+    audioWaveType: 'triangle',
+    culturalElements: [
+      'Kasi Yatra & Oonjal Swing Ceremony with Silk Cushions',
+      '18-Dish Authentic Banana Leaf Sadya (No Onion/Garlic)',
+      'Live Master Nadaswaram & Thavil Artists',
+      'Fresh Jasmine (Malli) Floral Pillars',
+    ],
+    recommendedBudget: '₹12,00,000 - ₹30,00,000',
+    curfewProfile: 'Strict Temple Muhurtham 07:30 - 11:30 AM',
+    colorGradient: 'from-amber-500 via-orange-600 to-amber-800',
+  },
+  {
+    id: 'church_cathedral',
+    name: 'Grand Church Cathedral Nuptial Mass',
+    category: 'Christian Nuptials',
+    tagline: 'Majestic Stained Glass Gothic Sanctuary, White Floral Aisle & Angelic Choral Harmony',
+    imageSrc: '/assets/cultural_themes.jpg',
+    imageAlt: 'Grand Church Cathedral Wedding',
+    audioName: 'Cathedral Pipe Organ & Choral Resonance',
+    audioFrequencies: [130.81, 164.81, 196.0, 261.63, 329.63],
+    audioWaveType: 'sine',
+    culturalElements: [
+      '80-Foot White Satin Velvet Aisle Runner',
+      'Tiered Ivory Fondant Cake & Champagne Toast',
+      'Classical String Quartet & Church Choir',
+      'European Roasted Gourmet Banquet & Pastry Station',
+    ],
+    recommendedBudget: '₹15,00,000 - ₹45,00,000',
+    curfewProfile: 'Reception Curfew 23:00 (Permit Extended)',
+    colorGradient: 'from-sky-600 via-indigo-700 to-purple-900',
+  },
+  {
+    id: 'muslim_nikah',
+    name: 'Royal Muslim Maharaja Nikah & Walima',
+    category: 'Mughal Aristocracy',
+    tagline: 'Emerald & Ivory Jaali Pavilion, Scented Oudh Misting & Devotional Sufi Qawwali',
+    imageSrc: '/assets/cultural_themes.jpg',
+    imageAlt: 'Royal Muslim Nikah Theme',
+    audioName: 'Sufi Harmonium & Rubab Devotional Drone',
+    audioFrequencies: [146.83, 220.0, 293.66, 440.0],
+    audioWaveType: 'triangle',
+    culturalElements: [
+      'Hand-Carved Marble Mehraab Stage Backdrop',
+      'Segregated Zenana & Mardana Plush Lounges',
+      'Authentic Slow-Cooked Dum Biryani Handis',
+      'Silver Ittar (Attar) Fragrance Fountains',
+    ],
+    recommendedBudget: '₹25,00,000 - ₹60,00,000',
+    curfewProfile: 'Late Evening Walima Banquet (20:00 - 23:30)',
+    colorGradient: 'from-emerald-600 via-teal-700 to-slate-900',
+  },
+  {
+    id: 'ambani_luxury',
+    name: 'Ultra-Modern Billionaire Extravaganza',
+    category: 'Limitless Luxury',
+    tagline: 'Tiered Crystal Chandeliers, Drone Light Show, Floating Floral Fountains & Global Couture',
+    imageSrc: '/assets/modern_themes.jpg',
+    imageAlt: 'Ambani Style Billionaire Wedding',
+    audioName: 'Symphonic Strings & Philharmonic Resonance',
+    audioFrequencies: [130.81, 196.0, 246.94, 329.63, 493.88],
+    audioWaveType: 'sine',
+    culturalElements: [
+      'Swarovski Crystal Cascades with Automated Dimmers',
+      'Michelin-Star Celebrity Chef Live Pavilions',
+      'Synchronized 400-Drone Aerial Storytelling Display',
+      'Bespoke Gold-Plated Invitation & Concierge Fleet',
+    ],
+    recommendedBudget: '₹1,50,00,000 - ₹10,00,00,000+',
+    curfewProfile: 'Enclosed Acoustic Glasshouse (24h Soundproof)',
+    colorGradient: 'from-amber-400 via-purple-600 to-rose-700',
+  },
+  {
+    id: 'genz_neon',
+    name: 'Gen Z Neon Techno After-Party & Sangeet',
+    category: 'Trendsetter & Party',
+    tagline: 'Cyberpunk Laser Light Shows, LED Cocktail Bar, 128 BPM Sound System & Silent Disco',
+    imageSrc: '/assets/modern_themes.jpg',
+    imageAlt: 'Gen Z Neon Techno Party Theme',
+    audioName: 'Electronic 808 Synth Bassline & Rhythmic Pulse',
+    audioFrequencies: [55.0, 110.0, 220.0],
+    audioWaveType: 'sawtooth',
+    culturalElements: [
+      'Laser Beam Grid with Haze Fog Mapping',
+      'Molecular Cocktail Mixology with Liquid Nitrogen',
+      'Silent Disco Headphones Past 22:00 Curfew',
+      'Interactive RFID Photo Wall & TikTok Drone Cam',
+    ],
+    recommendedBudget: '₹8,00,000 - ₹22,00,000',
+    curfewProfile: 'Outdoor Cutoff 22:00 -> Indoor Club 02:00',
+    colorGradient: 'from-fuchsia-600 via-cyan-500 to-purple-900',
+  },
+  {
+    id: 'eco_harvest',
+    name: 'Eco-Friendly Community Harvest Festival',
+    category: 'Sustainable & Folk',
+    tagline: 'Zero-Waste Bamboo Pavilions, Banana Leaf Dining, Earthen Matkas & Live Folk Flute',
+    imageSrc: '/assets/modern_themes.jpg',
+    imageAlt: 'Eco Harvest Community Theme',
+    audioName: 'Earthen Bamboo Flute & Folk Whistle Harmonics',
+    audioFrequencies: [174.61, 261.63, 349.23],
+    audioWaveType: 'triangle',
+    culturalElements: [
+      '100% Biodegradable Areca Nut Tableware',
+      'Solar-Powered Amber Fairy Light Canopies',
+      'Organic Farm-to-Table Traditional Feast',
+      'FSSAI 0% Food Waste Route to Local Shelters',
+    ],
+    recommendedBudget: '₹4,00,000 - ₹10,00,00,000',
+    curfewProfile: 'Natural Daylight & Sunset Celebration',
+    colorGradient: 'from-emerald-600 via-amber-600 to-stone-800',
+  },
+  {
+    id: 'economy_courtyard',
+    name: 'Smart Economy / Intimate Courtyard Wedding',
+    category: 'Budget-Optimized Dignity',
+    tagline: 'Warm Brass Diyas, Rustic Stone Archways, Intimate 80-Guest Banquet & Acoustic Melody',
+    imageSrc: '/assets/modern_themes.jpg',
+    imageAlt: 'Economy Intimate Courtyard Theme',
+    audioName: 'Acoustic Courtyard Guitar & Sitar Resonance',
+    audioFrequencies: [146.83, 196.0, 293.66],
+    audioWaveType: 'sine',
+    culturalElements: [
+      'Warm Brass Diya Illuminations on Stone Steps',
+      'Family-Recipe Heritage Feast Service',
+      'Intimate 80-Seat Open Sky Courtyard Table',
+      'Maximum Financial Prudence with Zero Elegance Loss',
+    ],
+    recommendedBudget: '₹2,50,000 - ₹6,00,000',
+    curfewProfile: 'Compliant 22:00 Soft Acoustic Wrap',
+    colorGradient: 'from-amber-700 via-orange-800 to-slate-900',
+  },
+];
 
 interface VenueZone {
   id: string;
@@ -98,7 +288,8 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
   onClose,
   onOpenQAModal,
 }) => {
-  const [activeTab, setActiveTab] = useState<TourTab>('digital_twin');
+  const [activeTab, setActiveTab] = useState<TourTab>('themes_atelier');
+  const [selectedTheme, setSelectedTheme] = useState<CelebrationTheme>(CELEBRATION_THEMES[0]);
   const [selectedZone, setSelectedZone] = useState<VenueZone>(VENUE_ZONES[0]);
   const [transformSlider, setTransformSlider] = useState<number>(75);
   const [lightingMode, setLightingMode] = useState<LightingMode>('candlelight');
@@ -106,32 +297,38 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
   const audioCtxRef = useRef<AudioContext | null>(null);
   const oscNodesRef = useRef<OscillatorNode[]>([]);
 
-  // Web Audio classical tambura / harmonic drone synthesizer (client-side, 0 dependencies)
+  // Web Audio Multi-Harmonic Sound Synthesizer (0 dependencies, 100% client side)
   useEffect(() => {
     return () => {
       stopAudio();
     };
   }, []);
 
-  const startAudio = () => {
+  // Update audio dynamically when selectedTheme changes
+  useEffect(() => {
+    if (audioPlaying) {
+      stopAudio();
+      startAudio(selectedTheme);
+    }
+  }, [selectedTheme]);
+
+  const startAudio = (theme: CelebrationTheme = selectedTheme) => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       const ctx = new AudioCtx();
       audioCtxRef.current = ctx;
 
-      // Indian classical Sa-Pa-Sa drone (C3: 130.81Hz, G3: 196.00Hz, C4: 261.63Hz)
-      const frequencies = [130.81, 196.0, 261.63];
       const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0.08, ctx.currentTime);
+      masterGain.gain.setValueAtTime(0.07, ctx.currentTime);
       masterGain.connect(ctx.destination);
 
       const oscillators: OscillatorNode[] = [];
-      frequencies.forEach((freq) => {
+      theme.audioFrequencies.forEach((freq) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = 'triangle';
+        osc.type = theme.audioWaveType;
         osc.frequency.setValueAtTime(freq, ctx.currentTime);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
         osc.connect(gain);
         gain.connect(masterGain);
         osc.start();
@@ -166,7 +363,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
     if (audioPlaying) {
       stopAudio();
     } else {
-      startAudio();
+      startAudio(selectedTheme);
     }
   };
 
@@ -179,7 +376,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
       aria-labelledby="tour-modal-title"
       className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-300"
     >
-      <div className="bg-[#FAF7F2] dark:bg-[#140F22] rounded-3xl w-full max-w-5xl border-2 border-[#D4AF37]/50 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden my-auto animate-in zoom-in-95 duration-200">
+      <div className="bg-[#FAF7F2] dark:bg-[#140F22] rounded-3xl w-full max-w-6xl border-2 border-[#D4AF37]/50 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden my-auto animate-in zoom-in-95 duration-200">
         {/* Royal Crest Header */}
         <div className="relative p-5 sm:p-6 bg-gradient-to-r from-amber-900/10 via-amber-500/10 to-rose-900/10 dark:from-[#1D1630] dark:via-[#261B40] dark:to-[#1D1630] border-b border-[#E8DFD1] dark:border-[#352952]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -194,7 +391,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                   </span>
                   <span className="text-[11px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Interactive Digital Twin
+                    Multi-Cultural & GPS Enabled
                   </span>
                 </div>
                 <h2 id="tour-modal-title" className="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-[#FAF7F2] mt-0.5">
@@ -204,7 +401,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
             </div>
 
             <div className="flex items-center gap-2 self-end sm:self-center">
-              {/* Classical Ambience Audio Toggle */}
+              {/* Dynamic Theme Ambience Audio Toggle */}
               <button
                 type="button"
                 onClick={toggleAudio}
@@ -213,10 +410,12 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                     ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-400 shadow-sm animate-pulse'
                     : 'bg-white dark:bg-[#1D1630] text-slate-700 dark:text-slate-300 border-[#E8DFD1] dark:border-[#352952] hover:border-amber-400'
                 }`}
-                title="Toggle Live Indian Classical Tambura Ambience"
+                title="Toggle Live Theme-Matched Ambient Soundscape"
               >
                 {audioPlaying ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                <span>{audioPlaying ? 'Shehnai / Drone Active' : 'Play Ambient Sound'}</span>
+                <span className="font-sans">
+                  {audioPlaying ? selectedTheme.audioName.split(' ')[0] + ' Active' : 'Play Soundscape'}
+                </span>
               </button>
 
               <button
@@ -230,443 +429,591 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
           </div>
 
           {/* Sub-Tabs Navigation */}
-          <div className="flex items-center gap-2 mt-4 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5 mt-5 overflow-x-auto pb-1 scrollbar-none text-xs">
+            <button
+              onClick={() => setActiveTab('themes_atelier')}
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                activeTab === 'themes_atelier'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
+              }`}
+            >
+              <Heart className="w-3.5 h-3.5" />
+              <span>Multi-Cultural & Budget Atelier (8 Themes)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('dynamic_itinerary')}
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
+                activeTab === 'dynamic_itinerary'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Dynamic Itinerary & Regional Menu</span>
+            </button>
+
             <button
               onClick={() => setActiveTab('digital_twin')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === 'digital_twin'
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-slate-950 shadow-md font-bold'
-                  : 'bg-white/80 dark:bg-[#1D1630] text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 border border-[#E8DFD1] dark:border-[#352952]'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
               }`}
             >
               <MapPin className="w-3.5 h-3.5" />
-              <span>3D Digital Twin & Spatial Hotspots</span>
+              <span>3D Spatial Digital Twin</span>
             </button>
 
             <button
               onClick={() => setActiveTab('transformation')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === 'transformation'
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-slate-950 shadow-md font-bold'
-                  : 'bg-white/80 dark:bg-[#1D1630] text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 border border-[#E8DFD1] dark:border-[#352952]'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Bare Hall → Royal Transformation</span>
+              <span>Before & After Transformation</span>
             </button>
 
             <button
               onClick={() => setActiveTab('sensory_4dx')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === 'sensory_4dx'
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-slate-950 shadow-md font-bold'
-                  : 'bg-white/80 dark:bg-[#1D1630] text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 border border-[#E8DFD1] dark:border-[#352952]'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>4DX Sensory & Lighting Ambience</span>
+              <span>4DX Sensory & Lighting</span>
             </button>
 
             <button
               onClick={() => setActiveTab('guided_walkthrough')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all whitespace-nowrap ${
                 activeTab === 'guided_walkthrough'
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-slate-950 shadow-md font-bold'
-                  : 'bg-white/80 dark:bg-[#1D1630] text-slate-700 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 border border-[#E8DFD1] dark:border-[#352952]'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white/80 dark:bg-[#140F22]/80 text-slate-700 dark:text-slate-300 border border-[#E8DFD1] dark:border-[#352952]'
               }`}
             >
-              <Compass className="w-3.5 h-3.5" />
-              <span>App Core Guided Walkthrough</span>
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Autonomous Copilot Pillars</span>
             </button>
           </div>
         </div>
 
-        {/* Modal Content Body */}
-        <div className="p-5 sm:p-6 max-h-[72vh] overflow-y-auto space-y-6">
-          {/* TAB 1: 3D Digital Twin with Interactive Hotspots */}
-          {activeTab === 'digital_twin' && (
+        {/* Modal Body Container */}
+        <div className="p-5 sm:p-6 max-h-[75vh] overflow-y-auto space-y-6">
+          {/* TAB 1: Multi-Cultural & Budget Atelier (8 Themes) */}
+          {activeTab === 'themes_atelier' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                  Click on any interactive glowing zone pin below to inspect spatial geometry, capacity limits, and safety telemetry:
-                </p>
-                <span className="text-[11px] font-mono text-amber-800 dark:text-amber-300 font-bold bg-amber-100/60 dark:bg-amber-950/40 px-2.5 py-1 rounded-lg border border-amber-300/40">
-                  Active Zone: {selectedZone.name}
-                </span>
+              {/* Theme Selector Carousel Bar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                    Select Celebration Theme & Soundscape:
+                  </span>
+                  <span className="text-[11px] font-mono text-amber-700 dark:text-amber-400">
+                    Active: {selectedTheme.name}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {CELEBRATION_THEMES.map((theme) => {
+                    const isSelected = selectedTheme.id === theme.id;
+                    return (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        onClick={() => setSelectedTheme(theme)}
+                        className={`p-3 rounded-2xl border text-left transition-all ${
+                          isSelected
+                            ? 'bg-gradient-to-br from-amber-500/20 to-rose-500/10 border-amber-500 shadow-md scale-102 ring-1 ring-amber-400'
+                            : 'bg-white dark:bg-[#1D1630] border-[#E8DFD1] dark:border-[#352952] hover:border-amber-400'
+                        }`}
+                      >
+                        <span className="text-[10px] font-mono uppercase text-amber-700 dark:text-amber-400 font-bold block">
+                          {theme.category}
+                        </span>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-1 mt-0.5">
+                          {theme.name}
+                        </h4>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1 font-mono">
+                          {theme.recommendedBudget.split('-')[0]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* 3D Digital Twin Canvas Container */}
-              <div className="relative rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-xl bg-slate-950 aspect-[16/9] group">
+              {/* Active Theme Grand Visual & Operational Panel */}
+              <div className="rounded-3xl border-2 border-amber-400/50 overflow-hidden shadow-xl bg-gradient-to-b from-white to-[#FDFBF7] dark:from-[#1D1630] dark:to-[#140F22]">
+                <div className="relative aspect-[16/8] sm:aspect-[16/7] w-full overflow-hidden bg-slate-950">
+                  <img
+                    src={selectedTheme.imageSrc}
+                    alt={selectedTheme.imageAlt}
+                    className="w-full h-full object-cover object-center filter brightness-[0.9] hover:scale-102 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+
+                  <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500 text-slate-950 inline-block mb-2">
+                      {selectedTheme.category}
+                    </span>
+                    <h3 className="text-xl sm:text-3xl font-black text-white font-display drop-shadow-md">
+                      {selectedTheme.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-amber-100/90 font-sans max-w-2xl mt-1 drop-shadow">
+                      {selectedTheme.tagline}
+                    </p>
+                  </div>
+
+                  {/* Soundscape Badge */}
+                  <div className="absolute top-4 right-4">
+                    <button
+                      type="button"
+                      onClick={toggleAudio}
+                      className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-amber-400/40 text-amber-300 hover:text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition-all"
+                    >
+                      <Music className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{selectedTheme.audioName}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Theme Highlights & Specifications */}
+                <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2 md:col-span-2">
+                    <h5 className="heading-section text-xs font-bold">Timeless Cultural Protocols</h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      {selectedTheme.culturalElements.map((elem, i) => (
+                        <div
+                          key={i}
+                          className="p-2.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 flex items-center gap-2"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                          <span className="text-slate-800 dark:text-slate-200">{elem}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 space-y-3 text-xs">
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
+                        Recommended Investment Band
+                      </span>
+                      <span className="text-base font-bold font-mono text-slate-900 dark:text-slate-100">
+                        {selectedTheme.recommendedBudget}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block uppercase">
+                        Sound Curfew Ordinance
+                      </span>
+                      <span className="text-xs font-semibold text-rose-700 dark:text-rose-400">
+                        {selectedTheme.curfewProfile}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('dynamic_itinerary')}
+                      className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <span>Customize Location & Menu</span>
+                      <Compass className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: Dynamic Itinerary & Regional Menu */}
+          {activeTab === 'dynamic_itinerary' && (
+            <DynamicItineraryMenu />
+          )}
+
+          {/* TAB 3: 3D Spatial Digital Twin */}
+          {activeTab === 'digital_twin' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 relative aspect-[16/10] rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-xl bg-slate-950">
                 <img
                   src="/assets/hall_transform_3d.jpg"
-                  alt="3D Venue Transformation Model"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  alt="3D Digital Twin Hall Schematic"
+                  className="w-full h-full object-cover filter brightness-[0.85] contrast-105"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30 pointer-events-none" />
 
-                {/* Ambient Holographic Overlay Vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/20 pointer-events-none" />
-
-                {/* Hotspot Markers */}
+                {/* Clickable Spatial Hotspots */}
                 {VENUE_ZONES.map((zone) => {
                   const isSelected = selectedZone.id === zone.id;
                   return (
                     <button
                       key={zone.id}
-                      type="button"
                       onClick={() => setSelectedZone(zone)}
                       style={{ top: `${zone.yPct}%`, left: `${zone.xPct}%` }}
-                      className={`absolute -translate-x-1/2 -translate-y-1/2 group/pin z-20 transition-all ${
-                        isSelected ? 'scale-125 ring-4 ring-[#D4AF37]' : 'scale-100 hover:scale-115'
+                      className={`absolute transform -translate-x-1/2 -translate-y-1/2 z-20 group transition-all duration-300 ${
+                        isSelected ? 'scale-125' : 'scale-100 hover:scale-110'
                       }`}
                       title={zone.name}
                     >
-                      <span className="relative flex h-8 w-8 items-center justify-center">
+                      <div className="relative">
                         <span
-                          className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                            isSelected ? 'bg-amber-400' : 'bg-rose-400'
+                          className={`absolute -inset-2 rounded-full animate-ping opacity-60 ${
+                            isSelected ? 'bg-amber-400' : 'bg-rose-500'
                           }`}
                         />
-                        <span
-                          className={`relative inline-flex rounded-full h-6 w-6 items-center justify-center font-bold text-[10px] text-slate-950 shadow-md ${
+                        <div
+                          className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-lg border-2 ${
                             isSelected
-                              ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B]'
-                              : 'bg-white/90 border border-slate-900'
+                              ? 'bg-gradient-to-r from-amber-400 to-amber-500 border-white text-slate-950'
+                              : 'bg-slate-900/90 border-amber-400 text-amber-300'
                           }`}
                         >
-                          <MapPin className="w-3.5 h-3.5" />
+                          <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        </div>
+                        <span className="absolute left-1/2 -bottom-6 transform -translate-x-1/2 bg-black/80 text-[10px] text-white px-2 py-0.5 rounded-md font-mono whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                          {zone.name.split(' ')[0]}
                         </span>
-                      </span>
-                      <span className="absolute top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-slate-900/90 text-amber-200 text-[10px] font-bold font-mono border border-amber-400/30 opacity-90 group-hover/pin:opacity-100">
-                        {zone.category}
-                      </span>
+                      </div>
                     </button>
                   );
                 })}
+
+                <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-[11px] text-amber-200 font-mono flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>5 Interactive Spatial Hotspots Active</span>
+                </div>
               </div>
 
-              {/* Selected Zone Deep Inspector Card */}
-              <div className="tactical-card border-amber-300 dark:border-amber-700/60 bg-white/95 dark:bg-[#1D1630]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8DFD1] dark:border-[#352952]">
-                  <div>
-                    <span className="text-xs font-bold font-mono text-amber-800 dark:text-amber-300 uppercase tracking-widest">
+              {/* Selected Zone Detail Card */}
+              <div className="tactical-card flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#E8DFD1] dark:border-[#352952] pb-2">
+                    <span className="text-[11px] font-mono uppercase text-amber-700 dark:text-amber-400 font-bold">
                       {selectedZone.category}
                     </span>
-                    <h3 className="font-display text-lg font-bold text-slate-900 dark:text-slate-100">
-                      {selectedZone.name}
-                    </h3>
-                  </div>
-                  <span className="text-xs font-semibold font-mono bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/40">
-                    {selectedZone.capacity}
-                  </span>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 mt-3 leading-relaxed">
-                  {selectedZone.description}
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-3 border-t border-[#E8DFD1]/50 dark:border-[#352952]/50">
-                  <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                    <span className="text-[11px] font-bold font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">
-                      Acoustic & Lighting Ambience
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      Coordinates: {selectedZone.xPct}%, {selectedZone.yPct}%
                     </span>
-                    <p className="text-xs font-medium text-amber-900 dark:text-amber-200">
-                      {selectedZone.ambience}
-                    </p>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                    <span className="text-[11px] font-bold font-mono uppercase text-slate-500 dark:text-slate-400 block mb-1">
-                      Verified Safety Protocols
+                  <h3 className="heading-card text-lg sm:text-xl font-bold">
+                    {selectedZone.name}
+                  </h3>
+                  <p className="text-sub text-xs leading-relaxed">
+                    {selectedZone.description}
+                  </p>
+
+                  <div className="space-y-2 pt-2 text-xs">
+                    <div className="p-3 bg-white dark:bg-[#1D1630] rounded-xl border border-[#E8DFD1] dark:border-[#352952]">
+                      <span className="text-[10px] text-slate-400 block uppercase font-mono">
+                        Capacity & Crowd Density
+                      </span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">
+                        {selectedZone.capacity}
+                      </span>
+                    </div>
+
+                    <div className="p-3 bg-white dark:bg-[#1D1630] rounded-xl border border-[#E8DFD1] dark:border-[#352952]">
+                      <span className="text-[10px] text-slate-400 block uppercase font-mono">
+                        Acoustic & Ambience Profile
+                      </span>
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">
+                        {selectedZone.ambience}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1">
+                      Safety & Invariant Protocols:
                     </span>
-                    <ul className="text-xs space-y-1 text-slate-700 dark:text-slate-300">
-                      {selectedZone.protocols.map((prot, idx) => (
-                        <li key={idx} className="flex items-center gap-1.5">
+                    <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                      {selectedZone.protocols.map((p, i) => (
+                        <li key={i} className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                          <span>{prot}</span>
+                          <span>{p}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
+
+                <div className="text-[11px] text-slate-400 font-mono pt-3 border-t border-[#E8DFD1] dark:border-[#352952]">
+                  Click any hotspot on the digital twin to inspect real-time venue telemetry.
+                </div>
               </div>
             </div>
           )}
 
-          {/* TAB 2: Bare Hall vs Royal Transformation Comparison Slider */}
+          {/* TAB 4: Before & After Transformation */}
           {activeTab === 'transformation' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                  Drag the slider below to witness the automated spatial transformation from empty civic hall into an opulent royal wedding palace:
-                </p>
-                <span className="text-xs font-bold font-mono text-amber-900 dark:text-amber-300">
-                  Transformation Progress: {transformSlider}%
-                </span>
-              </div>
-
-              {/* Interactive Transformation Comparison View */}
-              <div className="relative rounded-2xl overflow-hidden border-2 border-amber-400/40 shadow-2xl aspect-[16/9] select-none">
-                {/* Transformed Palatial View */}
-                <img
-                  src="/assets/royal_hero.jpg"
-                  alt="Transformed Royal Palace"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-
-                {/* Bare Hall View Masked by Slider */}
-                <div
-                  style={{ width: `${100 - transformSlider}%` }}
-                  className="absolute inset-y-0 right-0 overflow-hidden border-l-2 border-amber-400 bg-slate-900"
-                >
-                  <img
-                    src="/assets/hall_transform_3d.jpg"
-                    alt="Digital Twin Grid"
-                    className="absolute inset-y-0 right-0 w-full h-full object-cover max-w-none grayscale contrast-125 opacity-70"
-                    style={{ width: '100%', minWidth: '100%' }}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="heading-card text-lg font-bold">
+                    Interactive Before vs. After Hall Transformation
+                  </h3>
+                  <p className="text-sub text-xs">
+                    Slide to witness an empty municipal venue evolve into an opulent royal banquet.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-slate-500">Bare Hall (0%)</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={transformSlider}
+                    onChange={(e) => setTransformSlider(Number(e.target.value))}
+                    className="accent-amber-500 w-36 sm:w-48 cursor-pointer"
                   />
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-lg bg-slate-900/90 text-white font-mono text-xs font-bold border border-slate-700">
-                    Pre-Event Civic Grid
-                  </div>
-                </div>
-
-                <div className="absolute top-4 left-4 px-3 py-1 rounded-lg bg-amber-500/90 text-slate-950 font-mono text-xs font-extrabold shadow-lg">
-                  Transformed Royal Mandapam
-                </div>
-
-                {/* Slider Handle Marker */}
-                <div
-                  style={{ left: `${transformSlider}%` }}
-                  className="absolute inset-y-0 w-1 bg-amber-400 -translate-x-1/2 pointer-events-none"
-                >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-xl border-2 border-white">
-                    ↔
-                  </div>
+                  <span className="text-xs font-mono font-bold text-amber-700 dark:text-amber-300">
+                    Royal Atelier ({transformSlider}%)
+                  </span>
                 </div>
               </div>
 
-              {/* Slider Input Control */}
-              <div className="tactical-card space-y-2">
-                <div className="flex justify-between text-xs font-bold font-mono text-slate-700 dark:text-slate-300">
-                  <span>Empty Civic Structure (0%)</span>
-                  <span>Fully Decorated Royal Sanctuary (100%)</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={transformSlider}
-                  onChange={(e) => setTransformSlider(Number(e.target.value))}
-                  className="w-full accent-amber-500 cursor-pointer h-2 bg-slate-200 dark:bg-slate-700 rounded-lg"
+              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden border-2 border-amber-400/50 shadow-2xl bg-slate-900">
+                <img
+                  src="/assets/hall_transform_3d.jpg"
+                  alt="Transformed Celebration Atelier"
+                  className="w-full h-full object-cover"
                 />
+
+                <div
+                  className="absolute inset-0 bg-slate-900/90 pointer-events-none transition-opacity duration-300"
+                  style={{ opacity: (100 - transformSlider) / 100 * 0.85 }}
+                />
+
+                <div
+                  className="absolute inset-y-0 w-1 bg-amber-400 shadow-[0_0_15px_#F59E0B]"
+                  style={{ left: `${transformSlider}%` }}
+                >
+                  <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-xs shadow-lg">
+                    ⇄
+                  </div>
+                </div>
+
+                <div className="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded-lg text-white font-mono text-xs">
+                  Bare Framework (Pre-Decoration)
+                </div>
+                <div className="absolute top-4 right-4 bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded-lg font-mono text-xs shadow-md">
+                  Autonomous Transformation Complete
+                </div>
               </div>
             </div>
           )}
 
-          {/* TAB 3: 4DX Sensory Ambience & Lighting Simulator */}
+          {/* TAB 5: 4DX Sensory Ambience Engine */}
           {activeTab === 'sensory_4dx' && (
-            <div className="space-y-6">
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                Experience simulated micro-climate, lighting orchestration, and acoustic decibel filters tailored for dynastic celebrations:
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="tactical-card space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sun className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <h4 className="heading-card text-base font-bold">Dynamic Lighting Profiles</h4>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Lighting Mode 1 */}
-                <button
-                  type="button"
-                  onClick={() => setLightingMode('daylight')}
-                  className={`p-5 rounded-2xl border-2 text-left transition-all ${
-                    lightingMode === 'daylight'
-                      ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 shadow-lg'
-                      : 'border-[#E8DFD1] dark:border-[#352952] bg-white dark:bg-[#1D1630] hover:border-amber-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
-                    <Sun className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                    Surya Daylight Gold (Morning Muhurtham)
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                    5500K natural sunlight simulation with golden saffron uplighting on floral pillars.
-                  </p>
-                </button>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setLightingMode('daylight')}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      lightingMode === 'daylight'
+                        ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 font-bold text-amber-900 dark:text-amber-200'
+                        : 'bg-white dark:bg-[#1D1630] border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Sun className="w-5 h-5 mx-auto mb-1 text-amber-500" />
+                    <span className="text-xs block">Daylight Gold</span>
+                    <span className="text-[10px] text-slate-400 font-mono">5500K Ritual</span>
+                  </button>
 
-                {/* Lighting Mode 2 */}
-                <button
-                  type="button"
-                  onClick={() => setLightingMode('candlelight')}
-                  className={`p-5 rounded-2xl border-2 text-left transition-all ${
-                    lightingMode === 'candlelight'
-                      ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 shadow-lg'
-                      : 'border-[#E8DFD1] dark:border-[#352952] bg-white dark:bg-[#1D1630] hover:border-amber-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center mb-3">
-                    <Flame className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                    Twilight Diya Candlelight (Evening Feast)
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                    2700K warm candlelit intimacy with 500 brass oil lamps and soft amber chandelier glows.
-                  </p>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setLightingMode('candlelight')}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      lightingMode === 'candlelight'
+                        ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-400 font-bold text-amber-900 dark:text-amber-200'
+                        : 'bg-white dark:bg-[#1D1630] border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Flame className="w-5 h-5 mx-auto mb-1 text-orange-500" />
+                    <span className="text-xs block">Diya Glow</span>
+                    <span className="text-[10px] text-slate-400 font-mono">2700K Warm</span>
+                  </button>
 
-                {/* Lighting Mode 3 */}
-                <button
-                  type="button"
-                  onClick={() => setLightingMode('sangeet')}
-                  className={`p-5 rounded-2xl border-2 text-left transition-all ${
-                    lightingMode === 'sangeet'
-                      ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/40 shadow-lg'
-                      : 'border-[#E8DFD1] dark:border-[#352952] bg-white dark:bg-[#1D1630] hover:border-amber-300'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-3">
-                    <Moon className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                    Cosmic Starlight Sangeet (Celebration Night)
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                    Fiber-optic celestial ceiling with synced laser fountain acoustics and sound-reactive sparkles.
+                  <button
+                    type="button"
+                    onClick={() => setLightingMode('sangeet')}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      lightingMode === 'sangeet'
+                        ? 'bg-purple-100 dark:bg-purple-950/60 border-purple-400 font-bold text-purple-900 dark:text-purple-200'
+                        : 'bg-white dark:bg-[#1D1630] border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Moon className="w-5 h-5 mx-auto mb-1 text-purple-400" />
+                    <span className="text-xs block">Starlight Night</span>
+                    <span className="text-[10px] text-slate-400 font-mono">RGB Sangeet</span>
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs text-slate-700 dark:text-slate-300">
+                  <h5 className="font-bold text-amber-900 dark:text-amber-200 mb-1">
+                    Smart DMX Fixture Sync
+                  </h5>
+                  <p>
+                    All 48 LED pin-spots and ceiling wash beams synchronize automatically with Shubh Muhurtham rituals, dimming smoothly for sacred vows and illuminating dynamically during Baraat.
                   </p>
-                </button>
+                </div>
               </div>
 
-              {/* 4DX Sensory Environment Metrics */}
-              <div className="tactical-card grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                  <span className="text-[11px] font-mono text-slate-500 uppercase block">Ambient Temperature</span>
-                  <span className="text-lg font-bold font-mono text-amber-900 dark:text-amber-200">22.4°C (HVAC Auto)</span>
+              <div className="tactical-card space-y-4">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <h4 className="heading-card text-base font-bold">Acoustic & Olfactory Atmosphere</h4>
                 </div>
-                <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                  <span className="text-[11px] font-mono text-slate-500 uppercase block">Aromatherapy Misting</span>
-                  <span className="text-lg font-bold font-mono text-rose-700 dark:text-rose-300">Jasmine & Desi Gulab</span>
-                </div>
-                <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                  <span className="text-[11px] font-mono text-slate-500 uppercase block">Acoustic Decibels</span>
-                  <span className="text-lg font-bold font-mono text-emerald-700 dark:text-emerald-300">72 dB (Safe Limit)</span>
-                </div>
-                <div className="p-3 rounded-xl bg-[#FAF7F2] dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
-                  <span className="text-[11px] font-mono text-slate-500 uppercase block">Curfew Ordinance</span>
-                  <span className="text-lg font-bold font-mono text-indigo-700 dark:text-indigo-300">Compliant (22:00)</span>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-white dark:bg-[#1D1630] rounded-xl border border-[#E8DFD1] dark:border-[#352952]">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                        Floral Hydro-Fog Misting
+                      </span>
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                        ACTIVE
+                      </span>
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                      Sandalwood, Rosewater & Jasmine essential extract dispersed at 15-minute intervals to preserve fresh flower vitality under hall AC.
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white dark:bg-[#1D1630] rounded-xl border border-[#E8DFD1] dark:border-[#352952]">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                        Live Sound Level Sensor
+                      </span>
+                      <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">
+                        62.4 dB (Optimal)
+                      </span>
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                      Strict sound curfew monitor enforces municipal noise limits (&lt; 75 dB) to guarantee zero police citation penalties.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: App Core Guided Walkthrough */}
+          {/* TAB 6: Autonomous Copilot Pillars */}
           {activeTab === 'guided_walkthrough' && (
             <div className="space-y-4">
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                FestivaPulseAI automates wedding and festival orchestration through 5 zero-hallucination pillars:
-              </p>
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/40 text-xs">
+                <h4 className="font-bold text-amber-950 dark:text-amber-200 text-sm mb-1">
+                  FestivaPulseAI — 5 Operational Resilience Pillars
+                </h4>
+                <p className="text-slate-600 dark:text-slate-300">
+                  Built for zero failure on the most high-stakes day of a family's life.
+                </p>
+              </div>
 
-              <div className="space-y-3">
-                <div className="p-4 rounded-xl border border-amber-300/60 dark:border-amber-800/40 bg-white dark:bg-[#1D1630] flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold flex items-center justify-center flex-shrink-0 text-xs font-mono">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Phase 1: Constraint-Grounded Celebration Blueprinting
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      Enter wedding parameters with presets (₹5L Diwali, ₹18L Traditional Wedding, ₹3.5L Birthday Gala). Pure deterministic Python guarantees strict zero budget drift and validates HSE venue capacity.
-                    </p>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-amber-600 dark:text-amber-400 font-bold text-[11px]">
+                    01 · INGESTION
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Master Celebration Blueprint
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    Vertex AI Gemini 2.5 Flash digests cultural dietary requirements, capacity ceilings, and budgets to generate a locked execution DAG.
+                  </p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-emerald-300/60 dark:border-emerald-800/40 bg-white dark:bg-[#1D1630] flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-bold flex items-center justify-center flex-shrink-0 text-xs font-mono">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Phase 2: Live Event Pulse & 40/30/30 Culinary Batching
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      Ingests real-time gate RFID check-ins, tracks buffet tray burn rates, prevents stockouts, and generates official FSSAI regulatory food surplus rescue manifests for Feeding India and Robin Hood Army.
-                    </p>
-                  </div>
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                    02 · TELEMETRY
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Live Event Pulse & Check-in
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    Ingests live RFID gate arrivals, vendor delays, and dietary splits with sub-100ms pub/sub telemetry streaming.
+                  </p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-rose-300/60 dark:border-rose-800/40 bg-white dark:bg-[#1D1630] flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-800 dark:text-rose-300 font-bold flex items-center justify-center flex-shrink-0 text-xs font-mono">
-                    3
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Phase 3: Autonomous Rescue Studio (Tri-Option Matrix)
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      When live chaos strikes (food shortage, crowd surge, rain shock), Gemini synthesizes 3 comparative alternatives: Lowest Cost, Best Experience, and Lowest Disruption—enforcing Human-in-the-Loop coordinator approval.
-                    </p>
-                  </div>
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-rose-600 dark:text-rose-400 font-bold text-[11px]">
+                    03 · RESILIENCE
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Rescue Studio (HITL)
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    When rain strikes or guests surge, multi-agent ADK swarms generate comparative options for human coordinator signoff.
+                  </p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-indigo-300/60 dark:border-indigo-800/40 bg-white dark:bg-[#1D1630] flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-800 dark:text-indigo-300 font-bold flex items-center justify-center flex-shrink-0 text-xs font-mono">
-                    4
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Phase 4: Append-Only Immutable Decision Ledger
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      Every plan mutation is stamped with cryptographic hashes, timestamp, coordinator reason, and audited mathematical proofs with automatic plan version revisions (v1.0 → v2.0).
-                    </p>
-                  </div>
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-purple-600 dark:text-purple-400 font-bold text-[11px]">
+                    04 · AUDIT
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Immutable Decision Ledger
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    Every approved plan modification is cryptographically stamped with coordinator rationale, creating an airtight audit trail.
+                  </p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-purple-300/60 dark:border-purple-800/40 bg-white dark:bg-[#1D1630] flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-800 dark:text-purple-300 font-bold flex items-center justify-center flex-shrink-0 text-xs font-mono">
-                    5
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900 dark:text-slate-100">
-                      Phase 5: Reversible Scenario Lab & What-If Stress Testing
-                    </h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                      Stress-test contingency shocks (budget cut, rain relocation, delayed muhurtham) in an isolated sandbox with instant actionable adjustments before altering physical celebration state.
-                    </p>
-                  </div>
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-amber-600 dark:text-amber-400 font-bold text-[11px]">
+                    05 · SIMULATION
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Scenario Lab Sandbox
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    Stress-test what-if shocks: simulate +100 sudden guests or 45-minute Baraat delay to verify real-time tactical adjustments.
+                  </p>
+                </div>
+
+                <div className="tactical-subcard space-y-2">
+                  <span className="font-mono text-teal-600 dark:text-teal-400 font-bold text-[11px]">
+                    06 · VERIFICATION
+                  </span>
+                  <h5 className="font-bold text-slate-900 dark:text-slate-100">
+                    Automated Invariant Suite
+                  </h5>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+                    Rigorous domain invariant checks verifying zero arithmetic hallucinations, FSSAI temperature thresholds, and HSE limits.
+                  </p>
                 </div>
               </div>
+
+              {onOpenQAModal && (
+                <div className="pt-2 text-center">
+                  <button
+                    type="button"
+                    onClick={onOpenQAModal}
+                    className="btn-emerald text-xs font-bold inline-flex items-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Run In-App Automated QA Verification Suite</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
-        </div>
-
-        {/* Modal Footer Controls */}
-        <div className="p-4 sm:p-5 border-t border-[#E8DFD1] dark:border-[#352952] bg-[#FDFBF7] dark:bg-[#1D1630] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Google Cloud Run • Vertex AI Gemini 2.5 Flash • Zero Arithmetic Hallucination</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {onOpenQAModal && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenQAModal();
-                }}
-                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-300 dark:border-emerald-800 transition-colors"
-              >
-                Run Domain Invariant QA
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-gold px-6 py-2 rounded-xl text-xs font-bold"
-            >
-              Close Experience
-            </button>
-          </div>
         </div>
       </div>
     </div>

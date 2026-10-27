@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { EventIntakeRequest, EventBlueprint, EventType } from '../types';
 import { useTranslation } from '../i18n/I18nContext';
+import { DynamicItineraryMenu } from './DynamicItineraryMenu';
 
 interface CelebrationBlueprintProps {
   blueprint: EventBlueprint | null;
@@ -581,6 +582,13 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Dynamic Regional Itinerary & Menu Planner */}
+          <div className="pt-4">
+            <DynamicItineraryMenu
+              initialGuests={blueprint.expected_guests}
+            />
           </div>
         </div>
       )}

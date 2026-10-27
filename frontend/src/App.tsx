@@ -237,10 +237,15 @@ const MainCockpit: React.FC = () => {
                   <Calendar className="w-3.5 h-3.5 text-amber-400" />
                   <span>Target: Nov 12, 2026 (Shubh Muhurtham)</span>
                 </span>
-                <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
+                <button
+                  type="button"
+                  onClick={() => setTourOpen(true)}
+                  className="flex items-center gap-1.5 bg-black/40 hover:bg-black/60 px-2.5 py-1 rounded-md border border-amber-400/20 hover:border-amber-400 text-amber-200 transition-colors"
+                  title="Click to detect GPS or simulate regional location"
+                >
                   <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Tirunelveli Town Hall & Lawns</span>
-                </span>
+                  <span>{blueprint?.location || 'Auto-Detecting GPS Venue...'}</span>
+                </button>
                 <span className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-md border border-amber-400/20">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Chaos Resilience: 99.8%</span>
