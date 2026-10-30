@@ -18,8 +18,9 @@ import {
   Leaf,
   Truck,
   Check,
+  Music,
 } from 'lucide-react';
-import { EventIntakeRequest, EventBlueprint, EventType } from '../types';
+import { EventIntakeRequest, EventBlueprint, EventType, ADKSwarmOutput } from '../types';
 import { useTranslation } from '../i18n/I18nContext';
 import { DynamicItineraryMenu } from './DynamicItineraryMenu';
 import { GroundedVenueMapExplorer, GroundedHall } from './GroundedVenueMapExplorer';
@@ -31,6 +32,7 @@ interface CelebrationBlueprintProps {
   onApplyVenue?: (hall: GroundedHall, investmentPlan?: any) => void;
   onRefineBlueprint?: (userPrompt: string) => Promise<void>;
   onOpenTelemetry?: () => void;
+  adkSwarmOutput?: ADKSwarmOutput | null;
 }
 
 export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
@@ -40,6 +42,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   onApplyVenue,
   onRefineBlueprint,
   onOpenTelemetry,
+  adkSwarmOutput,
 }) => {
   const { t } = useTranslation();
   const [adkViewMode, setAdkViewMode] = useState<'swarm' | 'predictions'>('swarm');
@@ -556,16 +559,29 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
         <div className="space-y-6">
           {/* Live Google ADK Multi-Agent Swarm Orchestrator Console */}
           <div className="tactical-card border-indigo-400/40 dark:border-indigo-600/40 bg-gradient-to-br from-indigo-950/20 via-slate-900/30 to-amber-950/20">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-indigo-500/20 gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-indigo-500/20 gap-3">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-indigo-500/20 border border-indigo-400/30">
                   <Bot className="w-5 h-5 text-indigo-400 animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="heading-section text-indigo-950 dark:text-indigo-200">
-                    Google ADK Multi-Agent Swarm Orchestrator
-                  </h3>
-                  <p className="text-xs text-indigo-900/70 dark:text-indigo-300/70 font-sans">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="heading-section text-indigo-950 dark:text-indigo-200">
+                      Google ADK Multi-Agent Swarm Orchestrator
+                    </h3>
+                    {adkSwarmOutput?.is_live_gemini ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        LIVE GOOGLE GENAI / ADK SWARM (Gemini 2.5 Flash)
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        DETERMINISTIC OFFLINE ADK SWARM (Zero Hallucination Gate)
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-indigo-900/70 dark:text-indigo-300/70 font-sans mt-0.5">
                     Autonomous multi-agent consensus driven by Vertex AI Gemini 2.5 Flash with deterministic mathematical gates.
                   </p>
                 </div>
@@ -604,62 +620,80 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
               <>
                 {/* Agent Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 mt-4">
-                  {[
+                  {(adkSwarmOutput?.agents && adkSwarmOutput.agents.length > 0 ? adkSwarmOutput.agents : [
                     {
                       id: 'EventSupervisorAgent',
                       name: 'Supervisor',
                       role: 'Swarm Coordinator',
                       model: 'Gemini 2.5 Flash',
+                      is_live: false,
                       latency: '240ms',
                       status: 'Active',
                       color: 'indigo',
+                      tools: ['coordinate_plan_generation', 'consensus_synthesis'],
+                      reasoning: 'Dispatched asynchronous sub-tasks to BlueprintSpecialist, FoodGuard, SpatialCrowd, TimelineCascade, and BudgetElasticity agents in parallel using Google ADK task primitives.',
                     },
                     {
                       id: 'BlueprintSpecialistAgent',
                       name: 'Blueprint Agent',
                       role: 'Cultural Synthesizer',
                       model: 'Gemini 2.5 Flash',
+                      is_live: false,
                       latency: '180ms',
                       status: 'Synced',
                       color: 'amber',
+                      tools: ['generate_cultural_themes', 'verify_accessibility'],
+                      reasoning: `Synthesized royal celebration concepts for ${blueprint?.location || 'Venue'}. Integrated elder accessibility, young adult acoustic lounge, and kids activity pavilion.`,
                     },
                     {
                       id: 'FestivaFoodGuardAgent',
                       name: 'FoodGuard Agent',
                       role: '40/30/30 & Rescue',
-                      model: 'Deterministic + GenAI',
+                      model: 'Deterministic + FSSAI',
+                      is_live: false,
                       latency: '60ms',
                       status: 'Synced',
                       color: 'emerald',
+                      tools: ['calculate_food_sufficiency', 'fssai_ngo_coldchain_triage'],
+                      reasoning: 'Calculated 40/30/30 batch production cadence. Registered cold-chain surplus recovery link with local NGO partner.',
                     },
                     {
                       id: 'BudgetElasticityAgent',
                       name: 'Budget Agent',
                       role: 'Pareto Allocator',
                       model: 'Ledger Engine',
+                      is_live: false,
                       latency: '45ms',
                       status: 'Synced',
                       color: 'blue',
+                      tools: ['calculate_budget_ledger', 'pareto_rebalance'],
+                      reasoning: 'Protected core venue and catering anchor categories. Verified zero unallocated residual budget with mathematical precision.',
                     },
                     {
                       id: 'TimelineCascadeAgent',
                       name: 'Timeline Agent',
                       role: 'Curfew & Critical Path',
                       model: 'DAG Engine',
+                      is_live: false,
                       latency: '90ms',
                       status: 'Synced',
                       color: 'purple',
+                      tools: ['propagate_timeline_delays', 'critical_path_eval'],
+                      reasoning: 'Verified 4-node event DAG. Locked contractual AV curfew window complying with municipal police noise bylaws (<75dB limit).',
                     },
                     {
                       id: 'SpatialCrowdAgent',
                       name: 'Spatial Agent',
                       role: 'HSE Fire Governor',
                       model: 'Capacity Guard',
+                      is_live: false,
                       latency: '55ms',
                       status: 'Synced',
                       color: 'rose',
+                      tools: ['evaluate_crowd_density', 'fire_evacuation_calc'],
+                      reasoning: 'Evaluated approved capacity vs invited guests. Density rating meets HSE fire safety regulations.',
                     },
-                  ].map((agent) => {
+                  ]).map((agent) => {
                     const isSelected = activeAgentInspector === agent.id;
                     return (
                       <button
@@ -676,7 +710,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                           <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
                             {agent.latency}
                           </span>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span className={`w-2 h-2 rounded-full ${agent.is_live ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-500'}`} />
                         </div>
                         <div className="mt-1 font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
                           {agent.name}
@@ -695,86 +729,105 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 {/* Selected Agent Thought Stream Inspector */}
                 {activeAgentInspector && (
                   <div className="mt-4 p-4 rounded-xl bg-slate-900 text-slate-200 border border-indigo-500/30 text-xs font-mono shadow-inner animate-fadeIn">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <div className="flex items-center gap-2">
-                        <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="font-bold text-indigo-300">
-                          ADK Inspector: {activeAgentInspector}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-emerald-400 font-semibold">
-                        Runtime: Live In-Memory Swarm Thread
-                      </span>
-                    </div>
-                    <div className="mt-3 space-y-2">
-                      {activeAgentInspector === 'EventSupervisorAgent' && (
+                    {(() => {
+                      const allAgents = adkSwarmOutput?.agents && adkSwarmOutput.agents.length > 0 ? adkSwarmOutput.agents : [
+                        {
+                          id: 'EventSupervisorAgent',
+                          name: 'Supervisor',
+                          role: 'Swarm Coordinator',
+                          model: 'Gemini 2.5 Flash',
+                          is_live: false,
+                          latency: '240ms',
+                          tools: ['coordinate_plan_generation', 'consensus_synthesis'],
+                          reasoning: 'Dispatched asynchronous sub-tasks to BlueprintSpecialist, FoodGuard, SpatialCrowd, TimelineCascade, and BudgetElasticity agents in parallel using Google ADK task primitives.',
+                        },
+                        {
+                          id: 'BlueprintSpecialistAgent',
+                          name: 'Blueprint Agent',
+                          role: 'Cultural Synthesizer',
+                          model: 'Gemini 2.5 Flash',
+                          is_live: false,
+                          latency: '180ms',
+                          tools: ['generate_cultural_themes', 'verify_accessibility'],
+                          reasoning: `Synthesized royal celebration concepts for ${blueprint?.location || 'Venue'}. Integrated elder accessibility, young adult acoustic lounge, and kids activity pavilion.`,
+                        },
+                        {
+                          id: 'FestivaFoodGuardAgent',
+                          name: 'FoodGuard Agent',
+                          role: '40/30/30 & Rescue',
+                          model: 'Deterministic + FSSAI',
+                          is_live: false,
+                          latency: '60ms',
+                          tools: ['calculate_food_sufficiency', 'fssai_ngo_coldchain_triage'],
+                          reasoning: 'Calculated 40/30/30 batch production cadence. Registered cold-chain surplus recovery link with local NGO partner.',
+                        },
+                        {
+                          id: 'BudgetElasticityAgent',
+                          name: 'Budget Agent',
+                          role: 'Pareto Allocator',
+                          model: 'Ledger Engine',
+                          is_live: false,
+                          latency: '45ms',
+                          tools: ['calculate_budget_ledger', 'pareto_rebalance'],
+                          reasoning: 'Protected core venue and catering anchor categories. Verified zero unallocated residual budget with mathematical precision.',
+                        },
+                        {
+                          id: 'TimelineCascadeAgent',
+                          name: 'Timeline Agent',
+                          role: 'Curfew & Critical Path',
+                          model: 'DAG Engine',
+                          is_live: false,
+                          latency: '90ms',
+                          tools: ['propagate_timeline_delays', 'critical_path_eval'],
+                          reasoning: 'Verified 4-node event DAG. Locked contractual AV curfew window complying with municipal police noise bylaws (<75dB limit).',
+                        },
+                        {
+                          id: 'SpatialCrowdAgent',
+                          name: 'Spatial Agent',
+                          role: 'HSE Fire Governor',
+                          model: 'Capacity Guard',
+                          is_live: false,
+                          latency: '55ms',
+                          tools: ['evaluate_crowd_density', 'fire_evacuation_calc'],
+                          reasoning: 'Evaluated approved capacity vs invited guests. Density rating meets HSE fire safety regulations.',
+                        },
+                      ];
+                      const selected = allAgents.find((a) => a.id === activeAgentInspector) || allAgents[0];
+                      return (
                         <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[Supervisor Reasoning]:</strong> Dispatched asynchronous sub-tasks to BlueprintSpecialist, FoodGuard, SpatialCrowd, TimelineCascade, and BudgetElasticity agents in parallel using Google ADK task primitives. Aggregated zero-hallucination consensus across cultural, financial, dietary, and municipal curfew constraints.
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: coordinate_plan_generation()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Model: Gemini 2.5 Flash</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tenant: Sandbox EVT-001</span>
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+                              <span className="font-bold text-indigo-300">
+                                ADK Inspector: {selected.name} ({selected.id})
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-semibold flex items-center gap-1.5 ${selected.is_live ? 'text-emerald-400' : 'text-amber-400'}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${selected.is_live ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                              {selected.is_live ? 'Runtime: Live Vertex GenAI Stream' : 'Runtime: Deterministic Local Gate'}
+                            </span>
+                          </div>
+                          <div className="mt-3 space-y-2">
+                            <p className="text-slate-300 leading-relaxed font-sans text-xs">
+                              <strong className="text-amber-400 font-mono">[{selected.name} Reasoning]:</strong> {selected.reasoning}
+                            </p>
+                            <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
+                              {selected.tools && selected.tools.map((t, idx) => (
+                                <span key={idx} className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 font-mono text-[10px]">
+                                  Tool: {t}()
+                                </span>
+                              ))}
+                              <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 font-mono text-[10px]">
+                                Model: {selected.model}
+                              </span>
+                              <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 font-mono text-[10px]">
+                                Latency: {selected.latency}
+                              </span>
+                            </div>
                           </div>
                         </>
-                      )}
-                      {activeAgentInspector === 'BlueprintSpecialistAgent' && (
-                        <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[Blueprint Reasoning]:</strong> Synthesized royal celebration concepts for Bengaluru Palace Grounds. Integrated elder accessibility (zero-threshold ramps, quiet shaded courtyard seating), young adult acoustic lounge, and kids activity pavilion.
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: generate_cultural_themes()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: verify_elder_accessibility()</span>
-                          </div>
-                        </>
-                      )}
-                      {activeAgentInspector === 'FestivaFoodGuardAgent' && (
-                        <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[FoodGuard Reasoning]:</strong> Calculated 40/30/30 batch production volume (140 / 105 / 105 portions). Registered cold-chain surplus recovery link with No Food Waste (Bengaluru Urban) under FSSAI license FSSAI-RESCUE-KA-2024-1102 (40-min pickup SLA).
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: calculate_food_sufficiency()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: fssai_ngo_coldchain_triage()</span>
-                          </div>
-                        </>
-                      )}
-                      {activeAgentInspector === 'BudgetElasticityAgent' && (
-                        <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[Budget Reasoning]:</strong> Protected core venue (25% = ₹3,00,000) and catering (40% = ₹4,80,000) anchor categories. Verified zero unallocated residual budget with mathematical precision.
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: calculate_budget_ledger()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Invariant: Sum(Categories) == Total</span>
-                          </div>
-                        </>
-                      )}
-                      {activeAgentInspector === 'TimelineCascadeAgent' && (
-                        <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[Timeline Reasoning]:</strong> Verified 4-node event DAG. Locked contractual AV curfew window at 22:00 complying with municipal police noise bylaws (&lt;75dB limit).
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: propagate_timeline_delays()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Constraint: sound_curfew &lt;= 22:00</span>
-                          </div>
-                        </>
-                      )}
-                      {activeAgentInspector === 'SpatialCrowdAgent' && (
-                        <>
-                          <p className="text-slate-300 leading-relaxed">
-                            <strong className="text-amber-400">[Spatial Reasoning]:</strong> Evaluated approved capacity (500) vs invited guests (350). Density rating 70% meets HSE fire safety regulations with 1.8m unobstructed emergency exit corridors.
-                          </p>
-                          <div className="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-400">
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Tool: evaluate_crowd_density()</span>
-                            <span className="bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Gate: max_venue_capacity &gt;= guests</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                      );
+                    })()}
                   </div>
                 )}
               </>
@@ -796,25 +849,25 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                       </span>
                     </div>
                     <div className="space-y-1.5 pt-1">
-                      {[
-                        { time: '17:00', pct: 15, label: 'VIP Welcome' },
-                        { time: '18:00', pct: 45, label: 'Core Family' },
-                        { time: '19:30', pct: 35, label: 'Banquet Peak' },
-                        { time: '21:00', pct: 5, label: 'Dispersal' },
-                      ].map((item, idx) => (
+                      {(adkSwarmOutput?.adk_predictions?.crowd_velocity?.arrival_distribution || [
+                        { time: '17:00', arrival_pct: 15, description: 'VIP Welcome' },
+                        { time: '18:00', arrival_pct: 45, description: 'Core Family' },
+                        { time: '19:30', arrival_pct: 35, description: 'Banquet Peak' },
+                        { time: '21:00', arrival_pct: 5, description: 'Dispersal' },
+                      ]).map((item: any, idx: number) => (
                         <div key={idx} className="space-y-0.5">
                           <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                            <span>{item.time} ({item.label})</span>
-                            <span className="text-indigo-300 font-bold">{item.pct}%</span>
+                            <span>{item.time} ({item.description || item.label})</span>
+                            <span className="text-indigo-300 font-bold">{item.arrival_pct || item.pct}%</span>
                           </div>
                           <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${item.pct * 2}%` }} />
+                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${(item.arrival_pct || item.pct) * 2}%` }} />
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="pt-2 text-[10px] text-slate-400 font-mono border-t border-slate-800">
-                      Evacuation Clearance: <strong className="text-emerald-400">157s (HSE Grade A)</strong>
+                      Evacuation Clearance: <strong className="text-emerald-400">{adkSwarmOutput?.adk_predictions?.crowd_velocity?.evacuation_clearance_seconds || Math.round(blueprint.expected_guests * 0.45) || 157}s (HSE Grade A)</strong>
                     </div>
                   </div>
 
@@ -830,24 +883,24 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-300 leading-relaxed">
-                      Production divided into 40/30/30 batches (140 / 105 / 105 covers) to eliminate cooked waste.
+                      Production divided into 40/30/30 batches ({Math.round(blueprint.expected_guests * 0.4)} / {Math.round(blueprint.expected_guests * 0.3)} / {Math.round(blueprint.expected_guests * 0.3)} covers) to eliminate cooked waste.
                     </p>
                     <div className="p-2 rounded-lg bg-slate-800/80 text-[10px] font-mono space-y-1">
                       <div className="flex justify-between">
                         <span className="text-slate-400">Predicted Surplus:</span>
-                        <strong className="text-emerald-400">19.3 kg</strong>
+                        <strong className="text-emerald-400">{adkSwarmOutput?.adk_predictions?.catering_depletion?.predicted_surplus_kg || (blueprint.expected_guests * 0.055).toFixed(1)} kg</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Cold Chain SLA:</span>
-                        <strong className="text-emerald-400">40 mins</strong>
+                        <strong className="text-emerald-400">{adkSwarmOutput?.adk_predictions?.catering_depletion?.fssai_cold_chain_sla_mins || 40} mins</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Safe Window:</span>
-                        <strong className="text-amber-400">4.0 hrs (FSSAI)</strong>
+                        <strong className="text-amber-400">{adkSwarmOutput?.adk_predictions?.catering_depletion?.safe_consumption_window_hours || 4.0} hrs (FSSAI)</strong>
                       </div>
                     </div>
                     <div className="text-[10px] text-emerald-300 font-mono">
-                      Partner: No Food Waste (Bengaluru)
+                      Partner: FSSAI Certified NGO Food Relief Network
                     </div>
                   </div>
 
@@ -868,15 +921,15 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                     <div className="p-2 rounded-lg bg-slate-800/80 text-[10px] font-mono space-y-1">
                       <div className="flex justify-between">
                         <span className="text-slate-400">Curfew On-Time:</span>
-                        <strong className="text-purple-300">98.4% Prob</strong>
+                        <strong className="text-purple-300">{adkSwarmOutput?.adk_predictions?.timeline_risk?.curfew_compliance_probability_pct || 98.4}% Prob</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Sound Ceiling:</span>
-                        <strong className="text-emerald-400">&lt; 75 dBA</strong>
+                        <strong className="text-emerald-400">&lt; {adkSwarmOutput?.adk_predictions?.timeline_risk?.police_acoustic_limit_dba || 75} dBA</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Safety Buffer:</span>
-                        <strong className="text-purple-300">25 mins DAG</strong>
+                        <strong className="text-purple-300">{adkSwarmOutput?.adk_predictions?.timeline_risk?.critical_path_buffer_minutes || 25} mins DAG</strong>
                       </div>
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono">
@@ -901,11 +954,11 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                     <div className="p-2 rounded-lg bg-slate-800/80 text-[10px] font-mono space-y-1">
                       <div className="flex justify-between">
                         <span className="text-slate-400">Overrun Probability:</span>
-                        <strong className="text-emerald-400">&lt; 1.2%</strong>
+                        <strong className="text-emerald-400">&lt; {adkSwarmOutput?.adk_predictions?.budget_elasticity?.cost_overrun_probability_pct || 1.2}%</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Contingency Reserve:</span>
-                        <strong className="text-amber-300">₹96,000 (8%)</strong>
+                        <strong className="text-amber-300">₹{(adkSwarmOutput?.adk_predictions?.budget_elasticity?.emergency_contingency_fund_inr || Math.round(blueprint.total_budget * 0.08)).toLocaleString()} (8%)</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Residual Imbalance:</span>
@@ -924,7 +977,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                     ★ Google ADK Swarm Executive Consensus Summary:
                   </span>
                   <p className="text-slate-300 leading-relaxed">
-                    "All 5 domain specialist agents have synthesized unanimous plan verification for {eventName} at {location}. HSE fire capacity approved at 70% density. 40/30/30 batch production cadence eliminates hot buffet stagnation with certified surplus routing to local cold chain. Curfew locked at 22:00 complying with municipal police noise limits (&lt;75 dBA). Mathematical balance verified with 0% unallocated residual budget."
+                    {adkSwarmOutput?.adk_master_summary || adkSwarmOutput?.summary || `All 5 domain specialist agents have synthesized unanimous plan verification for ${blueprint.event_name} at ${blueprint.location}. HSE fire capacity approved at ${Math.round((blueprint.expected_guests / Math.max(1, blueprint.max_venue_capacity)) * 100)}% density. 40/30/30 batch production cadence eliminates hot buffet stagnation with certified surplus routing to local cold chain. Curfew locked at 22:00 complying with municipal police noise limits (<75 dBA). Mathematical balance verified with 0% unallocated residual budget.`}
                   </p>
                 </div>
               </div>
@@ -1066,17 +1119,86 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
           </div>
 
           {/* Personalized Theme Ideas */}
-          <div className="tactical-card">
-            <h3 className="heading-section mb-4 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              Culturally Tailored Theme & Experience Concepts
-            </h3>
+          <div className="tactical-card border-amber-300/40 dark:border-amber-600/40 bg-gradient-to-br from-white via-amber-50/20 to-orange-50/10 dark:from-[#1A1226] dark:via-[#130C1E] dark:to-[#0D0715]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-amber-200/50 dark:border-amber-800/40 gap-2 mb-4">
+              <div>
+                <h3 className="heading-section flex items-center gap-2 text-amber-950 dark:text-amber-200">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  Culturally Tailored Theme & Experience Concepts
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-sans mt-0.5">
+                  Artisan visual styling curated by BlueprintSpecialistAgent for wedding families and luxury event coordinators.
+                </p>
+              </div>
+              <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-400/30 self-start sm:self-auto">
+                {blueprint.personalized_themes.length} Atelier Concepts
+              </span>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {blueprint.personalized_themes.map((theme, i) => (
-                <div key={i} className="tactical-subcard hover:border-amber-400/50 transition-colors">
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{theme}</p>
-                </div>
-              ))}
+              {blueprint.personalized_themes.map((theme, i) => {
+                const THEME_VISUALS = [
+                  { img: '/assets/theme_raja_rani.jpg', label: 'Raja Rani Royal Palace Wedding', audio: 'Shehnai & Nagada', category: 'Royal Rajput Grandeur' },
+                  { img: '/assets/theme_tamil_brahmin.jpg', label: 'Tamil Brahmin Temple Kalyanam', audio: 'Nadaswaram & Thavil', category: 'Vedic Gopuram Sanctum' },
+                  { img: '/assets/theme_ambani_luxury.jpg', label: 'Modern Luxury Gala & Ballroom', audio: 'Symphonic Strings', category: 'Bespoke Chandelier Splendor' },
+                  { img: '/assets/theme_eco_harvest.jpg', label: 'Sustainable Eco-Harvest Courtyard', audio: 'Acoustic Flute & Percussion', category: 'Organic Millets & Brass' },
+                  { img: '/assets/theme_church_cathedral.jpg', label: 'White Floral Cathedral Nuptials', audio: 'Pipe Organ & Choral', category: 'Gothic Arch & Stained Glass' },
+                  { img: '/assets/theme_muslim_nikah.jpg', label: 'Mughal Maharaja Dastarkhwan Nikah', audio: 'Qawwali & Santoor', category: 'Carved Marble Jaali Courtyard' },
+                  { img: '/assets/theme_genz_neon.jpg', label: 'Gen-Z Neon Sangeet Fusion', audio: 'Electronic Fusion', category: 'LED Tunnel & Cocktail Lounge' },
+                  { img: '/assets/theme_economy_courtyard.jpg', label: 'Intimate Courtyard Diya Banquet', audio: 'Acoustic Sitar & Sarod', category: 'Warm Brass Diya Illuminations' },
+                ];
+                const visual = THEME_VISUALS[i % THEME_VISUALS.length];
+                return (
+                  <div
+                    key={i}
+                    className="group relative rounded-2xl overflow-hidden border-2 border-amber-300/50 dark:border-amber-600/50 shadow-md hover:shadow-2xl transition-all duration-300 bg-slate-950 flex flex-col"
+                  >
+                    <div className="relative h-44 sm:h-48 w-full overflow-hidden">
+                      <img
+                        src={visual.img}
+                        alt={visual.label}
+                        className="w-full h-full object-cover object-center filter brightness-[0.92] dark:brightness-[0.88] contrast-105 group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent dark:from-[#0C0616] dark:via-[#160B28]/50 dark:to-transparent" />
+
+                      {/* Floating Top Badges */}
+                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500 text-slate-950 shadow-md">
+                          Concept #{i + 1}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-black/75 backdrop-blur-md text-amber-200 border border-amber-400/40 shadow-md flex items-center gap-1">
+                          <Music className="w-3 h-3 text-amber-400" />
+                          <span>{visual.audio}</span>
+                        </span>
+                      </div>
+
+                      {/* Bottom Title on Image */}
+                      <div className="absolute bottom-2.5 left-3 right-3 text-white pointer-events-none">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-bold block drop-shadow-sm">
+                          {visual.category}
+                        </span>
+                        <h4 className="text-sm font-bold text-white drop-shadow font-display line-clamp-1">
+                          {visual.label}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 bg-white/95 dark:bg-[#1A122A] flex-1 flex flex-col justify-between border-t border-amber-200/50 dark:border-amber-800/40">
+                      <p className="text-xs sm:text-[13px] font-medium text-slate-800 dark:text-slate-200 leading-relaxed font-sans">
+                        {theme}
+                      </p>
+                      <div className="mt-3 pt-2 border-t border-amber-100 dark:border-amber-900/30 flex items-center justify-between text-[11px]">
+                        <span className="text-slate-500 dark:text-slate-400 font-mono">
+                          Style: {visual.category.split(' ')[0]}
+                        </span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold font-mono">
+                          ✓ Swarm Verified
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

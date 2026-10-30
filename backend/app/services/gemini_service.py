@@ -35,11 +35,11 @@ class GeminiOrchestratorService:
         self._init_client()
 
     def _init_client(self):
-        if self.api_key and self.api_key != "demo_mode_key" and not settings.DEMO_MODE:
+        if settings.is_live_gemini_enabled:
             try:
                 from google import genai
 
-                self._client = genai.Client(api_key=self.api_key)
+                self._client = genai.Client(api_key=settings.effective_gemini_key)
             except Exception as e:
                 print(f"[WARN] Failed to initialize Google GenAI client: {e}. Running in graceful demo mode.")
                 self._client = None

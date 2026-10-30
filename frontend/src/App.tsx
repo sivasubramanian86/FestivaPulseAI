@@ -21,6 +21,7 @@ import {
   GenAITelemetryTrace,
   DecisionLedgerEntry,
   EventIntakeRequest,
+  ADKSwarmOutput,
 } from './types';
 
 const MainCockpit: React.FC = () => {
@@ -37,6 +38,7 @@ const MainCockpit: React.FC = () => {
   const [rescueComparison, setRescueComparison] = useState<RescueStudioComparison | null>(null);
   const [decisionEntries, setDecisionEntries] = useState<DecisionLedgerEntry[]>([]);
   const [latestTelemetry, setLatestTelemetry] = useState<GenAITelemetryTrace | null>(null);
+  const [adkSwarmOutput, setAdkSwarmOutput] = useState<ADKSwarmOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [gpsLocation, setGpsLocation] = useState<string>('Palace Grounds Botanical Glasshouse & Lawns, Bengaluru');
   const [gpsDetecting, setGpsDetecting] = useState<boolean>(false);
@@ -118,6 +120,7 @@ const MainCockpit: React.FC = () => {
         setFoodRadar(res.food_radar);
         setTimeline(res.timeline);
         setLatestTelemetry(res.telemetry);
+        if (res.adk_swarm_output) setAdkSwarmOutput(res.adk_swarm_output);
       } catch (err) {
         console.error('Failed to initialize default celebration:', err);
       } finally {
@@ -138,6 +141,7 @@ const MainCockpit: React.FC = () => {
       setFoodRadar(res.food_radar);
       setTimeline(res.timeline);
       setLatestTelemetry(res.telemetry);
+      if (res.adk_swarm_output) setAdkSwarmOutput(res.adk_swarm_output);
       // Keep main view on the generated blueprint so user immediately sees their plan
       setXrayOpen(false);
     } catch (err: any) {
@@ -157,6 +161,7 @@ const MainCockpit: React.FC = () => {
       if (res.ledger) setLedger(res.ledger);
       if (res.food_radar) setFoodRadar(res.food_radar);
       if (res.timeline) setTimeline(res.timeline);
+      if (res.adk_swarm_output) setAdkSwarmOutput(res.adk_swarm_output);
       if (res.decision_entry) {
         setDecisionEntries((prev) => [res.decision_entry, ...prev]);
       }
@@ -294,10 +299,10 @@ const MainCockpit: React.FC = () => {
           <img
             src="/assets/royal_hero.jpg"
             alt="Royal Celebration Palace"
-            className="w-full h-full object-cover object-center filter brightness-[0.75] dark:brightness-[0.45] transform scale-105 transition-transform duration-1000 ease-out hover:scale-100"
+            className="w-full h-full object-cover object-center filter brightness-[0.88] dark:brightness-[0.82] contrast-105 transform scale-105 transition-transform duration-1000 ease-out hover:scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/85 via-slate-950/70 to-purple-950/80 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] dark:from-[#0E0918] via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/75 via-slate-950/50 to-purple-950/70 dark:from-[#150921]/75 dark:via-black/50 dark:to-[#231206]/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] dark:from-[#0E0918] via-transparent to-transparent opacity-85" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -380,6 +385,7 @@ const MainCockpit: React.FC = () => {
             loading={loading}
             onApplyVenue={handleApplyVenue}
             onOpenTelemetry={() => setXrayOpen(true)}
+            adkSwarmOutput={adkSwarmOutput}
           />
         )}
 

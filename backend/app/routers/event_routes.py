@@ -171,6 +171,7 @@ async def create_event(intake: EventIntakeRequest) -> dict[str, Any]:
 
         # 3. Save in storage
         state = storage_service.save_event(blueprint, intake)
+        state.adk_swarm_output = adk_plan
 
         # 4. Initialize initial state (deterministic ledger, food radar, timeline)
         _initialize_event_state(state)
@@ -211,6 +212,7 @@ async def get_event(event_id: str) -> dict[str, Any]:
         "latest_rescue": state.latest_rescue_comparison.model_dump() if state.latest_rescue_comparison else None,
         "decision_ledger": [d.model_dump() for d in state.decision_ledger],
         "telemetry_traces": [t.model_dump() for t in state.telemetry_traces[:5]],
+        "adk_swarm_output": state.adk_swarm_output,
         "version": state.version,
     }
 
@@ -292,6 +294,7 @@ async def refine_event(event_id: str, payload: BlueprintRefineRequest) -> dict[s
 
     # 4. Re-orchestrate parallel consensus through ADK Multi-Agent Supervisor
     adk_plan = await adk_supervisor.coordinate_plan_generation(state.intake.model_dump())
+    state.adk_swarm_output = adk_plan
 
     # 5. Re-balance categories & recalculate ledger
     if state.ledger:

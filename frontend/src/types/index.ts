@@ -228,3 +228,57 @@ export interface QATestSuiteResponse {
   total_duration_ms: number;
   results: QATestResult[];
 }
+
+export interface ADKAgentTrace {
+  id: string;
+  name: string;
+  role: string;
+  model: string;
+  is_live: boolean;
+  latency: string;
+  status: string;
+  color: string;
+  tools: string[];
+  reasoning: string;
+}
+
+export interface ADKPredictions {
+  crowd_velocity: {
+    peak_hour: string;
+    bottleneck_risk: string;
+    occupancy_rate_pct: number;
+    arrival_distribution: Array<{ time: string; arrival_pct: number; description: string }>;
+    evacuation_clearance_seconds: number;
+  };
+  catering_depletion: {
+    batch_1_hot_serve_pct: number;
+    batch_2_mid_serve_pct: number;
+    batch_3_demand_flex_pct: number;
+    predicted_surplus_kg: number;
+    safe_consumption_window_hours: number;
+    fssai_cold_chain_sla_mins: number;
+  };
+  timeline_risk: {
+    curfew_compliance_probability_pct: number;
+    critical_path_buffer_minutes: number;
+    police_acoustic_limit_dba: number;
+    delay_cascade_risk: string;
+  };
+  budget_elasticity: {
+    anchor_protection_pct: number;
+    cost_overrun_probability_pct: number;
+    emergency_contingency_fund_inr: number;
+  };
+}
+
+export interface ADKSwarmOutput {
+  is_live_gemini: boolean;
+  model_name: string;
+  orchestration_time: number;
+  adk_master_summary: string;
+  summary?: string;
+  adk_predictions: ADKPredictions;
+  agents: ADKAgentTrace[];
+  themes?: string[];
+  intergenerational_features?: string[];
+}

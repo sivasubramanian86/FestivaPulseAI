@@ -553,7 +553,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   {CELEBRATION_THEMES.map((theme) => {
                     const isSelected = selectedTheme.id === theme.id;
                     return (
@@ -561,19 +561,27 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                         key={theme.id}
                         type="button"
                         onClick={() => setSelectedTheme(theme)}
-                        className={`p-3 rounded-2xl border text-left transition-all ${
+                        className={`group relative p-2 rounded-2xl border text-left transition-all overflow-hidden ${
                           isSelected
-                            ? 'bg-gradient-to-br from-amber-500/20 to-rose-500/10 border-amber-500 shadow-md scale-102 ring-1 ring-amber-400'
-                            : 'bg-white dark:bg-[#1D1630] border-[#E8DFD1] dark:border-[#352952] hover:border-amber-400'
+                            ? 'bg-gradient-to-br from-amber-500/25 to-rose-500/20 border-amber-400 shadow-lg scale-102 ring-2 ring-amber-400'
+                            : 'bg-white/90 dark:bg-[#1C142E] border-[#E8DFD1] dark:border-[#382B57] hover:border-amber-400/80 hover:shadow-md'
                         }`}
                       >
-                        <span className="text-[10px] font-mono uppercase text-amber-700 dark:text-amber-400 font-bold block">
-                          {theme.category}
-                        </span>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-1 mt-0.5">
+                        <div className="relative h-14 w-full rounded-xl overflow-hidden mb-2 bg-slate-950">
+                          <img
+                            src={theme.imageSrc}
+                            alt=""
+                            className="w-full h-full object-cover object-center filter brightness-95 group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                          <span className="absolute bottom-1 left-1.5 text-[9px] font-mono uppercase text-amber-300 font-bold drop-shadow">
+                            {theme.category}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-1">
                           {theme.name}
                         </h4>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1 font-mono">
+                        <span className="text-[10px] text-slate-500 dark:text-amber-300/80 block mt-0.5 font-mono">
                           {theme.recommendedBudget.split('-')[0]}
                         </span>
                       </button>
@@ -583,17 +591,17 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
               </div>
 
               {/* Active Theme Grand Visual & Operational Showcase (Crisp Split Layout) */}
-              <div className="rounded-3xl border-2 border-amber-400/50 overflow-hidden shadow-xl bg-gradient-to-br from-white via-[#FDFBF7] to-amber-50/20 dark:from-[#1D1630] dark:via-[#140F22] dark:to-[#171126] p-5 sm:p-6">
+              <div className="rounded-3xl border-2 border-amber-400/60 overflow-hidden shadow-2xl bg-gradient-to-br from-white via-[#FDFBF7] to-amber-50/20 dark:from-[#211636] dark:via-[#190F28] dark:to-[#171026] p-5 sm:p-6">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                   {/* Left Column: Crisp Portrait Showcase Frame */}
-                  <div className="relative w-full md:w-5/12 max-w-sm h-[440px] rounded-2xl overflow-hidden bg-slate-950 border border-amber-400/40 shadow-2xl flex-shrink-0 group mx-auto md:mx-0">
+                  <div className="relative w-full md:w-5/12 max-w-sm h-[440px] rounded-2xl overflow-hidden bg-slate-950 border border-amber-400/50 shadow-2xl flex-shrink-0 group mx-auto md:mx-0">
                     <img
                       key={selectedTheme.id}
                       src={selectedTheme.imageSrc}
                       alt={selectedTheme.imageAlt}
-                      className="w-full h-full object-cover object-center filter brightness-[0.94] group-hover:scale-105 transition-transform duration-700 animate-in fade-in"
+                      className="w-full h-full object-cover object-center filter brightness-[1.0] contrast-105 group-hover:scale-105 transition-transform duration-700 animate-in fade-in"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
 
                     {/* GCS Bucket Synced Badge */}
                     <div className="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded-lg border border-amber-400/40 text-[10px] text-amber-200 font-mono flex items-center gap-1.5 shadow-md">

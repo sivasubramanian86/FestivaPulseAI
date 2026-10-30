@@ -109,3 +109,57 @@ class TestSupervisorAgentSwarmIntegration:
         result = await supervisor.coordinate_crisis_recovery(incident_type, values, context)
         assert result is not None
         assert "Multi-Agent Swarm Synthesis" in result["overall_recommendation"]
+
+    @pytest.mark.asyncio
+    async def test_supervisor_plan_generation_with_live_gemini_client(self):
+        supervisor = EventSupervisorAgent()
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = "Live Swarm Consensus: 5 specialist agents validated blueprint with 100% adherence."
+        mock_client.models.generate_content.return_value = mock_response
+        supervisor._client = mock_client
+
+        sample_intake = {
+            "event_name": "Royal Palace Reception",
+            "expected_guests": 300,
+            "max_venue_capacity": 500,
+            "total_budget": 1000000,
+            "location": "Bengaluru",
+        }
+        res = await supervisor.coordinate_plan_generation(sample_intake)
+        assert res["summary"] == "Live Swarm Consensus: 5 specialist agents validated blueprint with 100% adherence."
+        assert res["is_live_gemini"] is True
+        assert len(res["agents"]) == 6
+
+    @pytest.mark.asyncio
+    async def test_supervisor_plan_generation_gemini_exception_fallback(self):
+        supervisor = EventSupervisorAgent()
+        mock_client = MagicMock()
+        mock_client.models.generate_content.side_effect = Exception("Vertex quota exceeded")
+        supervisor._client = mock_client
+
+        sample_intake = {
+            "event_name": "Quota Fallback Gala",
+            "expected_guests": 200,
+            "max_venue_capacity": 400,
+            "total_budget": 500000,
+            "location": "Chennai",
+        }
+        res = await supervisor.coordinate_plan_generation(sample_intake)
+        assert "Google ADK Multi-Agent Consensus" in res["summary"]
+        assert len(res["agents"]) == 6
+
+    def test_supervisor_init_client_variants(self):
+        from unittest.mock import patch
+
+        with patch("backend.app.agents.supervisor.settings") as mock_settings:
+            mock_settings.is_live_gemini_enabled = True
+            mock_settings.effective_gemini_key = "live_key"
+            with patch("google.genai.Client", return_value=MagicMock()) as mock_cls:
+                s1 = EventSupervisorAgent()
+                assert s1._client is not None
+                mock_cls.assert_called_once()
+
+            with patch("google.genai.Client", side_effect=Exception("Failed to construct")):
+                s2 = EventSupervisorAgent()
+                assert s2._client is None

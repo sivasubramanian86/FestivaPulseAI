@@ -76,8 +76,8 @@ class TestADKBaseAndMemory:
 
     def test_agent_client_init_exception(self):
         with patch("backend.app.agents.base.settings") as mock_settings:
-            mock_settings.GEMINI_API_KEY = "live_key"
-            mock_settings.DEMO_MODE = False
+            mock_settings.is_live_gemini_enabled = True
+            mock_settings.effective_gemini_key = "live_key"
             with patch("google.genai.Client", side_effect=Exception("Failed to init")):
                 agent = FestivaAgent(name="InitFail", role="Tester")
                 assert agent._client is None
@@ -143,6 +143,41 @@ class TestSpecialistAgents:
         assert task.status == "COMPLETED"
         assert len(res["themes"]) == 4
         assert len(res["intergenerational_features"]) == 3
+
+    @pytest.mark.asyncio
+    async def test_blueprint_agent_with_live_genai_client(self):
+        from unittest.mock import MagicMock
+
+        agent = BlueprintAgent()
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = (
+            '{"themes": ["GenAI Royal Gold Mandap", "GenAI Lotus Pool", "GenAI Feast", "GenAI Lounge"], '
+            '"intergenerational": ["Elders lounge", "Teens arcade", "Kids play enclave"], '
+            '"reasoning": "Synthesized with Gemini 2.5 Flash"}'
+        )
+        mock_client.models.generate_content.return_value = mock_response
+        agent._client = mock_client
+
+        task = ADKTask(task_id="T-BP-02", intent="GENERATE_BLUEPRINT")
+        res = await agent.execute_task(task, {"intake": {"event_name": "Royal Gala"}})
+        assert task.status == "COMPLETED"
+        assert res["themes"][0] == "GenAI Royal Gold Mandap"
+        assert res["reasoning_trace"] == "Synthesized with Gemini 2.5 Flash"
+
+    @pytest.mark.asyncio
+    async def test_blueprint_agent_with_genai_exception(self):
+        from unittest.mock import MagicMock
+
+        agent = BlueprintAgent()
+        mock_client = MagicMock()
+        mock_client.models.generate_content.side_effect = Exception("API rate limited")
+        agent._client = mock_client
+
+        task = ADKTask(task_id="T-BP-03", intent="GENERATE_BLUEPRINT")
+        res = await agent.execute_task(task, {"intake": {"event_name": "Fallback Gala"}})
+        assert task.status == "COMPLETED"
+        assert len(res["themes"]) == 4
 
     @pytest.mark.asyncio
     async def test_food_guard_scarcity_mitigation(self):

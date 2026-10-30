@@ -362,3 +362,31 @@ class TestStorageAndCacheServices:
         # Clear
         cache.clear()
         assert cache.get("events", {"id": "test_2"}) is None
+
+    def test_settings_gemini_key_resolution(self):
+        from backend.app.config import Settings
+
+        # Default demo mode key
+        s1 = Settings(GEMINI_API_KEY="demo_mode_key")
+        assert not s1.is_live_gemini_enabled
+        assert s1.effective_gemini_key == "demo_mode_key"
+
+        # Explicit live key
+        s2 = Settings(GEMINI_API_KEY="AIzaSyLiveCustomKey123")
+        assert s2.is_live_gemini_enabled
+        assert s2.effective_gemini_key == "AIzaSyLiveCustomKey123"
+
+        # Fallback to os.environ GEMINI_API_KEY
+        import os
+        from unittest.mock import patch
+
+        with patch.dict(os.environ, {"GEMINI_API_KEY": "AIzaSyEnvKey999"}):
+            s3 = Settings(GEMINI_API_KEY="demo_mode_key")
+            assert s3.effective_gemini_key == "AIzaSyEnvKey999"
+            assert s3.is_live_gemini_enabled
+
+        # Fallback to os.environ GOOGLE_API_KEY
+        with patch.dict(os.environ, {"GOOGLE_API_KEY": "AIzaSyGoogleKey888"}, clear=True):
+            s4 = Settings(GEMINI_API_KEY="")
+            assert s4.effective_gemini_key == "AIzaSyGoogleKey888"
+            assert s4.is_live_gemini_enabled

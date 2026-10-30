@@ -79,12 +79,11 @@ class FestivaAgent:
         self._init_client()
 
     def _init_client(self) -> None:
-        api_key = settings.GEMINI_API_KEY
-        if api_key and api_key != "demo_mode_key" and not settings.DEMO_MODE:
+        if settings.is_live_gemini_enabled:
             try:
                 from google import genai
 
-                self._client = genai.Client(api_key=api_key)
+                self._client = genai.Client(api_key=settings.effective_gemini_key)
             except Exception as e:
                 logger.warning(f"Failed to initialize GenAI client for agent {self.name}: {e}")
                 self._client = None

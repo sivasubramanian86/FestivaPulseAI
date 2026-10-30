@@ -6,6 +6,7 @@ Adheres to @01_memory_manager and @02_system_architect.
 """
 
 from datetime import datetime
+from typing import Any
 
 from backend.app.models.budget import BudgetLedger
 from backend.app.models.event import EventBlueprint, EventIntakeRequest
@@ -25,6 +26,7 @@ class EventState:
         self.latest_rescue_comparison: RescueStudioComparison | None = None
         self.decision_ledger: list[DecisionLedgerEntry] = []
         self.telemetry_traces: list[GenAITelemetryTrace] = []
+        self.adk_swarm_output: dict[str, Any] | None = None
         self.version: int = 1
 
 

@@ -6,6 +6,7 @@ import {
   QATestSuiteResponse,
   GenAITelemetryTrace,
   DecisionLedgerEntry,
+  ADKSwarmOutput,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -30,6 +31,7 @@ export const api = {
     food_radar: FoodSufficiencyRadar;
     timeline: any[];
     telemetry: GenAITelemetryTrace;
+    adk_swarm_output?: ADKSwarmOutput;
   }> {
     const res = await fetch(`${API_BASE}/event/create`, {
       method: 'POST',
