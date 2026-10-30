@@ -136,6 +136,57 @@ class TestEventRoutesIntegration:
         res_bad_evt = client.post("/api/v1/event/non-existent-evt/venues/apply/blr-palace-glasshouse")
         assert res_bad_evt.status_code == 404
 
+    def test_refine_event_success_and_errors(self):
+        payload = {
+            "event_name": "Refine Test Gala",
+            "event_type": "Community Event",
+            "organizer_email": "refine@festiva.ai",
+            "target_date": "2026-11-29",
+            "location": "Bengaluru",
+            "expected_guests": 200,
+            "max_venue_capacity": 300,
+            "total_budget": 500000,
+            "currency": "INR",
+        }
+        res_create = client.post("/api/v1/event/create", json=payload)
+        event_id = res_create.json()["event_id"]
+
+        # Refine guests and curfew
+        res_refine = client.post(
+            f"/api/v1/event/{event_id}/refine",
+            json={"user_prompt": "Add 50 guests and extend curfew to 23:00"},
+        )
+        assert res_refine.status_code == 200
+        ref_body = res_refine.json()
+        assert ref_body["success"] is True
+        assert ref_body["blueprint"]["expected_guests"] == 250
+        assert ref_body["blueprint"]["version"] == 2
+        assert ref_body["decision_entry"] is not None
+
+        # Refine menu theme
+        res_theme = client.post(
+            f"/api/v1/event/{event_id}/refine",
+            json={"user_prompt": "Switch menu to organic millet banquet"},
+        )
+        assert res_theme.status_code == 200
+        assert res_theme.json()["blueprint"]["version"] == 3
+
+        # Refine set guest count
+        res_set = client.post(
+            f"/api/v1/event/{event_id}/refine",
+            json={"user_prompt": "Change guests to 300"},
+        )
+        assert res_set.status_code == 200
+        assert res_set.json()["blueprint"]["expected_guests"] == 300
+        assert res_set.json()["blueprint"]["version"] == 4
+
+        # Non-existent event returns 404
+        res_bad = client.post(
+            "/api/v1/event/EVT-NONEXISTENT/refine",
+            json={"user_prompt": "Add 50 guests"},
+        )
+        assert res_bad.status_code == 404
+
 
 @pytest.mark.integration
 class TestPulseRoutesIntegration:

@@ -138,9 +138,31 @@ const MainCockpit: React.FC = () => {
       setFoodRadar(res.food_radar);
       setTimeline(res.timeline);
       setLatestTelemetry(res.telemetry);
-      setXrayOpen(true);
+      // Keep main view on the generated blueprint so user immediately sees their plan
+      setXrayOpen(false);
     } catch (err: any) {
       alert(`Generation failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Refining Blueprint with Natural Language Prompt
+  const handleRefineBlueprint = async (userPrompt: string) => {
+    if (!blueprint) return;
+    setLoading(true);
+    try {
+      const res = await api.refineBlueprint(blueprint.id, userPrompt);
+      if (res.blueprint) setBlueprint(res.blueprint);
+      if (res.ledger) setLedger(res.ledger);
+      if (res.food_radar) setFoodRadar(res.food_radar);
+      if (res.timeline) setTimeline(res.timeline);
+      if (res.decision_entry) {
+        setDecisionEntries((prev) => [res.decision_entry, ...prev]);
+      }
+    } catch (err: any) {
+      console.error('Failed to refine blueprint:', err);
+      alert(`Refinement failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -354,8 +376,10 @@ const MainCockpit: React.FC = () => {
           <CelebrationBlueprint
             blueprint={blueprint}
             onGenerateBlueprint={handleGenerateBlueprint}
+            onRefineBlueprint={handleRefineBlueprint}
             loading={loading}
             onApplyVenue={handleApplyVenue}
+            onOpenTelemetry={() => setXrayOpen(true)}
           />
         )}
 

@@ -159,4 +159,17 @@ export const api = {
     if (!res.ok) throw new Error('Failed to apply venue selection');
     return res.json();
   },
+
+  async refineBlueprint(eventId: string, userPrompt: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/event/${eventId}/refine`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_prompt: userPrompt }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to refine celebration blueprint');
+    }
+    return res.json();
+  },
 };
