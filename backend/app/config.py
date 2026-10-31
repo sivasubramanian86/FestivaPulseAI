@@ -14,7 +14,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     PORT: int = 8000
     HOST: str = "127.0.0.1"
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+    CORS_ORIGINS: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,"
+        "https://festivapulseai.web.app,https://festivapulseai.firebaseapp.com,"
+        "https://genai-apac-2026-491004.web.app,https://genai-apac-2026-491004.firebaseapp.com"
+    )
     DATABASE_PATH: str = "festivapulse.db"
     DEMO_MODE: bool = True
 
