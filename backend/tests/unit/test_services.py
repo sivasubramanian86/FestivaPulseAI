@@ -401,8 +401,6 @@ class TestStorageAndCacheServices:
         state = storage.save_event(bp, intake)
 
         # Initialize full valid state
-        from backend.app.models.incident import RescueStudioComparison
-        from backend.app.models.telemetry import DecisionLedgerEntry, GenAITelemetryTrace
         from backend.app.routers.event_routes import _initialize_event_state
 
         _initialize_event_state(state)
