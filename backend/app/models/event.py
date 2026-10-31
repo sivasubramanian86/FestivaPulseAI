@@ -14,6 +14,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 class EventType(str, Enum):
     """Supported celebratory event categories."""
+
     WEDDING = "Wedding"
     BIRTHDAY = "Birthday"
     COMMUNITY_EVENT = "Community Event"
@@ -21,6 +22,7 @@ class EventType(str, Enum):
 
 class DietaryRequirement(BaseModel):
     """Category dietary breakdowns and portion allocations summing strictly to 100%."""
+
     general_veg_pct: int = Field(default=60, ge=0, le=100)
     vegan_pct: int = Field(default=10, ge=0, le=100)
     jain_pct: int = Field(default=10, ge=0, le=100)
@@ -42,6 +44,7 @@ class DietaryRequirement(BaseModel):
 
 class EventPreferences(BaseModel):
     """Cultural preferences, comfort priorities, and acoustic curfew policies."""
+
     cultural_vibe: str = Field(
         default="Traditional South Indian with classical fusion and sustainable decor",
         min_length=3,
@@ -60,6 +63,7 @@ class EventPreferences(BaseModel):
 
 class EventIntakeRequest(BaseModel):
     """Validated intake payload for new celebration blueprint generation."""
+
     event_name: str = Field(..., min_length=3, max_length=120, description="Title of the celebration")
     event_type: EventType = Field(..., description="Wedding, Birthday, or Community Event")
     organizer_email: EmailStr = Field(..., description="RFC-compliant organizer email")
@@ -96,6 +100,7 @@ class EventIntakeRequest(BaseModel):
 
 class MilestoneItem(BaseModel):
     """Timeline milestone with phase ownership and completion tracking."""
+
     phase: str  # e.g., "T-30 Days", "T-7 Days", "Day of Event"
     task_name: str
     owner: str
@@ -105,6 +110,7 @@ class MilestoneItem(BaseModel):
 
 class VendorSLAItem(BaseModel):
     """Vendor contractual SLA, deposit ledger, and emergency backup contacts."""
+
     vendor_type: str  # e.g., "Caterer", "AV & Acoustics", "Decor", "Priest/Officiant"
     vendor_name: str
     quote_amount: int
@@ -117,6 +123,7 @@ class VendorSLAItem(BaseModel):
 
 class EventBlueprint(BaseModel):
     """Master comprehensive celebration blueprint synthesized by the ADK swarm."""
+
     id: str
     event_name: str
     event_type: EventType

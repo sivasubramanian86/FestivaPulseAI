@@ -60,6 +60,7 @@ def create_sample_intake() -> EventIntakeRequest:
 @pytest.mark.unit
 class TestGeminiServiceBlueprint:
     """Test suite for Gemini Service Blueprint."""
+
     def test_synthesize_local_blueprint_fallback(self) -> None:
         """Verifies synthesize local blueprint fallback."""
         service = GeminiOrchestratorService()
@@ -129,6 +130,7 @@ class TestGeminiServiceBlueprint:
 @pytest.mark.unit
 class TestGeminiServiceTriage:
     """Test suite for Gemini Service Triage."""
+
     def test_triage_attendance_surge_incident(self) -> None:
         """Verifies triage attendance surge incident."""
         service = GeminiOrchestratorService()
@@ -273,6 +275,7 @@ class TestGeminiServiceTriage:
 @pytest.mark.unit
 class TestMultimodalService:
     """Test suite for Multimodal Service."""
+
     def test_extract_vendor_quote(self) -> None:
         """Verifies extract vendor quote."""
         svc = MultimodalService()
@@ -319,6 +322,7 @@ class TestMultimodalService:
 @pytest.mark.unit
 class TestStorageAndCacheServices:
     """Test suite for Storage And Cache Services."""
+
     def test_storage_service_lifecycle(self) -> None:
         """Verifies storage service lifecycle."""
         storage = StorageService()

@@ -35,6 +35,7 @@ from backend.app.models.timeline import TimelineCascadeImpact, TimelineNode
 @pytest.mark.unit
 class TestEventModels:
     """Test suite for Event Models."""
+
     def test_dietary_requirement_valid(self) -> None:
         """Verifies dietary requirement valid."""
         diet = DietaryRequirement(
@@ -182,6 +183,7 @@ class TestEventModels:
 @pytest.mark.unit
 class TestIncidentAndRecoveryModels:
     """Test suite for Incident And Recovery Models."""
+
     def test_incident_submission(self) -> None:
         """Verifies incident submission."""
         inc = IncidentSubmission(
@@ -239,6 +241,7 @@ class TestIncidentAndRecoveryModels:
 @pytest.mark.unit
 class TestInventoryTelemetryTimelineModels:
     """Test suite for Inventory Telemetry Timeline Models."""
+
     def test_food_category_breakdown_and_radar(self) -> None:
         """Verifies food category breakdown and radar."""
         status = CategoryPortionStatus(

@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 class MealCategory(str, Enum):
     """Dietary meal classification categories."""
+
     GENERAL_VEG = "General Vegetarian"
     VEGAN = "Vegan"
     JAIN = "Jain (Satvik)"
@@ -24,6 +25,7 @@ class MealCategory(str, Enum):
 
 class MealInventoryState(str, Enum):
     """Lifecycle state of an individual meal or batch portion."""
+
     AVAILABLE = "Available"
     RESERVED = "Reserved"
     SERVED = "Served"
@@ -33,6 +35,7 @@ class MealInventoryState(str, Enum):
 
 class CategoryPortionStatus(BaseModel):
     """Real-time portion metrics, burn rate, and depletion projections for a meal category."""
+
     category: MealCategory
     required_portions: int
     prepared_portions: int
@@ -49,6 +52,7 @@ class CategoryPortionStatus(BaseModel):
 
 class FSSAISurplusManifest(BaseModel):
     """Certified food donation manifest compliant with FSSAI Safe Food Share guidelines."""
+
     manifest_id: str
     timestamp: str
     event_id: str
@@ -67,6 +71,7 @@ class FSSAISurplusManifest(BaseModel):
 
 class FoodSufficiencyRadar(BaseModel):
     """Real-time telemetry model tracking food availability and shortfalls across all dietary lines."""
+
     event_id: str
     timestamp: str
     overall_attendance_expected: int

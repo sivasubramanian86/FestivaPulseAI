@@ -29,6 +29,7 @@ router = APIRouter(prefix="/api/v1", tags=["QA & Multimodal"])
 
 class VoiceMemoRequest(BaseModel):
     """Payload schema for raw audio voice memo transcriptions and coordinator intake."""
+
     transcript: str = Field(..., min_length=3, max_length=1000)
 
 

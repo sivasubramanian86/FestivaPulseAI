@@ -28,6 +28,7 @@ from backend.app.models.timeline import TimelineNode
 
 class ConcreteAgent(FestivaAgent):
     """Test suite for Concrete Agent."""
+
     async def _run_logic(self, task: ADKTask, context: dict) -> dict:
         """Verifies run logic."""
         if task.intent == "FAIL":
@@ -38,6 +39,7 @@ class ConcreteAgent(FestivaAgent):
 @pytest.mark.unit
 class TestADKBaseAndMemory:
     """Test suite for A D K Base And Memory."""
+
     def test_memory_remember_recall_and_clear(self) -> None:
         """Verifies memory remember recall and clear."""
         mem = ADKMemory()
@@ -101,6 +103,7 @@ class TestADKBaseAndMemory:
 @pytest.mark.unit
 class TestMCPTools:
     """Test suite for M C P Tools."""
+
     def test_pantry_rag_search_all_categories(self) -> None:
         """Verifies pantry rag search all categories."""
         for q in ["pulav", "millet", "dal", "dessert"]:
@@ -150,6 +153,7 @@ class TestMCPTools:
 @pytest.mark.unit
 class TestSpecialistAgents:
     """Test suite for Specialist Agents."""
+
     @pytest.mark.asyncio
     async def test_blueprint_agent_execution(self) -> None:
         """Verifies blueprint agent execution."""

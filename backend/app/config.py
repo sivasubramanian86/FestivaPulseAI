@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application configuration and environmental credentials management."""
+
     GEMINI_API_KEY: str = "demo_mode_key"
     GEMINI_MODEL: str = "gemini-2.5-flash"
     IMAGEN_MODEL: str = "imagen-3.0-generate-002"

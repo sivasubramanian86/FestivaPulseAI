@@ -18,6 +18,7 @@ client = TestClient(app)
 @pytest.mark.integration
 class TestHealthAndPresetsRoutes:
     """Test suite for Health And Presets Routes."""
+
     def test_health_check_endpoint(self) -> None:
         """Verifies health check endpoint."""
         response = client.get("/api/v1/health")
@@ -38,6 +39,7 @@ class TestHealthAndPresetsRoutes:
 @pytest.mark.integration
 class TestEventRoutesIntegration:
     """Test suite for Event Routes Integration."""
+
     def test_create_event_success_and_retrieval(self) -> None:
         """Verifies create event success and retrieval."""
         payload = {
@@ -205,6 +207,7 @@ class TestEventRoutesIntegration:
 @pytest.mark.integration
 class TestPulseRoutesIntegration:
     """Test suite for Pulse Routes Integration."""
+
     @pytest.fixture
     def setup_event(self) -> None:
         """Verifies setup event."""
@@ -289,6 +292,7 @@ class TestPulseRoutesIntegration:
 @pytest.mark.integration
 class TestRescueRoutesIntegration:
     """Test suite for Rescue Routes Integration."""
+
     @pytest.fixture
     def setup_event_for_rescue(self) -> None:
         """Verifies setup event for rescue."""
@@ -372,6 +376,7 @@ class TestRescueRoutesIntegration:
 @pytest.mark.integration
 class TestQARoutesAndMultimodalIntegration:
     """Test suite for Q A Routes And Multimodal Integration."""
+
     def test_run_tests_endpoint(self) -> None:
         """Verifies run tests endpoint."""
         res = client.post("/api/v1/qa/run-tests")

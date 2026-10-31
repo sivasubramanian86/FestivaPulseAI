@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class IncidentType(str, Enum):
     """Enumeration of day-of-event operational shocks and disruptions."""
+
     ATTENDANCE_SURGE = "Attendance Surge"
     ATTENDANCE_DROP = "Attendance Drop"
     FOOD_SHORTAGE = "Food Shortage"
@@ -27,6 +28,7 @@ class IncidentType(str, Enum):
 
 class RecoveryStrategyType(str, Enum):
     """Classification of the 3 comparative mitigation pathways in Rescue Studio."""
+
     LOWEST_COST = "Lowest Additional Cost"
     BEST_EXPERIENCE = "Best Guest Experience"
     LOWEST_DISRUPTION = "Lowest Operational Disruption"
@@ -34,6 +36,7 @@ class RecoveryStrategyType(str, Enum):
 
 class IncidentSubmission(BaseModel):
     """Payload representing a field-reported operational shock or scenario simulation."""
+
     event_id: str
     incident_type: IncidentType
     entered_values: dict[str, Any] = Field(
@@ -47,6 +50,7 @@ class IncidentSubmission(BaseModel):
 
 class RecoveryProposal(BaseModel):
     """Individual mitigation strategy proposal with cost, feasibility, and approval tags."""
+
     proposal_id: str = Field(default_factory=lambda: f"PROP-{uuid.uuid4().hex[:4]}")
     strategy_type: RecoveryStrategyType
     summary: str
@@ -64,6 +68,7 @@ class RecoveryProposal(BaseModel):
 
 class RescueStudioComparison(BaseModel):
     """Triage package containing 3 comparative proposals and rejected options for HITL review."""
+
     incident_id: str
     event_id: str
     timestamp: str

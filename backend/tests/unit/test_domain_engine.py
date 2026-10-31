@@ -24,6 +24,7 @@ from backend.app.models.timeline import TimelineNode
 @pytest.mark.unit
 class TestBudgetEngine:
     """Test suite for Budget Engine."""
+
     def test_calculate_budget_ledger_arithmetic(self) -> None:
         """Verifies that budget spent and committed amounts are never double-counted."""
         categories = [
@@ -144,6 +145,7 @@ class TestBudgetEngine:
 @pytest.mark.unit
 class TestFoodAndFSSAI:
     """Test suite for Food And F S S A I."""
+
     def test_food_sufficiency_category_shortfall(self) -> None:
         """Verifies category-level shortfall detection (e.g., vegan shortage despite overall surplus)."""
         dietary = DietaryRequirement(
@@ -190,6 +192,7 @@ class TestFoodAndFSSAI:
 @pytest.mark.unit
 class TestTimelineDAG:
     """Test suite for Timeline D A G."""
+
     def test_propagate_timeline_delay_dag(self) -> None:
         """Verifies that delays propagate downstream and sound curfew (22:00) is flagged."""
         nodes = [
@@ -277,6 +280,7 @@ class TestTimelineDAG:
 @pytest.mark.unit
 class TestProposalFeasibilityRules:
     """Test suite for Proposal Feasibility Rules."""
+
     def test_validate_proposal_feasibility_rules(self) -> None:
         """Verifies hard capacity and budget rejection checks."""
         feasible, msg = validate_proposal_feasibility("Add chairs", 250, 300, 20000, 50000)

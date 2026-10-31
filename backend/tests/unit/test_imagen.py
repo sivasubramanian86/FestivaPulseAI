@@ -57,6 +57,7 @@ def sample_intake() -> EventIntakeRequest:
 @pytest.mark.unit
 class TestImagenVisualizerService:
     """Test suite for Imagen Visualizer Service."""
+
     def test_init_disabled_gemini(self) -> None:
         """Verifies init disabled gemini."""
         with patch("backend.app.services.imagen_service.settings") as mock_settings:
@@ -289,6 +290,7 @@ class TestImagenVisualizerService:
 @pytest.mark.unit
 class TestVisualizationEndpoints:
     """Test suite for Visualization Endpoints."""
+
     def test_post_visualize_standalone(self, client) -> None:
         """Verifies post visualize standalone."""
         payload = {

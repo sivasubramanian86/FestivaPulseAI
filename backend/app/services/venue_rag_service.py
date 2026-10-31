@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class VenueHallItem(BaseModel):
     """Grounded celebration venue item with pricing, capacity, and accessibility metadata."""
+
     id: str
     name: str
     city: str

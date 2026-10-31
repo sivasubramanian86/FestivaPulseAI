@@ -72,6 +72,7 @@ def sample_intake() -> EventIntakeRequest:
 
 class TestEdgeCaseBranches:
     """Test suite for Edge Case Branches."""
+
     @pytest.mark.asyncio
     async def test_budget_elasticity_missing_ledger_or_zero_budget(self) -> None:
         """Verifies budget elasticity missing ledger or zero budget."""
@@ -246,6 +247,7 @@ class TestEdgeCaseBranches:
 
 class TestCloudIntegrations:
     """Test suite for Cloud Integrations."""
+
     @pytest.mark.asyncio
     async def test_firestore_service_lifecycle_local_fallback(self, sample_intake) -> None:
         """Verifies firestore service lifecycle local fallback."""

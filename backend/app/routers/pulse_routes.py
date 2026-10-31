@@ -24,6 +24,7 @@ router = APIRouter(prefix="/api/v1/event", tags=["Event Pulse"])
 
 class PulseUpdateRequest(BaseModel):
     """Payload schema for real-time celebration pulse updates (check-ins, inventory, delays)."""
+
     actual_checked_in: int = Field(default=0, ge=0)
     revised_expected_guests: int = Field(default=250, ge=10)
     category_inventory_update: dict[str, dict[str, int]] = Field(default_factory=dict)
@@ -110,6 +111,7 @@ async def update_event_pulse(event_id: str, payload: PulseUpdateRequest) -> dict
 
 class FSSAIDispatchRequest(BaseModel):
     """Payload schema for generating certified FSSAI food donation recovery manifests."""
+
     surplus_kg: float = Field(..., ge=1.0, le=500.0)
     hot_temp_celsius: float = Field(default=68.0, ge=40.0, le=95.0)
     cold_temp_celsius: float = Field(default=4.0, ge=0.0, le=25.0)

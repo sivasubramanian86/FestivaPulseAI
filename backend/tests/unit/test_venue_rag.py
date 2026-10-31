@@ -15,6 +15,7 @@ from backend.app.services.venue_rag_service import (
 @pytest.mark.unit
 class TestVenueRAGService:
     """Test suite for Venue R A G Service."""
+
     def test_registry_populated(self) -> None:
         """Verifies registry populated."""
         service = VenueRAGService()

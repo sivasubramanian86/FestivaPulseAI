@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 class TimelineNode(BaseModel):
     """Directed acyclic graph schedule node with critical-path dependency tracking."""
+
     node_id: str
     title: str = "Event Milestone"
     owner: str = "Host Lead"
@@ -24,6 +25,7 @@ class TimelineNode(BaseModel):
 
 class TimelineCascadeImpact(BaseModel):
     """Calculated cascade impact of an upstream delay across downstream schedule nodes."""
+
     delayed_node_id: str
     delay_minutes: int
     propagated_delays: list[TimelineNode]
