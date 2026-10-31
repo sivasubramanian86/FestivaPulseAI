@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = "demo_mode_key"
     GEMINI_MODEL: str = "gemini-2.5-flash"
     IMAGEN_MODEL: str = "imagen-3.0-generate-002"
+    IMAGE_MULTIMODAL_MODEL: str = "gemini-2.5-flash-image"
     ENVIRONMENT: str = "development"
     PORT: int = 8000
     HOST: str = "127.0.0.1"
@@ -34,6 +35,16 @@ class Settings(BaseSettings):
     ENABLE_CLOUD_MONITORING: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    @property
+    def effective_project_id(self) -> str:
+        """Resolves active GCP project ID from environment or settings."""
+        return (
+            os.environ.get("GOOGLE_CLOUD_PROJECT")
+            or os.environ.get("GCP_PROJECT")
+            or self.GCP_PROJECT_ID
+            or "genai-apac-2026-491004"
+        )
 
     @property
     def effective_gemini_key(self) -> str:

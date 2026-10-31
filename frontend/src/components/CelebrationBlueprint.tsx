@@ -111,6 +111,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
     themeName?: string;
     tagline?: string;
     culturalElements?: string[];
+    enrichedPrompt?: string;
   } | null>(null);
 
   const handleGenerateVisualization = async (customPrompt?: string) => {
@@ -132,6 +133,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
         themeName: res.theme_name,
         tagline: res.tagline,
         culturalElements: res.cultural_elements,
+        enrichedPrompt: res.enriched_prompt,
       });
       toast.success(res.is_live ? 'Visual synthesized via Vertex AI Imagen 3.0!' : `Visual synthesized: ${res.theme_name || 'Guided Tour Atelier'}!`);
     } catch (err: any) {
@@ -1564,6 +1566,22 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                       </a>
                     </div>
                   </div>
+
+                  {/* Dynamic LLM Photographic Prompt Details */}
+                  {visualResult.enrichedPrompt && (
+                    <div className="p-3 rounded-xl bg-slate-900/90 border border-amber-400/30 text-left space-y-1.5 animate-fadeIn">
+                      <div className="flex items-center justify-between text-[10px] font-mono font-bold text-amber-300">
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                          AI Cinematographic Prompt (Gemini LLM Dynamic Synthesis)
+                        </span>
+                        <span className="text-slate-400">Target: Imagen 3.0 / Gemini Flash Image</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
+                        "{visualResult.enrichedPrompt}"
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -391,6 +391,16 @@ class TestStorageAndCacheServices:
             assert s4.effective_gemini_key == "AIzaSyGoogleKey888"
             assert s4.is_live_gemini_enabled
 
+        # Project ID resolution variants
+        s_default = Settings(GCP_PROJECT_ID="test-proj-fallback")
+        assert s_default.effective_project_id in ("test-proj-fallback", "genai-apac-2026-491004")
+        with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "env-proj-123"}):
+            s_env = Settings()
+            assert s_env.effective_project_id == "env-proj-123"
+        with patch.dict(os.environ, {"GCP_PROJECT": "gcp-proj-456"}, clear=True):
+            s_gcp = Settings()
+            assert s_gcp.effective_project_id == "gcp-proj-456"
+
     def test_storage_service_sqlite_persistence_and_deserialization(self, tmp_path):
         db_file = str(tmp_path / "test_storage.db")
         storage = StorageService(db_path=db_file)

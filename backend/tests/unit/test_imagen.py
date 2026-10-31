@@ -77,6 +77,99 @@ class TestImagenVisualizerService:
                 service = ImagenVisualizerService()
                 assert service._client == mock_client
 
+    def test_init_vertex_ai_success(self):
+        mock_client = MagicMock()
+        with patch("backend.app.services.imagen_service.settings") as mock_settings:
+            mock_settings.is_live_gemini_enabled = True
+            mock_settings.effective_gemini_key = ""
+            with patch("google.genai.Client", return_value=mock_client):
+                service = ImagenVisualizerService()
+                assert service._client == mock_client
+
+    def test_synthesize_dynamic_photographic_prompt_with_llm(self):
+        service = ImagenVisualizerService()
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.text = "An ultra-cinematic architectural mandap bathed in volumetric amber rays."
+        mock_client.models.generate_content.return_value = mock_response
+        service._client = mock_client
+
+        expanded = service.synthesize_dynamic_photographic_prompt("Royal Mandap", "Golden Hour Glow")
+        assert "ultra-cinematic architectural mandap" in expanded
+
+    def test_synthesize_dynamic_photographic_prompt_llm_exception_fallback(self):
+        service = ImagenVisualizerService()
+        mock_client = MagicMock()
+        mock_client.models.generate_content.side_effect = RuntimeError("LLM Unavailable")
+        service._client = mock_client
+
+        expanded = service.synthesize_dynamic_photographic_prompt("Royal Mandap", "Golden Hour Glow")
+        assert "Hasselblad H6D-100c" in expanded
+        assert "Royal Mandap" in expanded
+
+    def test_live_generation_gemini_flash_image_success(self):
+        service = ImagenVisualizerService()
+        mock_client = MagicMock()
+        # Mock LLM prompt expansion
+        mock_llm_response = MagicMock()
+        mock_llm_response.text = "Cinematic expanded prompt description"
+
+        # Mock image multimodal output
+        mock_part = MagicMock()
+        mock_part.inline_data.data = b"fake-png-bytes-stream"
+        mock_part.inline_data.mime_type = "image/png"
+        mock_candidate = MagicMock()
+        mock_candidate.content.parts = [mock_part]
+        mock_img_response = MagicMock()
+        mock_img_response.candidates = [mock_candidate]
+
+        mock_client.models.generate_content.side_effect = [mock_llm_response, mock_img_response]
+        service._client = mock_client
+
+        res = service.generate_visualization(
+            prompt="Royal Palace Reception",
+            lighting_mood="Golden Hour Glow",
+        )
+        assert res["success"] is True
+        assert res["is_live"] is True
+        assert res["model"] == "gemini-2.5-flash-image (Vertex AI Live)"
+        assert res["image_url"].startswith("data:image/png;base64,")
+        assert res["theme_category"] == "Royal Rajput Heritage"
+
+    def test_live_generation_gemini_flash_image_exception_falls_back_to_imagen(self):
+        service = ImagenVisualizerService()
+        mock_client = MagicMock()
+        mock_llm_response = MagicMock()
+        mock_llm_response.text = "Cinematic expanded prompt description"
+
+        mock_image_item = MagicMock()
+        mock_image_item.image.image_bytes = b"fake-jpg-binary-stream"
+        mock_imagen_result = MagicMock()
+        mock_imagen_result.generated_images = [mock_image_item]
+
+        # First call is for LLM prompt expansion; second is for Flash Image which raises error
+        mock_client.models.generate_content.side_effect = [
+            mock_llm_response,
+            RuntimeError("Flash Image Service Unavailable"),
+        ]
+        mock_client.models.generate_images.return_value = mock_imagen_result
+        service._client = mock_client
+
+        res = service.generate_visualization(
+            prompt="Royal Rajput Palace",
+            lighting_mood="Golden Hour Glow",
+        )
+        assert res["success"] is True
+        assert res["is_live"] is True
+        assert res["model"] == "imagen-3.0-generate-002"
+        assert res["image_url"].startswith("data:image/jpeg;base64,")
+
+    def test_extract_theme_info_custom_celebration(self):
+        service = ImagenVisualizerService()
+        info = service._extract_theme_info("Futuristic Cyber Lunar Station 2099")
+        assert info["theme_category"] == "Custom AI Celebration"
+        assert "8K Hasselblad Lens" in info["cultural_elements"]
+
     def test_live_generation_success(self):
         service = ImagenVisualizerService()
         mock_client = MagicMock()

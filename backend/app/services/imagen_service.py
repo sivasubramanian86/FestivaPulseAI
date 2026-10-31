@@ -1,12 +1,13 @@
-"""Imagen 3.0 Programmatic Visualizer Service for FestivaPulseAI.
+"""Imagen 3.0 & Gemini Flash Image Visualizer Service for FestivaPulseAI.
 
 Generates opulent, constraint-aware celebration visualizations using Vertex AI / Google GenAI
-Imagen 3.0 (imagen-3.0-generate-002) with high-fidelity Guided Tour photographic atelier synthesis
-for local demo, hackathon evaluation, and offline modes.
+Imagen 3.0 (imagen-3.0-generate-002) and Gemini Multimodal Image Generation (gemini-2.5-flash-image)
+with dynamic LLM-orchestrated photographic prompt engineering and high-fidelity Guided Tour atelier fallback.
 Adheres to @05_vertex_model_registry, @09_frontend_gui_architect, and production-invariants.
 """
 
 import base64
+import os
 import time
 from typing import Any
 
@@ -268,6 +269,18 @@ DEFAULT_THEME = {
     ],
 }
 
+SYSTEM_PROMPT_DIRECTOR = (
+    "You are FestivaPulseAI's Senior Visual Director & Architectural Cinematographer for luxury celebrations. "
+    "Transform the user's celebration concept into an ultra-photorealistic, cinematographic scene prompt "
+    "engineered specifically for Google Imagen 3 and Gemini image generation models.\n\n"
+    "Follow these strict directives:\n"
+    "1. Perspective & Framing: Wide-angle eye-level architectural shot capturing the grand mandap/stage, banquet hall, or outdoor pavilion in full perspective.\n"
+    "2. Atmospheric Lighting: Deeply describe lighting physics matching the chosen mood (e.g., golden hour amber sunbeams, twilight violet dusk, candlelit brass lanterns, or crisp morning dawn).\n"
+    "3. Tactile Materials & Florals: Intricate Banarasi raw silk drapes, zardozi gold embroidery, cascading fresh Sambac jasmine (mogra) and orange marigold torans, polished Italian marble with mirror reflections.\n"
+    "4. Optics & Camera: Shot on Hasselblad H6D-100c medium format camera with a 35mm f/1.8 lens, natural optical depth-of-field, sharp focus, 8K UHD resolution, Architectural Digest and National Geographic luxury editorial style.\n"
+    "5. Format: Output ONLY a single dense, evocative descriptive paragraph (100-180 words). No conversational filler, no markdown bolding, no quotation marks."
+)
+
 
 class ImagenVisualizerService:
     def __init__(self):
@@ -280,10 +293,90 @@ class ImagenVisualizerService:
             try:
                 from google import genai
 
-                self._client = genai.Client(api_key=settings.effective_gemini_key)
+                if settings.effective_gemini_key and settings.effective_gemini_key not in (
+                    "demo_mode_key",
+                    "your_gemini_api_key_here",
+                ):
+                    self._client = genai.Client(api_key=settings.effective_gemini_key)
+                    return
+
+                project_id = (
+                    os.environ.get("GOOGLE_CLOUD_PROJECT")
+                    or os.environ.get("GCP_PROJECT")
+                    or settings.GCP_PROJECT_ID
+                    or "genai-apac-2026-491004"
+                )
+                region = os.environ.get("GCP_REGION") or "us-central1"
+                self._client = genai.Client(vertexai=True, project=project_id, location=region)
             except Exception as e:
                 print(f"[WARN] Failed to initialize Google GenAI Imagen client: {e}. Running in graceful demo mode.")
                 self._client = None
+
+    def synthesize_dynamic_photographic_prompt(
+        self,
+        prompt: str,
+        lighting_mood: str = "Golden Hour Glow",
+        style: str = "photorealistic",
+    ) -> str:
+        """Synthesizes an ultra-rich, cinematographic scene prompt using Gemini LLM with local fallback."""
+        clean_prompt = prompt.strip()
+        if self._client:
+            try:
+                response = self._client.models.generate_content(
+                    model=settings.GEMINI_MODEL,
+                    contents=f"Celebration concept: {clean_prompt}. Lighting mood: {lighting_mood}. Visual style: {style}.",
+                    config={
+                        "system_instruction": SYSTEM_PROMPT_DIRECTOR,
+                        "temperature": 0.6,
+                    },
+                )
+                if response and response.text and response.text.strip():
+                    return response.text.strip()
+            except Exception as e:
+                print(
+                    f"[WARN] Gemini LLM prompt expansion error: {e}. Falling back to deterministic prompt synthesizer."
+                )
+
+        return self._synthesize_local_photographic_prompt(clean_prompt, lighting_mood, style)
+
+    def _synthesize_local_photographic_prompt(
+        self,
+        prompt: str,
+        lighting_mood: str,
+        style: str = "photorealistic",
+    ) -> str:
+        """Deterministically constructs a multi-layered photographic master prompt for Imagen."""
+        mood_lighting_descriptions = {
+            "Golden Hour Glow": (
+                "bathed in warm late-afternoon volumetric golden light, long amber sunbeams filtering "
+                "through diaphanous silk canopies, casting glowing highlights over ornate floral arches and brass artifacts"
+            ),
+            "Muhurtham Twilight": (
+                "illuminated in sacred twilight violet and deep indigo gradients, contrasted with "
+                "hundreds of glowing brass kuthuvilakku oil lamps and soft lavender architectural uplighting"
+            ),
+            "Royal Candlelight Night": (
+                "dramatically lit by hundreds of flickering beeswax candles and brass oil lamps in floating bronze urlis, "
+                "with warm tungsten reflections glistening across polished stone and velvet drapery"
+            ),
+            "Sunlit Morning": (
+                "drenched in crisp morning dawn sunlight with crystalline atmospheric clarity, "
+                "morning dewdrops glistening on fresh floral petals with soft natural shadows"
+            ),
+        }
+        atmosphere = mood_lighting_descriptions.get(
+            lighting_mood,
+            f"illuminated in atmospheric {lighting_mood} with warm ambient glow and balanced shadows",
+        )
+
+        return (
+            f"An ultra-photorealistic, wide-angle eye-level architectural photograph capturing {prompt}. "
+            f"The celebration space is {atmosphere}. Intricate floral garlands of fresh marigolds, fragrant Sambac jasmine, "
+            f"and lotus blooms adorn hand-carved pillars and archways. Rich Banarasi raw silk and velvet drapery with subtle gold zardozi "
+            f"threading frame the grand ceremonial stage, with polished reflective marble floors mirroring the luminous surroundings. "
+            f"Captured on a Hasselblad H6D-100c medium format camera with a 35mm f/1.8 lens, sharp focus, natural optical depth of field, "
+            f"8K UHD resolution, in the opulent editorial aesthetic of Architectural Digest and National Geographic."
+        )
 
     def generate_visualization(
         self,
@@ -292,17 +385,51 @@ class ImagenVisualizerService:
         lighting_mood: str = "Golden Hour Glow",
         aspect_ratio: str = "16:9",
     ) -> dict[str, Any]:
-        """Generates celebration visual using Vertex AI Imagen 3.0 or opulent Guided Tour photographic synthesis."""
+        """Generates celebration visual using dynamic LLM prompt expansion and Vertex AI Imagen / Gemini Image models."""
         start_time = time.time()
         clean_prompt = prompt.strip()
-        enriched_prompt = (
-            f"Opulent Indian celebration event design: {clean_prompt}. "
-            f"Atmosphere: {lighting_mood}, floral arch with marigold and jasmine, regal mandap pillars, "
-            f"warm candlelit lanterns, 8k resolution, architectural digest style, professional event photography."
-        )
 
-        # 1. Attempt Live Imagen 3 Generation via Google GenAI SDK
+        # 1. Dynamic LLM Photographic Prompt Synthesis
+        enriched_prompt = self.synthesize_dynamic_photographic_prompt(clean_prompt, lighting_mood, style)
+
+        # 2. Attempt Live Image Generation via Gemini Flash Image or Imagen 3.0
         if self._client:
+            # Strategy A: Native Multimodal Image Generation via gemini-2.5-flash-image
+            try:
+                result = self._client.models.generate_content(
+                    model=settings.IMAGE_MULTIMODAL_MODEL,
+                    contents=enriched_prompt,
+                )
+                if result and result.candidates and len(result.candidates) > 0:
+                    candidate = result.candidates[0]
+                    if candidate.content and candidate.content.parts:
+                        for part in candidate.content.parts:
+                            if part.inline_data and part.inline_data.data:
+                                img_bytes = part.inline_data.data
+                                mime_type = part.inline_data.mime_type or "image/png"
+                                b64_data = base64.b64encode(img_bytes).decode("utf-8")
+                                latency_ms = int((time.time() - start_time) * 1000)
+                                data_url = f"data:{mime_type};base64,{b64_data}"
+                                theme_info = self._extract_theme_info(clean_prompt)
+                                return {
+                                    "success": True,
+                                    "image_url": data_url,
+                                    "asset_url": data_url,
+                                    "model": f"{settings.IMAGE_MULTIMODAL_MODEL} (Vertex AI Live)",
+                                    "prompt": clean_prompt,
+                                    "enriched_prompt": enriched_prompt,
+                                    "lighting_mood": lighting_mood,
+                                    "latency_ms": latency_ms,
+                                    "is_live": True,
+                                    "theme_category": theme_info["theme_category"],
+                                    "theme_name": f"{clean_prompt[:45]}... Dynamic AI Render",
+                                    "tagline": "Dynamic AI Photographic Render via Gemini LLM + Imagen",
+                                    "cultural_elements": theme_info["cultural_elements"],
+                                }
+            except Exception as e:
+                print(f"[WARN] Gemini Flash Image live generation error: {e}. Trying Imagen 3.0 model.")
+
+            # Strategy B: Imagen 3.0 via generate_images
             try:
                 result = self._client.models.generate_images(
                     model=self.model_name,
@@ -317,27 +444,29 @@ class ImagenVisualizerService:
                     img_bytes = generated_img.image.image_bytes
                     b64_data = base64.b64encode(img_bytes).decode("utf-8")
                     latency_ms = int((time.time() - start_time) * 1000)
+                    data_url = f"data:image/jpeg;base64,{b64_data}"
+                    theme_info = self._extract_theme_info(clean_prompt)
                     return {
                         "success": True,
-                        "image_url": f"data:image/jpeg;base64,{b64_data}",
-                        "asset_url": f"data:image/jpeg;base64,{b64_data}",
+                        "image_url": data_url,
+                        "asset_url": data_url,
                         "model": self.model_name,
                         "prompt": clean_prompt,
                         "enriched_prompt": enriched_prompt,
                         "lighting_mood": lighting_mood,
                         "latency_ms": latency_ms,
                         "is_live": True,
-                        "theme_category": "Custom AI Generation",
-                        "theme_name": "Vertex AI Imagen 3.0 Synthesized Design",
-                        "tagline": clean_prompt,
-                        "cultural_elements": ["Custom AI Mandap", "Neural Light Rendering", "8K Resolution"],
+                        "theme_category": theme_info["theme_category"],
+                        "theme_name": f"{clean_prompt[:45]}... Imagen 3.0 Render",
+                        "tagline": "Dynamic AI Photographic Render via Gemini LLM + Imagen 3",
+                        "cultural_elements": theme_info["cultural_elements"],
                     }
             except Exception as e:
                 print(
                     f"[WARN] Imagen 3 live generation error: {e}. Falling back to Guided Tour atelier photo synthesis."
                 )
 
-        # 2. High-Fidelity Guided Tour Photographic Atelier Synthesis
+        # 3. High-Fidelity Guided Tour Photographic Atelier Synthesis (Graceful Offline / Demo Fallback)
         latency_ms = int((time.time() - start_time) * 1000)
         procedural = self._synthesize_procedural_visual(clean_prompt, lighting_mood)
         return {
@@ -356,6 +485,25 @@ class ImagenVisualizerService:
             "theme_name": procedural["theme_name"],
             "tagline": procedural["tagline"],
             "cultural_elements": procedural["cultural_elements"],
+        }
+
+    def _extract_theme_info(self, prompt: str) -> dict[str, Any]:
+        """Extracts thematic metadata and cultural element tags aligned with prompt."""
+        prompt_low = prompt.lower()
+        for theme in GUIDED_TOUR_THEMES:
+            if any(k in prompt_low for k in theme["keywords"]):
+                return {
+                    "theme_category": theme["theme_category"],
+                    "cultural_elements": theme["cultural_elements"],
+                }
+        return {
+            "theme_category": "Custom AI Celebration",
+            "cultural_elements": [
+                "Custom Architectural Mandap",
+                "Neural Light Rendering",
+                "8K Hasselblad Lens",
+                "Volumetric Ambiance",
+            ],
         }
 
     def _synthesize_procedural_visual(self, prompt: str, lighting_mood: str) -> dict[str, Any]:
