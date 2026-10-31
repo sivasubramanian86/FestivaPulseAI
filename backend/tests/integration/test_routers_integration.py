@@ -75,6 +75,8 @@ class TestEventRoutesIntegration:
         assert "food_radar" in body
         assert "timeline" in body
         assert "telemetry" in body
+        assert "adk_swarm_output" in body
+        assert len(body["adk_swarm_output"]["agents"]) == 6
 
         # 2. Retrieve Event
         res_get = client.get(f"/api/v1/event/{event_id}")
@@ -82,6 +84,8 @@ class TestEventRoutesIntegration:
         state = res_get.json()
         assert state["blueprint"]["id"] == event_id
         assert state["blueprint"]["expected_guests"] == 250
+        assert state["adk_swarm_output"] is not None
+        assert "adk_predictions" in state["adk_swarm_output"]
 
     def test_get_event_not_found_returns_404(self):
         response = client.get("/api/v1/event/EVT-NON-EXISTENT")

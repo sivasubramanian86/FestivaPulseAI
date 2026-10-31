@@ -60,6 +60,40 @@ class TestFullEventLifecycleE2E:
         assert len(blueprint["milestones"]) >= 4
         assert len(blueprint["vendor_slas"]) >= 3
 
+        # Verify Google ADK Multi-Agent Swarm consensus & specialist agent telemetry
+        assert "adk_swarm_output" in create_data
+        adk_out = create_data["adk_swarm_output"]
+        assert "agents" in adk_out
+        assert len(adk_out["agents"]) == 6
+        agent_names = [a["name"] for a in adk_out["agents"]]
+        assert "Supervisor" in agent_names
+        assert "Blueprint Agent" in agent_names
+        assert "FoodGuard Agent" in agent_names
+        assert "Budget Agent" in agent_names
+        assert "Timeline Agent" in agent_names
+        assert "Spatial Agent" in agent_names
+
+        # Verify ADK predictive forecasts
+        preds = adk_out["adk_predictions"]
+        assert preds["crowd_velocity"]["occupancy_rate_pct"] == 75.0  # 300 / 400
+        assert preds["catering_depletion"]["predicted_surplus_kg"] > 0
+        assert preds["timeline_risk"]["curfew_compliance_probability_pct"] >= 90.0
+        assert preds["budget_elasticity"]["emergency_contingency_fund_inr"] == int(800000 * 0.08)
+        assert len(preds["crowd_velocity"]["arrival_distribution"]) == 4
+
+        # =========================================================================
+        # PHASE 1B: Natural Language AI Blueprint Refinement Copilot
+        # =========================================================================
+        refine_payload = {"user_prompt": "Increase guests to 320 and lock curfew to 22:30 with organic millet feast"}
+        res_refine = client.post(f"/api/v1/event/{event_id}/refine", json=refine_payload)
+        assert res_refine.status_code == 200
+        refine_data = res_refine.json()
+        assert refine_data["success"] is True
+        assert refine_data["blueprint"]["expected_guests"] == 320
+        assert refine_data["blueprint"]["version"] == 2
+        assert len(refine_data["decision_entry"]["what_changed"]) > 0
+        assert "adk_swarm_output" in refine_data
+
         # =========================================================================
         # PHASE 2: Live Day-of-Event Pulse & Health Monitoring
         # =========================================================================
@@ -130,7 +164,8 @@ class TestFullEventLifecycleE2E:
         res_state = client.get(f"/api/v1/event/{event_id}")
         assert res_state.status_code == 200
         event_state = res_state.json()
-        assert len(event_state["decision_ledger"]) == 1
+        assert len(event_state["decision_ledger"]) == 2  # 1 Refinement + 1 Rescue Approval
+        assert event_state["adk_swarm_output"] is not None
         assert event_state["blueprint"]["total_budget"] == 800000 + chosen_proposal["additional_cost"]
 
         # =========================================================================
