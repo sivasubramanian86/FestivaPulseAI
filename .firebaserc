@@ -1,14 +1,5 @@
 {
   "projects": {
     "default": "genai-apac-2026-491004"
-  },
-  "targets": {
-    "genai-apac-2026-491004": {
-      "hosting": {
-        "festivapulseai": [
-          "festivapulseai"
-        ]
-      }
-    }
   }
 }

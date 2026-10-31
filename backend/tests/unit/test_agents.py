@@ -82,6 +82,12 @@ class TestADKBaseAndMemory:
                 agent = FestivaAgent(name="InitFail", role="Tester")
                 assert agent._client is None
 
+    def test_agent_google_adk_init_exception(self):
+        with patch("backend.app.agents.base.HAS_GOOGLE_ADK", True):
+            with patch("backend.app.agents.base.GoogleADKAgent", side_effect=Exception("ADK failure")):
+                agent = ConcreteAgent(name="ADKFailAgent", role="Tester")
+                assert agent.adk_agent is None
+
 
 @pytest.mark.unit
 class TestMCPTools:

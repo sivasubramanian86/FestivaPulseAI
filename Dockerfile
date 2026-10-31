@@ -30,5 +30,5 @@ USER festivapulse
 
 EXPOSE 8080
 
-# Run FastAPI with Uvicorn on Cloud Run $PORT
-CMD exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 2
+# Run FastAPI with Uvicorn on Cloud Run $PORT (1 worker per container for unified memory & SQLite concurrency)
+CMD exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1

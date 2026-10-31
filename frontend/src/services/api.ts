@@ -9,7 +9,7 @@ import {
   ADKSwarmOutput,
 } from '../types';
 
-const API_BASE = '/api/v1';
+const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:8000/api/v1';
 
 export const api = {
   async health(): Promise<any> {

@@ -50,6 +50,8 @@ class EventSupervisorAgent:
             except Exception as e:
                 logger.warning(f"Supervisor GenAI client init failed: {e}")
                 self._client = None
+        else:
+            self._client = None
 
     async def coordinate_plan_generation(self, intake_data: dict[str, Any]) -> dict[str, Any]:
         """Dispatches tasks concurrently to all ADK specialist agents and generates predictive forecasts."""

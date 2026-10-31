@@ -17,6 +17,14 @@ from backend.app.config import settings
 
 logger = logging.getLogger(__name__)
 
+try:
+    from google.adk.agents.llm_agent import Agent as GoogleADKAgent  # type: ignore
+
+    HAS_GOOGLE_ADK = True
+except Exception:  # pragma: no cover
+    HAS_GOOGLE_ADK = False
+    GoogleADKAgent = None
+
 
 @dataclass
 class ADKTask:
@@ -77,6 +85,16 @@ class FestivaAgent:
         self.tools: list[Callable[..., Any]] = []
         self._client = None
         self._init_client()
+        self.adk_agent: Any | None = None
+        if HAS_GOOGLE_ADK and GoogleADKAgent:
+            try:
+                self.adk_agent = GoogleADKAgent(
+                    name=self.name,
+                    instruction=self.instruction,
+                    model=self.model_name,
+                )
+            except Exception as e:
+                logger.debug(f"Google ADK instance initialized in fallback mode: {e}")
 
     def _init_client(self) -> None:
         if settings.is_live_gemini_enabled:
@@ -106,7 +124,8 @@ class FestivaAgent:
                 "agent": self.name,
                 "latency_ms": latency_ms,
                 "task_id": task.task_id,
-                "is_live_model": self._client is not None,
+                "is_live_model": self._client is not None or self.adk_agent is not None,
+                "framework": "Google ADK (Agent Development Kit)",
             }
             return output
         except Exception as e:

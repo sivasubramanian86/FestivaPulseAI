@@ -465,6 +465,7 @@ async def apply_venue_selection(event_id: str, venue_id: str) -> dict[str, Any]:
     state.intake.total_budget = total_calc
     state.ledger = calculate_budget_ledger(state.blueprint.id, total_calc, categories, state.blueprint.currency)
     state.version += 1
+    storage_service.persist_event(state)
 
     return {
         "success": True,

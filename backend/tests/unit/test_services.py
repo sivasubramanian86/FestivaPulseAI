@@ -390,3 +390,98 @@ class TestStorageAndCacheServices:
             s4 = Settings(GEMINI_API_KEY="")
             assert s4.effective_gemini_key == "AIzaSyGoogleKey888"
             assert s4.is_live_gemini_enabled
+
+    def test_storage_service_sqlite_persistence_and_deserialization(self, tmp_path):
+        db_file = str(tmp_path / "test_storage.db")
+        storage = StorageService(db_path=db_file)
+        intake = create_sample_intake()
+        bp = gemini_service.generate_blueprint(intake)[0]
+
+        # Save event
+        state = storage.save_event(bp, intake)
+
+        # Initialize full valid state
+        from backend.app.models.incident import RescueStudioComparison
+        from backend.app.models.telemetry import DecisionLedgerEntry, GenAITelemetryTrace
+        from backend.app.routers.event_routes import _initialize_event_state
+
+        _initialize_event_state(state)
+        incident = IncidentSubmission(
+            event_id=bp.id,
+            observation_time="14:00",
+            incident_type=IncidentType.BUDGET_CUT,
+            entered_values={"reduction_inr": 50000},
+            severity="Medium",
+            reported_by="Coordinator",
+        )
+        comp, _ = gemini_service.synthesize_recovery_options(intake, incident, state)
+        state.latest_rescue_comparison = comp
+        storage.record_decision(
+            bp.id,
+            what_changed="test",
+            why_it_changed="test",
+            original_values={"budget": 800000},
+            revised_values={"budget": 750000},
+            calculation_proof="ok",
+            gemini_recommendation="ok",
+        )
+        _, tel = gemini_service.generate_blueprint(intake)
+        storage.record_telemetry(bp.id, tel)
+        state.adk_swarm_output = {"consensus": "approved"}
+        state.version = 2
+
+        storage.persist_event(state)
+
+        # Clear in-memory hot cache to force SQLite disk fetch & deserialization
+        storage._events.clear()
+
+        loaded = storage.get_event(bp.id)
+        assert loaded is not None
+        assert loaded.blueprint.id == bp.id
+        assert loaded.ledger is not None
+        assert loaded.food_radar is not None
+        assert len(loaded.timeline_nodes) >= 1
+        assert loaded.latest_rescue_comparison is not None
+        assert len(loaded.decision_ledger) == 1
+        assert len(loaded.telemetry_traces) == 1
+        assert loaded.adk_swarm_output["consensus"] == "approved"
+        assert loaded.version == 2
+
+    def test_storage_service_sqlite_error_fallbacks(self, tmp_path):
+        db_file = str(tmp_path / "test_fallback.db")
+        storage = StorageService(db_path=db_file)
+        intake = create_sample_intake()
+        bp = gemini_service.generate_blueprint(intake)[0]
+        state = storage.save_event(bp, intake)
+
+        # Test SQLite init exception
+        with patch("sqlite3.connect", side_effect=Exception("DB init failed")):
+            broken_storage = StorageService(db_path="invalid.db")
+            assert broken_storage._events == {}
+
+        # Test SQLite persist exception
+        with patch("sqlite3.connect", side_effect=Exception("DB write failed")):
+            storage.persist_event(state)  # Should handle gracefully without raising
+
+        # Test SQLite lookup exception
+        storage._events.clear()
+        with patch("sqlite3.connect", side_effect=Exception("DB read failed")):
+            res = storage.get_event("EVT-INVALID-FAIL")
+            assert res is None
+
+        # Test resilient auto-hydration for active client sessions
+        fallback_state = storage.get_event("EVT-12345678")
+        assert fallback_state is not None
+        assert fallback_state.blueprint.id == "EVT-12345678"
+
+    @pytest.mark.asyncio
+    async def test_firestore_save_celebration_saves_if_not_in_storage(self):
+        from backend.app.services.firestore_service import firestore_service
+
+        intake = create_sample_intake()
+        bp = gemini_service.generate_blueprint(intake)[0]
+
+        with patch("backend.app.services.firestore_service.storage_service.get_event", return_value=None):
+            with patch("backend.app.services.firestore_service.storage_service.save_event") as mock_save:
+                await firestore_service.save_celebration(bp, intake)
+                mock_save.assert_called_once_with(bp, intake)
