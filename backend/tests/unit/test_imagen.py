@@ -1,7 +1,7 @@
 """Unit tests for ImagenVisualizerService and Visualization Endpoints.
 
-Validates Imagen 3.0 generation, Nano procedural fallback, lighting moods,
-cultural theme palettes, and FastAPI route integrations.
+Validates Imagen 3.0 generation, Guided Tour photographic atelier synthesis,
+lighting moods, cultural theme palettes, and FastAPI route integrations.
 Adheres to @enterprise-testing-pyramid and 100% statement coverage.
 """
 
@@ -112,8 +112,8 @@ class TestImagenVisualizerService:
         )
         assert res["success"] is True
         assert res["is_live"] is False
-        assert "Nano Procedural Engine" in res["model"]
-        assert res["image_url"].startswith("data:image/svg+xml;base64,")
+        assert "Guided Tour Atelier Engine" in res["model"]
+        assert res["image_url"] == "/assets/theme_eco_harvest.jpg"
         assert res["theme_category"] == "Eco-Sustainable Botanical"
 
     def test_live_generation_exception_fallback(self):
@@ -130,6 +130,7 @@ class TestImagenVisualizerService:
         assert res["is_live"] is False
         assert res["theme_category"] == "Ultra-Luxury Royal Gala"
         assert res["asset_url"] == "/assets/theme_ambani_luxury.jpg"
+        assert res["image_url"] == "/assets/theme_ambani_luxury.jpg"
 
     def test_procedural_lighting_moods(self):
         service = ImagenVisualizerService()
@@ -145,24 +146,34 @@ class TestImagenVisualizerService:
         for mood in moods:
             res = service.generate_visualization("Grand Mandap", lighting_mood=mood)
             assert res["success"] is True
-            assert res["image_url"].startswith("data:image/svg+xml;base64,")
+            assert res["image_url"].endswith(".jpg")
+            assert "svg_data_url" in res
 
     def test_procedural_cultural_palettes(self):
         service = ImagenVisualizerService()
         service._client = None
 
         test_cases = [
-            ("Bamboo and green millet harvest decor", "Eco-Sustainable Botanical", "/assets/theme_eco_harvest.jpg"),
-            ("Crystal glasshouse billionaire gala", "Ultra-Luxury Royal Gala", "/assets/theme_ambani_luxury.jpg"),
+            ("Raja Rani royal palace fort with marigolds", "Royal Rajput Heritage", "/assets/theme_raja_rani.jpg"),
+            ("South Indian temple kalyana muhurtham", "Vedic Temple Muhurtham", "/assets/theme_tamil_brahmin.jpg"),
             ("Mughal palace nikah with shehnai", "Mughal Royal Grandeur", "/assets/theme_muslim_nikah.jpg"),
-            ("South Indian temple kalyana muhurtham", "Vedic Temple Muhurtham", "/assets/hall_transform_3d.jpg"),
-            ("Modern contemporary reception", "Regal Royal Celebration", "/assets/royal_hero.jpg"),
+            ("Grand church cathedral with choir", "Christian Nuptials", "/assets/theme_church_cathedral.jpg"),
+            ("Crystal glasshouse billionaire gala", "Ultra-Luxury Royal Gala", "/assets/theme_ambani_luxury.jpg"),
+            ("Cyberpunk neon laser sangeet afterparty", "Trendsetter & Party", "/assets/theme_genz_neon.jpg"),
+            ("Bamboo and green millet harvest decor", "Eco-Sustainable Botanical", "/assets/theme_eco_harvest.jpg"),
+            (
+                "Intimate rustic courtyard stone wedding",
+                "Budget-Optimized Dignity",
+                "/assets/theme_economy_courtyard.jpg",
+            ),
+            ("Modern contemporary reception", "3D Transformed Mandap Atelier", "/assets/hall_transform_3d.jpg"),
         ]
 
         for prompt_text, expected_theme, expected_asset in test_cases:
             res = service.generate_visualization(prompt_text)
             assert res["theme_category"] == expected_theme
             assert res["asset_url"] == expected_asset
+            assert res["image_url"] == expected_asset
 
 
 @pytest.mark.unit
@@ -188,7 +199,7 @@ class TestVisualizationEndpoints:
 
         # 2. Invoke contextual visualization
         payload = {
-            "user_prompt": "Regal temple floral corridor with marigolds",
+            "user_prompt": "Regal temple floral corridor with jasmine",
             "lighting_mood": "Muhurtham Twilight",
         }
         vis_resp = client.post(f"/api/v1/event/{event_id}/visualize", json=payload)
@@ -197,6 +208,7 @@ class TestVisualizationEndpoints:
         assert data["success"] is True
         assert "Coimbatore" in data["enriched_prompt"]
         assert data["theme_category"] == "Vedic Temple Muhurtham"
+        assert data["image_url"] == "/assets/theme_tamil_brahmin.jpg"
 
     def test_post_visualize_with_nonexistent_event(self, client):
         payload = {
