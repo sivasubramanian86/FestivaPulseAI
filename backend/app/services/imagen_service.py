@@ -308,6 +308,7 @@ class ImagenVisualizerService:
                 )
                 region = os.environ.get("GCP_REGION") or "us-central1"
                 self._client = genai.Client(vertexai=True, project=project_id, location=region)
+                print(f"[INFO] Initialized Vertex AI GenAI Client (project={project_id}, location={region})")
             except Exception as e:
                 print(f"[WARN] Failed to initialize Google GenAI Imagen client: {e}. Running in graceful demo mode.")
                 self._client = None
@@ -390,12 +391,16 @@ class ImagenVisualizerService:
         clean_prompt = prompt.strip()
 
         # 1. Dynamic LLM Photographic Prompt Synthesis
+        print(
+            f"[INFO] ImagenVisualizer: Generating visual for prompt='{clean_prompt[:60]}', client_active={self._client is not None}"
+        )
         enriched_prompt = self.synthesize_dynamic_photographic_prompt(clean_prompt, lighting_mood, style)
 
         # 2. Attempt Live Image Generation via Gemini Flash Image or Imagen 3.0
         if self._client:
             # Strategy A: Native Multimodal Image Generation via gemini-2.5-flash-image
             try:
+                print(f"[INFO] Calling Vertex AI model: {settings.IMAGE_MULTIMODAL_MODEL}...")
                 result = self._client.models.generate_content(
                     model=settings.IMAGE_MULTIMODAL_MODEL,
                     contents=enriched_prompt,
@@ -411,6 +416,9 @@ class ImagenVisualizerService:
                                 latency_ms = int((time.time() - start_time) * 1000)
                                 data_url = f"data:{mime_type};base64,{b64_data}"
                                 theme_info = self._extract_theme_info(clean_prompt)
+                                print(
+                                    f"[INFO] Vertex AI Flash Image generation succeeded in {latency_ms}ms ({len(img_bytes)} bytes)"
+                                )
                                 return {
                                     "success": True,
                                     "image_url": data_url,
@@ -431,6 +439,7 @@ class ImagenVisualizerService:
 
             # Strategy B: Imagen 3.0 via generate_images
             try:
+                print(f"[INFO] Calling Vertex AI model: {self.model_name}...")
                 result = self._client.models.generate_images(
                     model=self.model_name,
                     prompt=enriched_prompt,
@@ -446,6 +455,9 @@ class ImagenVisualizerService:
                     latency_ms = int((time.time() - start_time) * 1000)
                     data_url = f"data:image/jpeg;base64,{b64_data}"
                     theme_info = self._extract_theme_info(clean_prompt)
+                    print(
+                        f"[INFO] Vertex AI Imagen 3.0 generation succeeded in {latency_ms}ms ({len(img_bytes)} bytes)"
+                    )
                     return {
                         "success": True,
                         "image_url": data_url,

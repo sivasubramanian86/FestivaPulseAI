@@ -401,6 +401,20 @@ class TestStorageAndCacheServices:
             s_gcp = Settings()
             assert s_gcp.effective_project_id == "gcp-proj-456"
 
+        # Vertex AI ADC resolution variants
+        s_demo = Settings(DEMO_MODE=True)
+        assert not s_demo.is_vertex_ai_enabled
+
+        with patch.dict(os.environ, {"K_SERVICE": "festivapulse-api"}):
+            s_cloudrun = Settings(DEMO_MODE=True)
+            assert s_cloudrun.is_vertex_ai_enabled
+            assert s_cloudrun.is_live_gemini_enabled
+
+        s_live_demo_false = Settings(DEMO_MODE=False)
+        with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "genai-apac-2026-491004"}):
+            assert s_live_demo_false.is_vertex_ai_enabled
+            assert s_live_demo_false.is_live_gemini_enabled
+
     def test_storage_service_sqlite_persistence_and_deserialization(self, tmp_path):
         db_file = str(tmp_path / "test_storage.db")
         storage = StorageService(db_path=db_file)

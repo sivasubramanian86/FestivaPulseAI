@@ -57,10 +57,20 @@ class Settings(BaseSettings):
         return self.GEMINI_API_KEY.strip()
 
     @property
+    def is_vertex_ai_enabled(self) -> bool:
+        """Checks if Vertex AI via GCP ADC / Service Account is enabled."""
+        if self.DEMO_MODE and not os.environ.get("K_SERVICE"):
+            return False
+        return bool(
+            os.environ.get("K_SERVICE") or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        )
+
+    @property
     def is_live_gemini_enabled(self) -> bool:
-        """Checks if a valid Gemini API key is active for live Google ADK calls."""
+        """Checks if a valid Gemini API key or Vertex AI ADC is active for live Google GenAI calls."""
         key = self.effective_gemini_key
-        return bool(key and key not in ("demo_mode_key", "your_gemini_api_key_here"))
+        has_key = bool(key and key not in ("demo_mode_key", "your_gemini_api_key_here"))
+        return has_key or self.is_vertex_ai_enabled
 
     @property
     def cors_origin_list(self) -> list[str]:
