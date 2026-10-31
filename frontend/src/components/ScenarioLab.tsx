@@ -171,11 +171,16 @@ export const ScenarioLab: React.FC<ScenarioLabProps> = ({ blueprint }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 tactical-subcard">
           <div>
             <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>{t.scenario.attendanceShock}: {attendanceDelta > 0 ? `+${attendanceDelta}` : attendanceDelta} Guests</span>
+              <label htmlFor="scenario-attendance-shock-slider">{t.scenario.attendanceShock}: {attendanceDelta > 0 ? `+${attendanceDelta}` : attendanceDelta} Guests</label>
               <span className="text-amber-700 dark:text-amber-300 font-bold font-mono">{simulatedGuests} Simulated</span>
             </div>
             <input
+              id="scenario-attendance-shock-slider"
               type="range"
+              aria-label="Simulate Attendance Headcount Shock"
+              aria-valuemin={-100}
+              aria-valuemax={200}
+              aria-valuenow={attendanceDelta}
               min="-100"
               max="200"
               step="10"
@@ -190,11 +195,16 @@ export const ScenarioLab: React.FC<ScenarioLabProps> = ({ blueprint }) => {
 
           <div>
             <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>{t.scenario.budgetVariance}: {budgetDeltaPct > 0 ? `+${budgetDeltaPct}%` : `${budgetDeltaPct}%`}</span>
+              <label htmlFor="scenario-budget-variance-slider">{t.scenario.budgetVariance}: {budgetDeltaPct > 0 ? `+${budgetDeltaPct}%` : `${budgetDeltaPct}%`}</label>
               <span className="text-emerald-700 dark:text-emerald-400 font-bold font-mono">₹{simulatedBudget.toLocaleString()}</span>
             </div>
             <input
+              id="scenario-budget-variance-slider"
               type="range"
+              aria-label="Simulate Budget Variance Percentage"
+              aria-valuemin={-30}
+              aria-valuemax={30}
+              aria-valuenow={budgetDeltaPct}
               min="-30"
               max="30"
               step="5"
@@ -209,11 +219,16 @@ export const ScenarioLab: React.FC<ScenarioLabProps> = ({ blueprint }) => {
 
           <div>
             <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>{t.scenario.delayShock}: +{delayMins} Minutes</span>
+              <label htmlFor="scenario-delay-shock-slider">{t.scenario.delayShock}: +{delayMins} Minutes</label>
               <span className="text-amber-700 dark:text-amber-400 font-bold font-mono">Delay Offset</span>
             </div>
             <input
+              id="scenario-delay-shock-slider"
               type="range"
+              aria-label="Simulate Timeline Schedule Delay Shock"
+              aria-valuemin={0}
+              aria-valuemax={90}
+              aria-valuenow={delayMins}
               min="0"
               max="90"
               step="15"
@@ -228,11 +243,13 @@ export const ScenarioLab: React.FC<ScenarioLabProps> = ({ blueprint }) => {
 
           <div className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-[#140F22] border border-[#E8DFD1] dark:border-[#352952]">
             <div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">{t.scenario.weatherFlip}</span>
+              <label htmlFor="scenario-weather-flip-checkbox" className="text-xs font-bold text-slate-800 dark:text-slate-200 block cursor-pointer">{t.scenario.weatherFlip}</label>
               <span className="text-[11px] text-slate-500 dark:text-slate-400">{t.scenario.weatherSub}</span>
             </div>
             <input
+              id="scenario-weather-flip-checkbox"
               type="checkbox"
+              aria-label="Toggle Weather Rain Storm Disruption"
               checked={rainDisruption}
               onChange={(e) => {
                 setRainDisruption(e.target.checked);

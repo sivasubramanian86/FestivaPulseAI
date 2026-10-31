@@ -437,8 +437,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="tactical-label">{t.blueprint.eventName} *</label>
+              <label htmlFor="blueprint-event-name" className="tactical-label">{t.blueprint.eventName} *</label>
               <input
+                id="blueprint-event-name"
                 type="text"
                 value={eventName}
                 onChange={(e) => setEventName(e.target.value)}
@@ -448,8 +449,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">Event Type *</label>
+              <label htmlFor="blueprint-event-type" className="tactical-label">Event Type *</label>
               <select
+                id="blueprint-event-type"
                 value={eventType}
                 onChange={(e) => setEventType(e.target.value as EventType)}
                 className="tactical-input"
@@ -461,8 +463,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">Organizer Email *</label>
+              <label htmlFor="blueprint-organizer-email" className="tactical-label">Organizer Email *</label>
               <input
+                id="blueprint-organizer-email"
                 type="email"
                 value={organizerEmail}
                 onChange={(e) => setOrganizerEmail(e.target.value)}
@@ -476,8 +479,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">{t.blueprint.date} *</label>
+              <label htmlFor="blueprint-target-date" className="tactical-label">{t.blueprint.date} *</label>
               <input
+                id="blueprint-target-date"
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
@@ -488,9 +492,10 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="tactical-label mb-0">{t.blueprint.location} *</label>
+                <label htmlFor="blueprint-location" className="tactical-label mb-0">{t.blueprint.location} *</label>
                 <button
                   type="button"
+                  aria-label="Detect current location via browser GPS geolocation"
                   onClick={handleAutoDetectGPS}
                   disabled={gpsDetecting}
                   className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-400 hover:text-amber-600 transition-colors cursor-pointer"
@@ -501,6 +506,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </button>
               </div>
               <input
+                id="blueprint-location"
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
@@ -515,8 +521,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">{t.blueprint.budget} *</label>
+              <label htmlFor="blueprint-total-budget" className="tactical-label">{t.blueprint.budget} *</label>
               <input
+                id="blueprint-total-budget"
                 type="number"
                 value={totalBudget}
                 onChange={(e) => setTotalBudget(Number(e.target.value))}
@@ -530,8 +537,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">{t.blueprint.guests} *</label>
+              <label htmlFor="blueprint-expected-guests" className="tactical-label">{t.blueprint.guests} *</label>
               <input
+                id="blueprint-expected-guests"
                 type="number"
                 value={expectedGuests}
                 onChange={(e) => setExpectedGuests(Number(e.target.value))}
@@ -545,10 +553,11 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">
+              <label htmlFor="blueprint-max-capacity" className="tactical-label">
                 Approved Venue Fire Capacity *
               </label>
               <input
+                id="blueprint-max-capacity"
                 type="number"
                 value={maxCapacity}
                 onChange={(e) => setMaxCapacity(Number(e.target.value))}
@@ -562,10 +571,11 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </div>
 
             <div>
-              <label className="tactical-label">
+              <label htmlFor="blueprint-sound-curfew" className="tactical-label">
                 Acoustic Curfew Limit (Police)
               </label>
               <input
+                id="blueprint-sound-curfew"
                 type="text"
                 value={soundCurfew}
                 onChange={(e) => setSoundCurfew(e.target.value)}
@@ -576,10 +586,11 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
 
           {/* Cultural Vibe & Theme */}
           <div>
-            <label className="tactical-label">
+            <label htmlFor="blueprint-cultural-vibe" className="tactical-label">
               {t.blueprint.culturalVibe} *
             </label>
             <input
+              id="blueprint-cultural-vibe"
               type="text"
               value={culturalVibe}
               onChange={(e) => setCulturalVibe(e.target.value)}
@@ -593,8 +604,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
               {t.blueprint.wellbeingTitle}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              <label htmlFor="blueprint-elders-comfort" className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
+                  id="blueprint-elders-comfort"
                   type="checkbox"
                   checked={eldersPriority}
                   onChange={(e) => setEldersPriority(e.target.checked)}
@@ -606,8 +618,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              <label htmlFor="blueprint-healthy-lifestyle" className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
+                  id="blueprint-healthy-lifestyle"
                   type="checkbox"
                   checked={healthyLifestyle}
                   onChange={(e) => setHealthyLifestyle(e.target.checked)}
@@ -619,8 +632,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 </span>
               </label>
 
-              <label className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              <label htmlFor="blueprint-kids-zone" className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                 <input
+                  id="blueprint-kids-zone"
                   type="checkbox"
                   checked={kidsZone}
                   onChange={(e) => setKidsZone(e.target.checked)}
@@ -1241,6 +1255,8 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
 
               <form onSubmit={handleRefineSubmit} className="flex flex-col sm:flex-row gap-2 mt-3">
                 <input
+                  id="blueprint-refine-prompt"
+                  aria-label="Natural Language Blueprint Refinement Prompt"
                   type="text"
                   value={refinePrompt}
                   onChange={(e) => setRefinePrompt(e.target.value)}
@@ -1342,6 +1358,8 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
+                  id="imagen-decor-prompt"
+                  aria-label="Imagen 3 Decor Visualization Prompt"
                   type="text"
                   value={visualPrompt}
                   onChange={(e) => setVisualPrompt(e.target.value)}

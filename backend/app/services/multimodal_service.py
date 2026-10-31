@@ -40,6 +40,7 @@ INDIAN_LANGUAGES = {
 
 
 class MultimodalService:
+    """Multimodal invoice OCR, audio voice-memo triage, and Indic localization engine."""
     def extract_vendor_quote(self, filename: str, file_text: str) -> dict[str, Any]:
         """Extracts vendor quote line items into a structured review form with field-level confidence."""
         return {
@@ -123,6 +124,7 @@ class MultimodalService:
             }
 
     def get_supported_languages(self) -> dict[str, dict[str, str]]:
+        """Returns the dictionary of supported Indic languages and greeting strings."""
         return INDIAN_LANGUAGES
 
     def verify_multilingual_compliance(self, text: str, lang_code: str) -> dict[str, Any]:

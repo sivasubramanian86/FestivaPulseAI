@@ -1,3 +1,7 @@
+/**
+ * FestivaPulseAI — FestivaPulseAI module.
+ */
+
 export type SupportedLanguage = 'en' | 'ta' | 'hi' | 'te' | 'kn' | 'ml' | 'es';
 
 export interface TranslationDictionary {

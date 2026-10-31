@@ -30,6 +30,7 @@ from backend.app.services.storage_service import (
 
 
 def create_sample_intake() -> EventIntakeRequest:
+    """Verifies create sample intake."""
     return EventIntakeRequest(
         event_name="Coimbatore Tech & Cultural Gala",
         event_type=EventType.COMMUNITY_EVENT,
@@ -58,7 +59,9 @@ def create_sample_intake() -> EventIntakeRequest:
 
 @pytest.mark.unit
 class TestGeminiServiceBlueprint:
-    def test_synthesize_local_blueprint_fallback(self):
+    """Test suite for Gemini Service Blueprint."""
+    def test_synthesize_local_blueprint_fallback(self) -> None:
+        """Verifies synthesize local blueprint fallback."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         raw_json, exec_summary, themes, intergen = service._synthesize_local_blueprint(intake)
@@ -67,7 +70,8 @@ class TestGeminiServiceBlueprint:
         assert len(themes) == 4
         assert len(intergen) >= 2
 
-    def test_generate_event_blueprint_complete(self):
+    def test_generate_event_blueprint_complete(self) -> None:
+        """Verifies generate event blueprint complete."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         blueprint, telemetry = service.generate_blueprint(intake)
@@ -81,7 +85,8 @@ class TestGeminiServiceBlueprint:
         assert telemetry.latency_ms >= 0
         assert telemetry.dynamic_diff_summary != ""
 
-    def test_generate_blueprint_with_mock_client_success(self):
+    def test_generate_blueprint_with_mock_client_success(self) -> None:
+        """Verifies generate blueprint with mock client success."""
         service = GeminiOrchestratorService()
         mock_client = MagicMock()
         mock_response = MagicMock()
@@ -99,7 +104,8 @@ class TestGeminiServiceBlueprint:
         assert telemetry.is_live_call is True
         assert blueprint.executive_summary == "AI Generated Luxury Wedding Plan"
 
-    def test_generate_blueprint_with_mock_client_exception_falls_back(self):
+    def test_generate_blueprint_with_mock_client_exception_falls_back(self) -> None:
+        """Verifies generate blueprint with mock client exception falls back."""
         service = GeminiOrchestratorService()
         mock_client = MagicMock()
         mock_client.models.generate_content.side_effect = RuntimeError("Vertex AI Quota Exceeded")
@@ -110,7 +116,8 @@ class TestGeminiServiceBlueprint:
         assert blueprint is not None
         assert blueprint.event_name == intake.event_name
 
-    def test_gemini_service_init_auth_failure_falls_back(self):
+    def test_gemini_service_init_auth_failure_falls_back(self) -> None:
+        """Verifies gemini service init auth failure falls back."""
         with patch("backend.app.services.gemini_service.settings") as mock_settings:
             mock_settings.GEMINI_API_KEY = "live_key"
             mock_settings.DEMO_MODE = False
@@ -121,7 +128,9 @@ class TestGeminiServiceBlueprint:
 
 @pytest.mark.unit
 class TestGeminiServiceTriage:
-    def test_triage_attendance_surge_incident(self):
+    """Test suite for Gemini Service Triage."""
+    def test_triage_attendance_surge_incident(self) -> None:
+        """Verifies triage attendance surge incident."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         incident = IncidentSubmission(
@@ -137,7 +146,8 @@ class TestGeminiServiceTriage:
         assert comparison.candidate_lowest_disruption is not None
         assert len(comparison.rejected_proposals) > 0  # Rejects exceeding 350 max capacity
 
-    def test_triage_food_shortage_incident(self):
+    def test_triage_food_shortage_incident(self) -> None:
+        """Verifies triage food shortage incident."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         incident = IncidentSubmission(
@@ -151,7 +161,8 @@ class TestGeminiServiceTriage:
         assert "ZERO-STOCKOUT" in comparison.system_advisory
         assert comparison.candidate_lowest_cost.additional_cost <= comparison.candidate_best_experience.additional_cost
 
-    def test_triage_budget_cut_incident(self):
+    def test_triage_budget_cut_incident(self) -> None:
+        """Verifies triage budget cut incident."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         incident = IncidentSubmission(
@@ -165,7 +176,8 @@ class TestGeminiServiceTriage:
         assert "PARETO RE-OPTIMIZER" in comparison.system_advisory
         assert len(comparison.candidate_lowest_cost.action_items) >= 2
 
-    def test_triage_timeline_delay_incident(self):
+    def test_triage_timeline_delay_incident(self) -> None:
+        """Verifies triage timeline delay incident."""
         service = GeminiOrchestratorService()
         intake = create_sample_intake()
         incident = IncidentSubmission(
@@ -178,7 +190,8 @@ class TestGeminiServiceTriage:
         assert comparison is not None
         assert "CRITICAL PATH ADJUSTMENT" in comparison.system_advisory
 
-    def test_triage_with_mock_client_success(self):
+    def test_triage_with_mock_client_success(self) -> None:
+        """Verifies triage with mock client success."""
         service = GeminiOrchestratorService()
         mock_client = MagicMock()
         mock_response = MagicMock()
@@ -259,14 +272,17 @@ class TestGeminiServiceTriage:
 
 @pytest.mark.unit
 class TestMultimodalService:
-    def test_extract_vendor_quote(self):
+    """Test suite for Multimodal Service."""
+    def test_extract_vendor_quote(self) -> None:
+        """Verifies extract vendor quote."""
         svc = MultimodalService()
         res = svc.extract_vendor_quote("sample_quote.jpg", "Eco-friendly Jasmine Arch 45000")
         assert res["vendor_name"] is not None
         assert res["total_extracted_amount"] > 0
         assert res["requires_human_verification"] is True
 
-    def test_analyze_voice_memo(self):
+    def test_analyze_voice_memo(self) -> None:
+        """Verifies analyze voice memo."""
         svc = MultimodalService()
         # 1. Attendance Surge
         res_surge = svc.parse_voice_memo("There are 50 extra guests arriving at reception")
@@ -288,7 +304,8 @@ class TestMultimodalService:
         res_note = svc.parse_voice_memo("Please check the floral background lighting")
         assert res_note["detected_incident"] == "GENERAL_NOTE"
 
-    def test_verify_multilingual_compliance(self):
+    def test_verify_multilingual_compliance(self) -> None:
+        """Verifies verify multilingual compliance."""
         svc = MultimodalService()
         # Supported language
         res_ta = svc.verify_multilingual_compliance("Mandapam decor verified", "ta")
@@ -301,7 +318,9 @@ class TestMultimodalService:
 
 @pytest.mark.unit
 class TestStorageAndCacheServices:
-    def test_storage_service_lifecycle(self):
+    """Test suite for Storage And Cache Services."""
+    def test_storage_service_lifecycle(self) -> None:
+        """Verifies storage service lifecycle."""
         storage = StorageService()
         intake = create_sample_intake()
         bp, tel = gemini_service.generate_blueprint(intake)
@@ -326,7 +345,8 @@ class TestStorageAndCacheServices:
         storage.record_telemetry(bp.id, tel)
         assert len(storage.get_event(bp.id).telemetry_traces) >= 1
 
-    def test_storage_service_missing_event_raises(self):
+    def test_storage_service_missing_event_raises(self) -> None:
+        """Verifies storage service missing event raises."""
         storage = StorageService()
         with pytest.raises(ValueError, match="not found"):
             storage.record_decision(
@@ -339,7 +359,8 @@ class TestStorageAndCacheServices:
                 gemini_recommendation="W",
             )
 
-    def test_cache_service(self):
+    def test_cache_service(self) -> None:
+        """Verifies cache service."""
         from backend.app.services.cache_service import MemoryCacheService
 
         cache = MemoryCacheService(max_entries=2, ttl_seconds=10)
@@ -363,7 +384,8 @@ class TestStorageAndCacheServices:
         cache.clear()
         assert cache.get("events", {"id": "test_2"}) is None
 
-    def test_settings_gemini_key_resolution(self):
+    def test_settings_gemini_key_resolution(self) -> None:
+        """Verifies settings gemini key resolution."""
         from backend.app.config import Settings
 
         # Default demo mode key
@@ -415,7 +437,8 @@ class TestStorageAndCacheServices:
             assert s_live_demo_false.is_vertex_ai_enabled
             assert s_live_demo_false.is_live_gemini_enabled
 
-    def test_storage_service_sqlite_persistence_and_deserialization(self, tmp_path):
+    def test_storage_service_sqlite_persistence_and_deserialization(self, tmp_path) -> None:
+        """Verifies storage service sqlite persistence and deserialization."""
         db_file = str(tmp_path / "test_storage.db")
         storage = StorageService(db_path=db_file)
         intake = create_sample_intake()
@@ -469,7 +492,8 @@ class TestStorageAndCacheServices:
         assert loaded.adk_swarm_output["consensus"] == "approved"
         assert loaded.version == 2
 
-    def test_storage_service_sqlite_error_fallbacks(self, tmp_path):
+    def test_storage_service_sqlite_error_fallbacks(self, tmp_path) -> None:
+        """Verifies storage service sqlite error fallbacks."""
         db_file = str(tmp_path / "test_fallback.db")
         storage = StorageService(db_path=db_file)
         intake = create_sample_intake()
@@ -497,7 +521,8 @@ class TestStorageAndCacheServices:
         assert fallback_state.blueprint.id == "EVT-12345678"
 
     @pytest.mark.asyncio
-    async def test_firestore_save_celebration_saves_if_not_in_storage(self):
+    async def test_firestore_save_celebration_saves_if_not_in_storage(self) -> None:
+        """Verifies firestore save celebration saves if not in storage."""
         from backend.app.services.firestore_service import firestore_service
 
         intake = create_sample_intake()

@@ -15,7 +15,10 @@ client = TestClient(app)
 
 @pytest.mark.e2e
 class TestFullEventLifecycleE2E:
-    def test_complete_event_management_lifecycle(self):
+    """End-to-end verification of celebration lifecycle from intake to FSSAI donation."""
+
+    def test_complete_event_management_lifecycle(self) -> None:
+        """Verifies end-to-end journey across intake, pulse updates, rescue triage, and FSSAI manifest."""
         # =========================================================================
         # PHASE 1: Event Intake & Master Blueprint Synthesis
         # =========================================================================

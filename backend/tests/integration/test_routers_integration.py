@@ -17,14 +17,17 @@ client = TestClient(app)
 
 @pytest.mark.integration
 class TestHealthAndPresetsRoutes:
-    def test_health_check_endpoint(self):
+    """Test suite for Health And Presets Routes."""
+    def test_health_check_endpoint(self) -> None:
+        """Verifies health check endpoint."""
         response = client.get("/api/v1/health")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "HEALTHY"
         assert data["invariants"]["deterministic_math"] is True
 
-    def test_presets_list_endpoint(self):
+    def test_presets_list_endpoint(self) -> None:
+        """Verifies presets list endpoint."""
         response = client.get("/api/v1/event/presets/list")
         assert response.status_code == 200
         presets = response.json()
@@ -34,7 +37,9 @@ class TestHealthAndPresetsRoutes:
 
 @pytest.mark.integration
 class TestEventRoutesIntegration:
-    def test_create_event_success_and_retrieval(self):
+    """Test suite for Event Routes Integration."""
+    def test_create_event_success_and_retrieval(self) -> None:
+        """Verifies create event success and retrieval."""
         payload = {
             "event_name": "Coimbatore Heritage Sangam",
             "event_type": "Community Event",
@@ -87,12 +92,14 @@ class TestEventRoutesIntegration:
         assert state["adk_swarm_output"] is not None
         assert "adk_predictions" in state["adk_swarm_output"]
 
-    def test_get_event_not_found_returns_404(self):
+    def test_get_event_not_found_returns_404(self) -> None:
+        """Verifies get event not found returns 404."""
         response = client.get("/api/v1/event/EVT-NON-EXISTENT")
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
 
-    def test_create_event_validation_error_returns_422(self):
+    def test_create_event_validation_error_returns_422(self) -> None:
+        """Verifies create event validation error returns 422."""
         invalid_payload = {
             "event_name": "Bad Event",
             "organizer_email": "not-an-email",
@@ -101,7 +108,8 @@ class TestEventRoutesIntegration:
         response = client.post("/api/v1/event/create", json=invalid_payload)
         assert response.status_code == 422
 
-    def test_venues_search_endpoint(self):
+    def test_venues_search_endpoint(self) -> None:
+        """Verifies venues search endpoint."""
         res = client.get("/api/v1/event/venues/search?location=Bengaluru&guests=350&budget=1200000")
         assert res.status_code == 200
         body = res.json()
@@ -109,7 +117,8 @@ class TestEventRoutesIntegration:
         assert body["count"] > 0
         assert len(body["venues"]) > 0
 
-    def test_apply_venue_to_event_success_and_errors(self):
+    def test_apply_venue_to_event_success_and_errors(self) -> None:
+        """Verifies apply venue to event success and errors."""
         payload = {
             "event_name": "Venue Apply Test",
             "event_type": "Wedding",
@@ -140,7 +149,8 @@ class TestEventRoutesIntegration:
         res_bad_evt = client.post("/api/v1/event/non-existent-evt/venues/apply/blr-palace-glasshouse")
         assert res_bad_evt.status_code == 404
 
-    def test_refine_event_success_and_errors(self):
+    def test_refine_event_success_and_errors(self) -> None:
+        """Verifies refine event success and errors."""
         payload = {
             "event_name": "Refine Test Gala",
             "event_type": "Community Event",
@@ -194,8 +204,10 @@ class TestEventRoutesIntegration:
 
 @pytest.mark.integration
 class TestPulseRoutesIntegration:
+    """Test suite for Pulse Routes Integration."""
     @pytest.fixture
-    def setup_event(self):
+    def setup_event(self) -> None:
+        """Verifies setup event."""
         payload = {
             "event_name": "Pulse Test Gala",
             "event_type": "Wedding",
@@ -210,7 +222,8 @@ class TestPulseRoutesIntegration:
         res = client.post("/api/v1/event/create", json=payload)
         return res.json()["event_id"]
 
-    def test_pulse_lifecycle_with_budget_and_delay(self, setup_event):
+    def test_pulse_lifecycle_with_budget_and_delay(self, setup_event) -> None:
+        """Verifies pulse lifecycle with budget and delay."""
         event_id = setup_event
 
         # 1. Update pulse with surge and budget slash
@@ -257,7 +270,8 @@ class TestPulseRoutesIntegration:
         assert res_reset.status_code == 200
         assert res_reset.json()["success"] is True
 
-    def test_pulse_missing_event_returns_404(self):
+    def test_pulse_missing_event_returns_404(self) -> None:
+        """Verifies pulse missing event returns 404."""
         res = client.post(
             "/api/v1/event/EVT-MISSING/pulse",
             json={
@@ -274,8 +288,10 @@ class TestPulseRoutesIntegration:
 
 @pytest.mark.integration
 class TestRescueRoutesIntegration:
+    """Test suite for Rescue Routes Integration."""
     @pytest.fixture
-    def setup_event_for_rescue(self):
+    def setup_event_for_rescue(self) -> None:
+        """Verifies setup event for rescue."""
         payload = {
             "event_name": "Rescue Test Wedding",
             "event_type": "Wedding",
@@ -290,7 +306,8 @@ class TestRescueRoutesIntegration:
         res = client.post("/api/v1/event/create", json=payload)
         return res.json()["event_id"]
 
-    def test_rescue_propose_and_approve_lifecycle(self, setup_event_for_rescue):
+    def test_rescue_propose_and_approve_lifecycle(self, setup_event_for_rescue) -> None:
+        """Verifies rescue propose and approve lifecycle."""
         event_id = setup_event_for_rescue
 
         # 1. Propose Recovery
@@ -325,7 +342,8 @@ class TestRescueRoutesIntegration:
         )
         assert bad_approve.status_code == 404
 
-    def test_rescue_propose_missing_event_returns_404(self):
+    def test_rescue_propose_missing_event_returns_404(self) -> None:
+        """Verifies rescue propose missing event returns 404."""
         res = client.post(
             "/api/v1/event/EVT-MISSING/rescue/propose",
             json={
@@ -337,21 +355,25 @@ class TestRescueRoutesIntegration:
         )
         assert res.status_code == 404
 
-    def test_rescue_approve_missing_event_returns_404(self):
+    def test_rescue_approve_missing_event_returns_404(self) -> None:
+        """Verifies rescue approve missing event returns 404."""
         res = client.post(
             "/api/v1/event/EVT-MISSING/rescue/approve",
             json={"proposal_id": "PROP-1", "reason_for_approval": "Test"},
         )
         assert res.status_code == 404
 
-    def test_reset_missing_event_returns_404(self):
+    def test_reset_missing_event_returns_404(self) -> None:
+        """Verifies reset missing event returns 404."""
         res = client.post("/api/v1/event/EVT-MISSING/reset")
         assert res.status_code == 404
 
 
 @pytest.mark.integration
 class TestQARoutesAndMultimodalIntegration:
-    def test_run_tests_endpoint(self):
+    """Test suite for Q A Routes And Multimodal Integration."""
+    def test_run_tests_endpoint(self) -> None:
+        """Verifies run tests endpoint."""
         res = client.post("/api/v1/qa/run-tests")
         assert res.status_code == 200
         body = res.json()
@@ -359,7 +381,8 @@ class TestQARoutesAndMultimodalIntegration:
         assert body["failed_tests"] == 0
         assert body["passed_tests"] >= 7
 
-    def test_voice_memo_analysis_route(self):
+    def test_voice_memo_analysis_route(self) -> None:
+        """Verifies voice memo analysis route."""
         res = client.post(
             "/api/v1/multimodal/voice",
             json={"transcript": "There are 50 extra guests arriving at main reception right now"},
@@ -369,7 +392,8 @@ class TestQARoutesAndMultimodalIntegration:
         assert body["detected_incident"] == "ATTENDANCE_SURGE"
         assert body["extracted_parameters"]["new_guests"] == 50
 
-    def test_vendor_quote_upload_route(self):
+    def test_vendor_quote_upload_route(self) -> None:
+        """Verifies vendor quote upload route."""
         txt_content = b"Invoice: Eco-friendly Jasmine Stage Arch 45000\nBrass Lamps 15000\nTotal: 60000"
         res = client.post(
             "/api/v1/multimodal/quote",
@@ -380,7 +404,8 @@ class TestQARoutesAndMultimodalIntegration:
         assert body["total_extracted_amount"] > 0
         assert body["requires_human_verification"] is True
 
-    def test_get_supported_languages_route(self):
+    def test_get_supported_languages_route(self) -> None:
+        """Verifies get supported languages route."""
         res = client.get("/api/v1/languages")
         assert res.status_code == 200
         body = res.json()

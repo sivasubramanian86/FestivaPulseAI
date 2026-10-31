@@ -1,3 +1,7 @@
+/**
+ * FestivaPulseAI — FestivaPulseAI module.
+ */
+
 import { TranslationDictionary } from '../types';
 
 export const ml: TranslationDictionary = {

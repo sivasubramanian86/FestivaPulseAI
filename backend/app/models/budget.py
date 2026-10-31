@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 
 class BudgetCategoryItem(BaseModel):
+    """Line-item category budget item with protected anchor designation."""
     category_name: str  # e.g., "Venue & Logistics", "Catering & Beverages", "Decor & Flora", "Audio & Visual"
     approved_budget: int
     spent_amount: int
@@ -22,6 +23,7 @@ class BudgetCategoryItem(BaseModel):
 
 
 class BudgetLedger(BaseModel):
+    """Event budget ledger tracking spent, committed, and contingency balances."""
     event_id: str
     currency: str = "INR"
     approved_total: int
@@ -36,6 +38,7 @@ class BudgetLedger(BaseModel):
 
 
 class BudgetParetoRebalance(BaseModel):
+    """Pareto optimization reallocation result following budget expansion or contraction."""
     original_budget: int
     revised_budget: int
     budget_delta: int

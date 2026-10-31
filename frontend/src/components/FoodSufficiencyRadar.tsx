@@ -191,8 +191,9 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
           <form onSubmit={handleManifestSubmit} className="mt-6 tactical-subcard space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="tactical-label">Surplus Quantity (kg)</label>
+                <label htmlFor="fssai-surplus-kg" className="tactical-label">Surplus Quantity (kg)</label>
                 <input
+                  id="fssai-surplus-kg"
                   type="number"
                   step="0.5"
                   value={surplusKg}
@@ -203,10 +204,11 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
               </div>
 
               <div>
-                <label className="tactical-label">
+                <label htmlFor="fssai-hot-temp" className="tactical-label">
                   Hot Holding Temp (FSSAI &gt;= 63°C)
                 </label>
                 <input
+                  id="fssai-hot-temp"
                   type="number"
                   step="0.5"
                   value={hotTemp}
@@ -217,10 +219,11 @@ export const FoodSufficiencyRadar: React.FC<FoodSufficiencyRadarProps> = ({
               </div>
 
               <div>
-                <label className="tactical-label">
+                <label htmlFor="fssai-cold-temp" className="tactical-label">
                   Cold Holding Temp (FSSAI &lt;= 5°C)
                 </label>
                 <input
+                  id="fssai-cold-temp"
                   type="number"
                   step="0.5"
                   value={coldTemp}

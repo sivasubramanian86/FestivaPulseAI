@@ -11,17 +11,22 @@ from typing import Any
 
 
 class MemoryCacheService:
-    def __init__(self, max_entries: int = 200, ttl_seconds: int = 3600):
+    """In-memory TTL cache with LRU eviction and SHA-256 payload key generation."""
+
+    def __init__(self, max_entries: int = 200, ttl_seconds: int = 3600) -> None:
+        """Initialize memory cache with configurable maximum capacity and TTL duration."""
         self._cache: dict[str, dict[str, Any]] = {}
         self._max_entries = max_entries
         self._ttl_seconds = ttl_seconds
 
     def _generate_key(self, namespace: str, payload: Any) -> str:
+        """Generate deterministic SHA-256 hash key for arbitrary JSON payload."""
         serialized = json.dumps(payload, sort_keys=True, default=str)
         hash_digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
         return f"{namespace}:{hash_digest}"
 
     def get(self, namespace: str, payload: Any) -> Any | None:
+        """Retrieve cached value if present and unexpired."""
         key = self._generate_key(namespace, payload)
         entry = self._cache.get(key)
         if not entry:
@@ -35,6 +40,7 @@ class MemoryCacheService:
         return entry["value"]
 
     def set(self, namespace: str, payload: Any, value: Any) -> None:
+        """Cache value under namespaced payload key, evicting oldest item if full."""
         if len(self._cache) >= self._max_entries:
             # Evict oldest entry
             oldest_key = min(self._cache.keys(), key=lambda k: self._cache[k]["created_at"])
@@ -49,6 +55,7 @@ class MemoryCacheService:
         }
 
     def clear(self) -> None:
+        """Flush all cached entries."""
         self._cache.clear()
 
 

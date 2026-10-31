@@ -11,7 +11,10 @@ from backend.app.agents.mcp_tools import venue_hse_capacity_lookup
 
 
 class SpatialCrowdAgent(FestivaAgent):
-    def __init__(self):
+    """Specialist agent auditing crowd density, fire safety egress, and venue capacity constraints."""
+
+    def __init__(self) -> None:
+        """Initialize SpatialCrowdAgent with municipal HSE capacity lookup tools."""
         super().__init__(
             name="SpatialCrowdAgent",
             role="Crowd Logistics & HSE Capacity Guardian",
@@ -24,6 +27,7 @@ class SpatialCrowdAgent(FestivaAgent):
         self.register_tool(venue_hse_capacity_lookup)
 
     async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
+        """Evaluates spatial crowd logistics against HSE safety and egress thresholds."""
         values = context.get("values", {})
         new_guests = values.get("new_guests", 250)
         max_capacity = context.get("max_capacity", 350)

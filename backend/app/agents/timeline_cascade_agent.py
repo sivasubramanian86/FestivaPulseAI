@@ -12,7 +12,10 @@ from backend.app.core.engine import propagate_timeline_delay
 
 
 class TimelineCascadeAgent(FestivaAgent):
-    def __init__(self):
+    """Specialist agent modeling DAG dependency shifts, buffer absorption, and curfew compliance."""
+
+    def __init__(self) -> None:
+        """Initialize TimelineCascadeAgent with critical-path propagation parameters."""
         super().__init__(
             name="TimelineCascadeAgent",
             role="Critical-Path Timeline & Curfew Coordinator",
@@ -25,6 +28,7 @@ class TimelineCascadeAgent(FestivaAgent):
         )
 
     async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
+        """Calculates topological delay cascade across event schedule DAG nodes and curfew constraints."""
         nodes = context.get("timeline_nodes", [])
         delayed_node_id = context.get("delayed_node_id", "T1")
         delay_minutes = context.get("delay_minutes", 30)

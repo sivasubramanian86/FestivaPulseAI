@@ -43,6 +43,7 @@ class ADKMemory:
     """ADK Memory interface supporting short-term active state scratchpad and long-term audit trail."""
 
     def __init__(self) -> None:
+        """Initialize short-term scratchpad and long-term history stores."""
         self.short_term: dict[str, Any] = {}
         self.long_term: list[dict[str, Any]] = []
 
@@ -77,6 +78,7 @@ class FestivaAgent:
         instruction: str = "Perform domain tasks with maximum precision",
         model_name: str = "gemini-2.5-flash",
     ) -> None:
+        """Initialize specialist agent attributes, isolated memory, and capability tools."""
         self.name = name
         self.role = role
         self.instruction = instruction
@@ -97,6 +99,7 @@ class FestivaAgent:
                 logger.debug(f"Google ADK instance initialized in fallback mode: {e}")
 
     def _init_client(self) -> None:
+        """Initializes the underlying Google GenAI SDK client when live credentials exist."""
         if settings.is_live_gemini_enabled:
             try:
                 from google import genai

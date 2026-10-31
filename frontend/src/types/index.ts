@@ -1,3 +1,8 @@
+/**
+ * FestivaPulseAI — Domain TypeScript Schema and Type Definitions.
+ * Aligns with backend Pydantic models for zero-drift type safety.
+ */
+
 export type EventType = 'Wedding' | 'Birthday' | 'Community Event';
 
 export interface DietaryRequirement {

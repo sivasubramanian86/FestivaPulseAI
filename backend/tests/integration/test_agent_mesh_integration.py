@@ -15,8 +15,11 @@ from backend.app.models.budget import BudgetCategoryItem
 
 @pytest.mark.integration
 class TestSupervisorAgentSwarmIntegration:
+    """Integration test suite for the EventSupervisorAgent and sub-agent swarm mesh."""
+
     @pytest.mark.asyncio
-    async def test_supervisor_coordinate_plan_generation(self):
+    async def test_supervisor_coordinate_plan_generation(self) -> None:
+        """Verifies multi-agent consensus coordination during initial blueprint generation."""
         supervisor = EventSupervisorAgent()
         sample_intake = {
             "event_name": "Kongu Heritage Gala",
@@ -34,7 +37,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert cached["summary"] == res["summary"]
 
     @pytest.mark.asyncio
-    async def test_supervisor_parallel_crisis_coordination(self):
+    async def test_supervisor_parallel_crisis_coordination(self) -> None:
+        """Verifies concurrent crisis recovery coordination across multiple specialist agents."""
         supervisor = EventSupervisorAgent()
         # Complex shock triggering food shortage AND crowd surge concurrently
         incident_type = "Attendance Surge and Food Shortage"
@@ -60,7 +64,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert len(supervisor.memory.long_term) == 1
 
     @pytest.mark.asyncio
-    async def test_supervisor_with_budget_slash_coordination(self):
+    async def test_supervisor_with_budget_slash_coordination(self) -> None:
+        """Verifies budget elasticity agent execution during unexpected funding cutbacks."""
         supervisor = EventSupervisorAgent()
         cats = [
             BudgetCategoryItem(
@@ -94,7 +99,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert len(result["findings"]) >= 1
 
     @pytest.mark.asyncio
-    async def test_supervisor_with_mock_gemini_client(self):
+    async def test_supervisor_with_mock_gemini_client(self) -> None:
+        """Verifies supervisor generates Gemini-augmented crisis consensus with a mock client."""
         supervisor = EventSupervisorAgent()
         mock_client = MagicMock()
         mock_response = MagicMock()
@@ -111,7 +117,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert "Multi-Agent Swarm Synthesis" in result["overall_recommendation"]
 
     @pytest.mark.asyncio
-    async def test_supervisor_plan_generation_with_live_gemini_client(self):
+    async def test_supervisor_plan_generation_with_live_gemini_client(self) -> None:
+        """Verifies plan generation consensus when live Gemini API responds successfully."""
         supervisor = EventSupervisorAgent()
         mock_client = MagicMock()
         mock_response = MagicMock()
@@ -132,7 +139,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert len(res["agents"]) == 6
 
     @pytest.mark.asyncio
-    async def test_supervisor_plan_generation_gemini_exception_fallback(self):
+    async def test_supervisor_plan_generation_gemini_exception_fallback(self) -> None:
+        """Verifies fallback to deterministic consensus when Gemini throws API quota exception."""
         supervisor = EventSupervisorAgent()
         mock_client = MagicMock()
         mock_client.models.generate_content.side_effect = Exception("Vertex quota exceeded")
@@ -149,7 +157,8 @@ class TestSupervisorAgentSwarmIntegration:
         assert "Google ADK Multi-Agent Consensus" in res["summary"]
         assert len(res["agents"]) == 6
 
-    def test_supervisor_init_client_variants(self):
+    def test_supervisor_init_client_variants(self) -> None:
+        """Verifies supervisor client initialization across enabled, disabled, and error modes."""
         from unittest.mock import patch
 
         with patch("backend.app.agents.supervisor.settings") as mock_settings:

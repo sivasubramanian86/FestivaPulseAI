@@ -244,6 +244,7 @@ def propagate_timeline_delay(
     _ = node_map[delayed_node_id]
 
     def parse_time(t_str: str) -> datetime:
+        """Parses hour-minute timestamp string into a datetime object for comparison."""
         return datetime.strptime(t_str, "%H:%M")
 
     delayed_nodes_ids = {delayed_node_id}

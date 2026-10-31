@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 class PubSubService:
     """Manages real-time telemetry streaming and chaos event queuing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize PubSubService with Google Cloud Publisher or in-memory bus."""
         self._publisher = None
         self._is_cloud_enabled = False
         self._local_bus: dict[str, list[Callable[[dict[str, Any]], Any]]] = {
@@ -30,7 +31,8 @@ class PubSubService:
         if settings.ENABLE_PUBSUB:
             self._init_cloud_pubsub()
 
-    def _init_cloud_pubsub(self):
+    def _init_cloud_pubsub(self) -> None:
+        """Initialize Google Cloud Pub/Sub PublisherClient."""
         try:
             from google.cloud import pubsub_v1
 
@@ -44,6 +46,7 @@ class PubSubService:
 
     @property
     def is_cloud_enabled(self) -> bool:
+        """Return whether live Cloud Pub/Sub connection is active."""
         return self._is_cloud_enabled
 
     async def publish_telemetry(self, event_id: str, data: dict[str, Any]) -> str:
@@ -65,6 +68,7 @@ class PubSubService:
         return await self._dispatch_message(settings.PUBSUB_CHAOS_TOPIC, payload)
 
     async def _dispatch_message(self, topic_name: str, payload: dict[str, Any]) -> str:
+        """Publishes serialized message payload to Cloud Pub/Sub or in-memory subscriber queue."""
         encoded = json.dumps(payload).encode("utf-8")
         msg_id = f"MSG-{asyncio.get_event_loop().time()}"
 
@@ -92,7 +96,7 @@ class PubSubService:
 
         return msg_id
 
-    def subscribe(self, topic_name: str, callback: Callable[[dict[str, Any]], Any]):
+    def subscribe(self, topic_name: str, callback: Callable[[dict[str, Any]], Any]) -> None:
         """Registers a listener for live stream events."""
         if topic_name not in self._local_bus:
             self._local_bus[topic_name] = []

@@ -1,3 +1,7 @@
+/**
+ * FestivaPulseAI — Frontend React Application Mount and Root Bootstrap.
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

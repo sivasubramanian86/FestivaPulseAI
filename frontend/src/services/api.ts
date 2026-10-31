@@ -1,3 +1,8 @@
+/**
+ * FestivaPulseAI — REST Client API Service.
+ * Type-safe interface communicating with FastAPI backend endpoints.
+ */
+
 import {
   EventIntakeRequest,
   EventBlueprint,

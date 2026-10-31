@@ -27,7 +27,9 @@ from backend.app.models.timeline import TimelineNode
 
 
 class ConcreteAgent(FestivaAgent):
+    """Test suite for Concrete Agent."""
     async def _run_logic(self, task: ADKTask, context: dict) -> dict:
+        """Verifies run logic."""
         if task.intent == "FAIL":
             raise RuntimeError("Test runtime error")
         return {"status": "ok", "context": context}
@@ -35,7 +37,9 @@ class ConcreteAgent(FestivaAgent):
 
 @pytest.mark.unit
 class TestADKBaseAndMemory:
-    def test_memory_remember_recall_and_clear(self):
+    """Test suite for A D K Base And Memory."""
+    def test_memory_remember_recall_and_clear(self) -> None:
+        """Verifies memory remember recall and clear."""
         mem = ADKMemory()
         mem.remember("key1", {"value": 100})
         assert mem.recall("key1") == {"value": 100}
@@ -47,7 +51,8 @@ class TestADKBaseAndMemory:
         assert len(mem.long_term) == 0
 
     @pytest.mark.asyncio
-    async def test_base_agent_execution_success(self):
+    async def test_base_agent_execution_success(self) -> None:
+        """Verifies base agent execution success."""
         agent = ConcreteAgent(name="TestAgent", role="Tester")
         agent.register_tool(lambda x: x * 2)
         assert len(agent.tools) == 1
@@ -59,7 +64,8 @@ class TestADKBaseAndMemory:
         assert result["_meta"]["agent"] == "TestAgent"
 
     @pytest.mark.asyncio
-    async def test_base_agent_execution_failure(self):
+    async def test_base_agent_execution_failure(self) -> None:
+        """Verifies base agent execution failure."""
         agent = ConcreteAgent(name="FailAgent", role="Tester")
         task = ADKTask(task_id="T-02", intent="FAIL")
         result = await agent.execute_task(task, {})
@@ -67,14 +73,16 @@ class TestADKBaseAndMemory:
         assert "Test runtime error" in result["error"]
 
     @pytest.mark.asyncio
-    async def test_base_agent_not_implemented(self):
+    async def test_base_agent_not_implemented(self) -> None:
+        """Verifies base agent not implemented."""
         agent = FestivaAgent(name="RawBase", role="Tester")
         task = ADKTask(task_id="T-03", intent="UNKNOWN")
         result = await agent.execute_task(task, {})
         assert task.status == "FAILED"
         assert "Sub-classes must implement _run_logic" in result["error"]
 
-    def test_agent_client_init_exception(self):
+    def test_agent_client_init_exception(self) -> None:
+        """Verifies agent client init exception."""
         with patch("backend.app.agents.base.settings") as mock_settings:
             mock_settings.is_live_gemini_enabled = True
             mock_settings.effective_gemini_key = "live_key"
@@ -82,7 +90,8 @@ class TestADKBaseAndMemory:
                 agent = FestivaAgent(name="InitFail", role="Tester")
                 assert agent._client is None
 
-    def test_agent_google_adk_init_exception(self):
+    def test_agent_google_adk_init_exception(self) -> None:
+        """Verifies agent google adk init exception."""
         with patch("backend.app.agents.base.HAS_GOOGLE_ADK", True):
             with patch("backend.app.agents.base.GoogleADKAgent", side_effect=Exception("ADK failure")):
                 agent = ConcreteAgent(name="ADKFailAgent", role="Tester")
@@ -91,7 +100,9 @@ class TestADKBaseAndMemory:
 
 @pytest.mark.unit
 class TestMCPTools:
-    def test_pantry_rag_search_all_categories(self):
+    """Test suite for M C P Tools."""
+    def test_pantry_rag_search_all_categories(self) -> None:
+        """Verifies pantry rag search all categories."""
         for q in ["pulav", "millet", "dal", "dessert"]:
             res = pantry_rag_search(query=q, required_portions=40)
             assert "recommended_recipe" in res
@@ -99,11 +110,13 @@ class TestMCPTools:
             assert res["required_raw_kg"] > 0
             assert res["estimated_ingredient_cost_inr"] > 0
 
-    def test_pantry_rag_search_category_keyword_match(self):
+    def test_pantry_rag_search_category_keyword_match(self) -> None:
+        """Verifies pantry rag search category keyword match."""
         res = pantry_rag_search(query="We need grains urgently", required_portions=25)
         assert res["recommended_recipe"] is not None
 
-    def test_ngo_registry_lookup_known_and_fallback(self):
+    def test_ngo_registry_lookup_known_and_fallback(self) -> None:
+        """Verifies ngo registry lookup known and fallback."""
         res_cbe = ngo_registry_lookup("Chennai")
         assert "Feeding India" in res_cbe["registered_ngo"]
         assert res_cbe["pickup_sla_minutes"] > 0
@@ -111,7 +124,8 @@ class TestMCPTools:
         res_unknown = ngo_registry_lookup("Tirunelveli")
         assert "Robin Hood Army" in res_unknown["registered_ngo"]
 
-    def test_venue_hse_capacity_lookup(self):
+    def test_venue_hse_capacity_lookup(self) -> None:
+        """Verifies venue hse capacity lookup."""
         res = venue_hse_capacity_lookup(
             venue_type="Heritage Banquet Hall", requested_guests=320, authorized_capacity=350
         )
@@ -126,7 +140,8 @@ class TestMCPTools:
         assert res_breach["compliance_status"] == "PROHIBITED_OVERCROWDING"
         assert res_breach["is_breach"] is True
 
-    def test_weather_risk_evaluator(self):
+    def test_weather_risk_evaluator(self) -> None:
+        """Verifies weather risk evaluator."""
         res = weather_risk_evaluator("Chennai")
         assert "rain_probability_pct" in res
         assert "recommended_contingency" in res
@@ -134,8 +149,10 @@ class TestMCPTools:
 
 @pytest.mark.unit
 class TestSpecialistAgents:
+    """Test suite for Specialist Agents."""
     @pytest.mark.asyncio
-    async def test_blueprint_agent_execution(self):
+    async def test_blueprint_agent_execution(self) -> None:
+        """Verifies blueprint agent execution."""
         agent = BlueprintAgent()
         task = ADKTask(task_id="T-BP-01", intent="GENERATE_BLUEPRINT")
         intake_data = {
@@ -151,7 +168,8 @@ class TestSpecialistAgents:
         assert len(res["intergenerational_features"]) == 3
 
     @pytest.mark.asyncio
-    async def test_blueprint_agent_with_live_genai_client(self):
+    async def test_blueprint_agent_with_live_genai_client(self) -> None:
+        """Verifies blueprint agent with live genai client."""
         from unittest.mock import MagicMock
 
         agent = BlueprintAgent()
@@ -172,7 +190,8 @@ class TestSpecialistAgents:
         assert res["reasoning_trace"] == "Synthesized with Gemini 2.5 Flash"
 
     @pytest.mark.asyncio
-    async def test_blueprint_agent_with_genai_exception(self):
+    async def test_blueprint_agent_with_genai_exception(self) -> None:
+        """Verifies blueprint agent with genai exception."""
         from unittest.mock import MagicMock
 
         agent = BlueprintAgent()
@@ -186,7 +205,8 @@ class TestSpecialistAgents:
         assert len(res["themes"]) == 4
 
     @pytest.mark.asyncio
-    async def test_food_guard_scarcity_mitigation(self):
+    async def test_food_guard_scarcity_mitigation(self) -> None:
+        """Verifies food guard scarcity mitigation."""
         agent = FestivaFoodGuardAgent()
         task = ADKTask(task_id="T-FG-01", intent="FOOD_SHORTAGE")
         res = await agent.execute_task(
@@ -201,7 +221,8 @@ class TestSpecialistAgents:
         assert "rag_solution" in res
 
     @pytest.mark.asyncio
-    async def test_food_guard_surplus_fssai_manifest(self):
+    async def test_food_guard_surplus_fssai_manifest(self) -> None:
+        """Verifies food guard surplus fssai manifest."""
         agent = FestivaFoodGuardAgent()
         task = ADKTask(task_id="T-FG-02", intent="FOOD_SURPLUS")
         res = await agent.execute_task(
@@ -218,7 +239,8 @@ class TestSpecialistAgents:
         assert "manifest" in res
 
     @pytest.mark.asyncio
-    async def test_spatial_crowd_agent_hse_refusal(self):
+    async def test_spatial_crowd_agent_hse_refusal(self) -> None:
+        """Verifies spatial crowd agent hse refusal."""
         agent = SpatialCrowdAgent()
         task = ADKTask(task_id="T-SC-01", intent="SURGE")
         res = await agent.execute_task(
@@ -233,7 +255,8 @@ class TestSpecialistAgents:
         assert "NOT FEASIBLE" in res["refusal_reason"]
 
     @pytest.mark.asyncio
-    async def test_spatial_crowd_agent_feasible(self):
+    async def test_spatial_crowd_agent_feasible(self) -> None:
+        """Verifies spatial crowd agent feasible."""
         agent = SpatialCrowdAgent()
         task = ADKTask(task_id="T-SC-02", intent="SURGE")
         res = await agent.execute_task(
@@ -247,7 +270,8 @@ class TestSpecialistAgents:
         assert res["is_feasible"] is True
 
     @pytest.mark.asyncio
-    async def test_budget_elasticity_successful_pareto_rebalance(self):
+    async def test_budget_elasticity_successful_pareto_rebalance(self) -> None:
+        """Verifies budget elasticity successful pareto rebalance."""
         agent = BudgetElasticityAgent()
         task = ADKTask(task_id="T-BE-02", intent="REBALANCE_BUDGET")
         cats = [
@@ -282,7 +306,8 @@ class TestSpecialistAgents:
         assert res["pruned_elastic_total"] > 0
 
     @pytest.mark.asyncio
-    async def test_timeline_cascade_execution(self):
+    async def test_timeline_cascade_execution(self) -> None:
+        """Verifies timeline cascade execution."""
         agent = TimelineCascadeAgent()
         task = ADKTask(task_id="T-TC-01", intent="PROPAGATE_DELAY")
         nodes = [

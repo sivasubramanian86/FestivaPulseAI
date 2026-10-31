@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 class CloudMonitoringService:
     """Manages SRE observability, SLO tracking, and Cloud Monitoring metrics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize CloudMonitoringService and telemetry history buffer."""
         self._metric_client = None
         self._is_enabled = False
         self._telemetry_history: list[dict[str, Any]] = []
@@ -27,7 +28,8 @@ class CloudMonitoringService:
         if settings.ENABLE_CLOUD_MONITORING:
             self._init_client()
 
-    def _init_client(self):
+    def _init_client(self) -> None:
+        """Initialize Google Cloud Monitoring v3 MetricServiceClient."""
         try:
             from google.cloud import monitoring_v3
 
@@ -39,7 +41,7 @@ class CloudMonitoringService:
             self._metric_client = None
             self._is_enabled = False
 
-    def emit_metric(self, metric_name: str, value: float, labels: dict[str, str] | None = None):
+    def emit_metric(self, metric_name: str, value: float, labels: dict[str, str] | None = None) -> None:
         """Emits a custom metric point to Google Cloud Monitoring."""
         entry = {
             "metric": f"custom.googleapis.com/festivapulse/{metric_name}",
@@ -59,21 +61,24 @@ class CloudMonitoringService:
         sys.stdout.write(json.dumps(log_payload) + "\n")
         sys.stdout.flush()
 
-    def record_gemini_latency(self, latency_ms: int, model: str, operation: str):
+    def record_gemini_latency(self, latency_ms: int, model: str, operation: str) -> None:
+        """Record model inference latency metrics."""
         self.emit_metric(
             "gemini_inference_latency_ms",
             float(latency_ms),
             {"model": model, "operation": operation},
         )
 
-    def record_fssai_redistribution(self, surplus_kg: float, partner_ngo: str):
+    def record_fssai_redistribution(self, surplus_kg: float, partner_ngo: str) -> None:
+        """Record redistributed surplus food metrics under FSSAI protocols."""
         self.emit_metric(
             "fssai_surplus_kg_redistributed",
             surplus_kg,
             {"partner_ngo": partner_ngo},
         )
 
-    def record_incident_triage(self, incident_type: str, strategy: str):
+    def record_incident_triage(self, incident_type: str, strategy: str) -> None:
+        """Record triaged operational incidents and selected mitigation strategies."""
         self.emit_metric(
             "incidents_triaged_total",
             1.0,
@@ -81,6 +86,7 @@ class CloudMonitoringService:
         )
 
     def get_metrics_snapshot(self) -> dict[str, Any]:
+        """Retrieve recent metrics snapshot for observability dashboards."""
         return {
             "cloud_monitoring_enabled": self._is_enabled,
             "project_id": settings.GCP_PROJECT_ID,

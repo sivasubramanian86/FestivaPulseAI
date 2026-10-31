@@ -1,3 +1,7 @@
+/**
+ * FestivaPulseAI — FestivaPulseAI module.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { DecisionLedger } from '../../components/DecisionLedger';

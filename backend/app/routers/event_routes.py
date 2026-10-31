@@ -290,6 +290,7 @@ async def reset_event(event_id: str) -> dict[str, Any]:
 
 
 class BlueprintRefineRequest(BaseModel):
+    """Payload schema for natural-language blueprint refinement requests."""
     user_prompt: str = Field(
         ...,
         min_length=3,
@@ -533,6 +534,7 @@ async def apply_venue_selection(event_id: str, venue_id: str) -> dict[str, Any]:
 
 
 class VisualizationRequest(BaseModel):
+    """Payload schema for Imagen-powered photorealistic celebration decor rendering."""
     user_prompt: str = Field(..., min_length=3, max_length=500, description="Visual description of celebration decor")
     lighting_mood: str = Field(default="Golden Hour Glow", description="Atmospheric lighting setting")
     aspect_ratio: str = Field(default="16:9", description="Aspect ratio for image generation")

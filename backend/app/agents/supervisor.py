@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 class EventSupervisorAgent:
     """Master ADK Supervisor coordinating the swarm of specialist domain agents."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize EventSupervisorAgent and instantiate the 5 specialist sub-agents."""
         self.name = "EventSupervisorAgent"
         self.role = "Swarm Coordinator"
         self.memory = ADKMemory()

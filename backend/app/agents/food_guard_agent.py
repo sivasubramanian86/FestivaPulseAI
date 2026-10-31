@@ -13,7 +13,10 @@ from backend.app.core.engine import generate_fssai_surplus_manifest
 
 
 class FestivaFoodGuardAgent(FestivaAgent):
-    def __init__(self):
+    """Specialist agent managing real-time food sufficiency, batch stretching, and FSSAI surplus manifests."""
+
+    def __init__(self) -> None:
+        """Initialize FestivaFoodGuardAgent with pantry RAG and NGO directory tools."""
         super().__init__(
             name="FestivaFoodGuardAgent",
             role="Catering Sufficiency & Zero-Waste Architect",
@@ -28,6 +31,7 @@ class FestivaFoodGuardAgent(FestivaAgent):
         self.register_tool(ngo_registry_lookup)
 
     async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
+        """Executes food guard logic reconciling pantry buffers or generating FSSAI surplus manifests."""
         incident_type = context.get("incident_type", "Food Shortage")
         values = context.get("values", {})
         location = context.get("location", "Chennai")

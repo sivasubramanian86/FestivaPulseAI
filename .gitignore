@@ -94,6 +94,10 @@ scripts/generate_demo_audio.py
 scripts/record_demo_video.py
 scripts/*demo*
 
+# Social media & LinkedIn cover assets
+docs/*LinkedIn*
+docs/*linkedin*
+
 # Databases & local logs
 *.sqlite3-journal
 *.log

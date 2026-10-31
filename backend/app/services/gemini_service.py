@@ -28,13 +28,17 @@ from backend.app.models.telemetry import GenAITelemetryTrace
 
 
 class GeminiOrchestratorService:
-    def __init__(self):
+    """Enterprise Google Gemini 2.5 generative orchestrator for blueprints, triage, and multi-agent synthesis."""
+
+    def __init__(self) -> None:
+        """Initializes Gemini orchestration client, setting target models and API credentials."""
         self.api_key = settings.GEMINI_API_KEY
         self.model_name = settings.GEMINI_MODEL
         self._client = None
         self._init_client()
 
-    def _init_client(self):
+    def _init_client(self) -> None:
+        """Establishes Google GenAI client instance when valid credentials are present."""
         if settings.is_live_gemini_enabled:
             try:
                 from google import genai
@@ -218,7 +222,9 @@ class GeminiOrchestratorService:
 
         return blueprint, telemetry
 
-    def _synthesize_local_blueprint(self, intake: EventIntakeRequest):
+    def _synthesize_local_blueprint(
+        self, intake: EventIntakeRequest
+    ) -> tuple[dict[str, Any], str, list[str], list[str]]:
         """Dynamic local synthesis guaranteeing 100% responsiveness even without internet."""
         executive_summary = (
             f"End-to-End {intake.event_type.value} Blueprint for {intake.expected_guests} guests at {intake.location}. "

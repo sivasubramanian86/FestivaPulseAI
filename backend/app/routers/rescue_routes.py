@@ -49,6 +49,7 @@ async def propose_recovery_options(event_id: str, incident: IncidentSubmission) 
 
 
 class ApproveProposalRequest(BaseModel):
+    """Payload schema for Human-In-The-Loop approval of a candidate recovery proposal."""
     proposal_id: str = Field(..., description="ID of the candidate proposal approved by the host/coordinator")
     reason_for_approval: str = Field(default="Selected optimal balance between cost and guest experience")
 

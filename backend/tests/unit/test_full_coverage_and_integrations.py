@@ -33,12 +33,14 @@ from backend.app.services.storage_service import storage_service
 
 
 @pytest.fixture
-def client():
+def client() -> TestClient:
+    """Verifies client."""
     return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture
-def sample_intake():
+def sample_intake() -> EventIntakeRequest:
+    """Verifies sample intake."""
     return EventIntakeRequest(
         event_name="Coverage Wedding Celebration",
         event_type=EventType.WEDDING,
@@ -69,22 +71,26 @@ def sample_intake():
 
 
 class TestEdgeCaseBranches:
+    """Test suite for Edge Case Branches."""
     @pytest.mark.asyncio
-    async def test_budget_elasticity_missing_ledger_or_zero_budget(self):
+    async def test_budget_elasticity_missing_ledger_or_zero_budget(self) -> None:
+        """Verifies budget elasticity missing ledger or zero budget."""
         agent = BudgetElasticityAgent()
         task = ADKTask(task_id="T-CUT", intent="REBALANCE_BUDGET")
         res = await agent.execute_task(task, {"ledger": None, "revised_budget": 0})
         assert "error" in res
 
     @pytest.mark.asyncio
-    async def test_timeline_cascade_missing_nodes(self):
+    async def test_timeline_cascade_missing_nodes(self) -> None:
+        """Verifies timeline cascade missing nodes."""
         agent = TimelineCascadeAgent()
         task = ADKTask(task_id="T-TIME", intent="PROPAGATE_TIMELINE")
         res = await agent.execute_task(task, {"timeline_nodes": []})
         assert "error" in res
 
     @pytest.mark.asyncio
-    async def test_supervisor_timeline_incident_and_client_exception(self):
+    async def test_supervisor_timeline_incident_and_client_exception(self) -> None:
+        """Verifies supervisor timeline incident and client exception."""
         supervisor = EventSupervisorAgent()
         mock_client = MagicMock()
         mock_client.models.generate_content.side_effect = RuntimeError("Vertex AI rate limit")
@@ -110,18 +116,21 @@ class TestEdgeCaseBranches:
         assert res["executed_sub_agents_count"] >= 1
         assert "Swarm actions dispatched" in res["overall_recommendation"]
 
-    def test_cors_origin_list_fallback(self):
+    def test_cors_origin_list_fallback(self) -> None:
+        """Verifies cors origin list fallback."""
         s = Settings(CORS_ORIGINS="")
         assert len(s.cors_origin_list) >= 1
 
-    def test_main_global_exception_handler(self, client):
+    def test_main_global_exception_handler(self, client) -> None:
+        """Verifies main global exception handler."""
         with patch("backend.app.routers.event_routes.storage_service.get_event", side_effect=ValueError("Test crash")):
             resp = client.get("/api/v1/event/EVT-TEST-CRASH")
             assert resp.status_code == 500
             assert resp.json()["success"] is False
             assert "Test crash" in resp.json()["message"]
 
-    def test_event_routes_create_event_exception_handling(self, client):
+    def test_event_routes_create_event_exception_handling(self, client) -> None:
+        """Verifies event routes create event exception handling."""
         with patch(
             "backend.app.services.gemini_service.gemini_service.generate_blueprint",
             side_effect=RuntimeError("Engine fail"),
@@ -149,7 +158,8 @@ class TestEdgeCaseBranches:
             )
             assert resp.status_code == 400
 
-    def test_pulse_fssai_event_not_found(self, client):
+    def test_pulse_fssai_event_not_found(self, client) -> None:
+        """Verifies pulse fssai event not found."""
         resp = client.post(
             "/api/v1/event/non_existent_event_999/food/fssai-manifest",
             json={
@@ -160,7 +170,8 @@ class TestEdgeCaseBranches:
         )
         assert resp.status_code == 404
 
-    def test_rescue_routes_no_active_proposal_and_infeasible_approval(self, client, sample_intake):
+    def test_rescue_routes_no_active_proposal_and_infeasible_approval(self, client, sample_intake) -> None:
+        """Verifies rescue routes no active proposal and infeasible approval."""
         create_resp = client.post("/api/v1/event/create", json=sample_intake.model_dump())
         assert create_resp.status_code == 201
         event_id = create_resp.json()["event_id"]
@@ -209,7 +220,8 @@ class TestEdgeCaseBranches:
         assert infeasible_resp.status_code == 400
         assert "Cannot approve infeasible proposal" in infeasible_resp.json()["detail"]
 
-    def test_gemini_service_triage_api_exception_fallback(self, sample_intake):
+    def test_gemini_service_triage_api_exception_fallback(self, sample_intake) -> None:
+        """Verifies gemini service triage api exception fallback."""
         blueprint, _ = gemini_service.generate_blueprint(sample_intake)
         state = storage_service.save_event(blueprint, sample_intake)
 
@@ -233,8 +245,10 @@ class TestEdgeCaseBranches:
 
 
 class TestCloudIntegrations:
+    """Test suite for Cloud Integrations."""
     @pytest.mark.asyncio
-    async def test_firestore_service_lifecycle_local_fallback(self, sample_intake):
+    async def test_firestore_service_lifecycle_local_fallback(self, sample_intake) -> None:
+        """Verifies firestore service lifecycle local fallback."""
         fs = FirestoreService()
         assert fs.is_connected is False
 
@@ -257,7 +271,8 @@ class TestCloudIntegrations:
         trace, _ = gemini_service.generate_blueprint(sample_intake)
         await fs.record_telemetry(bp.id, _)
 
-    def test_firestore_service_init_enabled_success_and_failure(self):
+    def test_firestore_service_init_enabled_success_and_failure(self) -> None:
+        """Verifies firestore service init enabled success and failure."""
         with patch("backend.app.services.firestore_service.settings.ENABLE_FIRESTORE", True):
             mock_google = MagicMock()
             mock_cloud = MagicMock()
@@ -283,7 +298,8 @@ class TestCloudIntegrations:
                 assert fs_fail._db is None
 
     @pytest.mark.asyncio
-    async def test_firestore_service_connected_mock(self, sample_intake):
+    async def test_firestore_service_connected_mock(self, sample_intake) -> None:
+        """Verifies firestore service connected mock."""
         fs = FirestoreService()
         fs._is_connected = True
         mock_db = MagicMock()
@@ -314,7 +330,8 @@ class TestCloudIntegrations:
         assert mock_doc.set.call_count >= 3
 
     @pytest.mark.asyncio
-    async def test_firestore_service_sync_exceptions(self, sample_intake):
+    async def test_firestore_service_sync_exceptions(self, sample_intake) -> None:
+        """Verifies firestore service sync exceptions."""
         fs = FirestoreService()
         fs._is_connected = True
         mock_db = MagicMock()
@@ -344,7 +361,8 @@ class TestCloudIntegrations:
 
         await fs.record_telemetry(bp.id, trace)
 
-    def test_monitoring_service_init_enabled_success_and_failure(self):
+    def test_monitoring_service_init_enabled_success_and_failure(self) -> None:
+        """Verifies monitoring service init enabled success and failure."""
         with patch("backend.app.services.monitoring_service.settings.ENABLE_CLOUD_MONITORING", True):
             mock_google = MagicMock()
             mock_cloud = MagicMock()
@@ -369,7 +387,8 @@ class TestCloudIntegrations:
                 assert ms_fail._is_enabled is False
                 assert ms_fail._metric_client is None
 
-    def test_monitoring_service_lifecycle(self):
+    def test_monitoring_service_lifecycle(self) -> None:
+        """Verifies monitoring service lifecycle."""
         ms = CloudMonitoringService()
         ms.record_gemini_latency(245, "gemini-2.5-flash", "blueprint_synthesis")
         ms.record_fssai_redistribution(18.5, "Feeding India")
@@ -379,7 +398,8 @@ class TestCloudIntegrations:
         assert snapshot["total_points_emitted"] >= 3
         assert len(snapshot["recent_metrics"]) >= 3
 
-    def test_pubsub_service_init_enabled_success_and_failure(self):
+    def test_pubsub_service_init_enabled_success_and_failure(self) -> None:
+        """Verifies pubsub service init enabled success and failure."""
         with patch("backend.app.services.pubsub_service.settings.ENABLE_PUBSUB", True):
             mock_google = MagicMock()
             mock_cloud = MagicMock()
@@ -405,13 +425,15 @@ class TestCloudIntegrations:
                 assert ps_fail._publisher is None
 
     @pytest.mark.asyncio
-    async def test_pubsub_service_lifecycle_local_bus(self):
+    async def test_pubsub_service_lifecycle_local_bus(self) -> None:
+        """Verifies pubsub service lifecycle local bus."""
         ps = PubSubService()
         assert ps.is_cloud_enabled is False
 
         received_events = []
 
-        def listener(data):
+        def listener(data) -> None:
+            """Verifies listener."""
             received_events.append(data)
 
         ps.subscribe(settings.PUBSUB_TELEMETRY_TOPIC, listener)
@@ -425,7 +447,8 @@ class TestCloudIntegrations:
         assert len(ps.get_buffered_events()) >= 2
 
     @pytest.mark.asyncio
-    async def test_pubsub_service_cloud_mock(self):
+    async def test_pubsub_service_cloud_mock(self) -> None:
+        """Verifies pubsub service cloud mock."""
         ps = PubSubService()
         ps._is_cloud_enabled = True
         mock_pub = MagicMock()
@@ -439,7 +462,8 @@ class TestCloudIntegrations:
         assert msg_id == "PUB-CLOUD-MSG-999"
 
     @pytest.mark.asyncio
-    async def test_pubsub_service_cloud_publish_failure_and_subscribers(self):
+    async def test_pubsub_service_cloud_publish_failure_and_subscribers(self) -> None:
+        """Verifies pubsub service cloud publish failure and subscribers."""
         ps = PubSubService()
         ps._is_cloud_enabled = True
         mock_pub = MagicMock()
@@ -449,10 +473,12 @@ class TestCloudIntegrations:
 
         async_received = []
 
-        async def async_sub(data):
+        async def async_sub(data) -> None:
+            """Verifies async sub."""
             async_received.append(data)
 
-        def err_sub(data):
+        def err_sub(data) -> None:
+            """Verifies err sub."""
             raise RuntimeError("Subscriber handler crashed")
 
         ps.subscribe("custom-chaos-topic", async_sub)

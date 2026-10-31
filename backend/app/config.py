@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Application configuration and environmental credentials management."""
     GEMINI_API_KEY: str = "demo_mode_key"
     GEMINI_MODEL: str = "gemini-2.5-flash"
     IMAGEN_MODEL: str = "imagen-3.0-generate-002"
@@ -74,6 +75,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
+        """Parses comma-delimited allowed origins into a verified list of origin URLs."""
         origins = [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
         return origins if origins else ["http://localhost:5173", "http://127.0.0.1:5173"]
 

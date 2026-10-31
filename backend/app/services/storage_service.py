@@ -24,7 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class EventState:
-    def __init__(self, blueprint: EventBlueprint, intake: EventIntakeRequest):
+    """Encapsulates the in-flight runtime state, models, and ledgers of a celebration."""
+
+    def __init__(self, blueprint: EventBlueprint, intake: EventIntakeRequest) -> None:
+        """Initialize EventState with blueprint and intake payload."""
         self.blueprint = blueprint
         self.intake = intake
         self.ledger: BudgetLedger | None = None
@@ -38,12 +41,16 @@ class EventState:
 
 
 class StorageService:
-    def __init__(self, db_path: str = "festivapulse.db"):
+    """Manages dual-layer persistence across memory and SQLite database with auto-hydration."""
+
+    def __init__(self, db_path: str = "festivapulse.db") -> None:
+        """Initialize storage service with SQLite database path."""
         self.db_path = db_path
         self._events: dict[str, EventState] = {}
         self._init_sqlite()
 
     def _init_sqlite(self) -> None:
+        """Initialize SQLite database table schema if not present."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 conn.execute(
@@ -60,6 +67,7 @@ class StorageService:
             logger.warning(f"Failed to initialize SQLite persistence ({e}), using in-memory only")
 
     def _serialize_state(self, state: EventState) -> str:
+        """Serialize EventState dataclass into JSON string."""
         data = {
             "blueprint": state.blueprint.model_dump(),
             "intake": state.intake.model_dump(),
@@ -77,6 +85,7 @@ class StorageService:
         return json.dumps(data)
 
     def _deserialize_state(self, raw_json: str) -> EventState:
+        """Deserialize JSON string into validated EventState models."""
         data = json.loads(raw_json)
         blueprint = EventBlueprint(**data["blueprint"])
         intake = EventIntakeRequest(**data["intake"])
@@ -111,12 +120,14 @@ class StorageService:
             logger.warning(f"Could not persist event {state.blueprint.id} to SQLite: {e}")
 
     def save_event(self, blueprint: EventBlueprint, intake: EventIntakeRequest) -> EventState:
+        """Save a newly created event into hot memory cache and SQLite disk store."""
         state = EventState(blueprint, intake)
         self._events[blueprint.id] = state
         self.persist_event(state)
         return state
 
     def get_event(self, event_id: str) -> EventState | None:
+        """Retrieve an event by ID from in-memory cache, SQLite, or resilient fallback."""
         # 1. In-memory hot cache
         if event_id in self._events:
             return self._events[event_id]
@@ -140,6 +151,7 @@ class StorageService:
         return None
 
     def _create_fallback_state(self, event_id: str) -> EventState:
+        """Create and persist a default celebration state for valid session tokens."""
         intake = EventIntakeRequest(
             event_name="Grand Heritage Celebration",
             event_type="Wedding",
@@ -175,7 +187,7 @@ class StorageService:
         return state
 
     def list_events(self) -> list[EventBlueprint]:
-        # Return all in-memory plus sqlite
+        """List all celebration blueprints available across hot memory and disk store."""
         events = list(self._events.values())
         return [state.blueprint for state in events]
 
@@ -189,6 +201,7 @@ class StorageService:
         calculation_proof: str,
         gemini_recommendation: str,
     ) -> DecisionLedgerEntry:
+        """Record an immutable, coordinator-approved decision ledger entry and bump version."""
         state = self.get_event(event_id)
         if not state:
             raise ValueError(f"Event {event_id} not found")
@@ -214,6 +227,7 @@ class StorageService:
         return entry
 
     def record_telemetry(self, event_id: str, trace: GenAITelemetryTrace) -> None:
+        """Store GenAI telemetry traces in reverse-chronological order."""
         state = self.get_event(event_id)
         if state:
             state.telemetry_traces.insert(0, trace)  # Most recent first

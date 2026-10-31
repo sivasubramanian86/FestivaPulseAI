@@ -23,12 +23,14 @@ from backend.app.services.storage_service import EventState
 
 
 @pytest.fixture
-def client():
+def client() -> TestClient:
+    """Verifies client."""
     return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture
-def sample_intake():
+def sample_intake() -> EventIntakeRequest:
+    """Verifies sample intake."""
     return EventIntakeRequest(
         event_name="Coimbatore Royal Wedding",
         event_type=EventType.WEDDING,
@@ -54,13 +56,16 @@ def sample_intake():
 
 @pytest.mark.unit
 class TestImagenVisualizerService:
-    def test_init_disabled_gemini(self):
+    """Test suite for Imagen Visualizer Service."""
+    def test_init_disabled_gemini(self) -> None:
+        """Verifies init disabled gemini."""
         with patch("backend.app.services.imagen_service.settings") as mock_settings:
             mock_settings.is_live_gemini_enabled = False
             service = ImagenVisualizerService()
             assert service._client is None
 
-    def test_init_live_gemini_exception(self):
+    def test_init_live_gemini_exception(self) -> None:
+        """Verifies init live gemini exception."""
         with patch("backend.app.services.imagen_service.settings") as mock_settings:
             mock_settings.is_live_gemini_enabled = True
             mock_settings.effective_gemini_key = "test_key"
@@ -68,7 +73,8 @@ class TestImagenVisualizerService:
                 service = ImagenVisualizerService()
                 assert service._client is None
 
-    def test_init_live_gemini_success(self):
+    def test_init_live_gemini_success(self) -> None:
+        """Verifies init live gemini success."""
         mock_client = MagicMock()
         with patch("backend.app.services.imagen_service.settings") as mock_settings:
             mock_settings.is_live_gemini_enabled = True
@@ -77,7 +83,8 @@ class TestImagenVisualizerService:
                 service = ImagenVisualizerService()
                 assert service._client == mock_client
 
-    def test_init_vertex_ai_success(self):
+    def test_init_vertex_ai_success(self) -> None:
+        """Verifies init vertex ai success."""
         mock_client = MagicMock()
         with patch("backend.app.services.imagen_service.settings") as mock_settings:
             mock_settings.is_live_gemini_enabled = True
@@ -86,7 +93,8 @@ class TestImagenVisualizerService:
                 service = ImagenVisualizerService()
                 assert service._client == mock_client
 
-    def test_synthesize_dynamic_photographic_prompt_with_llm(self):
+    def test_synthesize_dynamic_photographic_prompt_with_llm(self) -> None:
+        """Verifies synthesize dynamic photographic prompt with llm."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_response = MagicMock()
@@ -97,7 +105,8 @@ class TestImagenVisualizerService:
         expanded = service.synthesize_dynamic_photographic_prompt("Royal Mandap", "Golden Hour Glow")
         assert "ultra-cinematic architectural mandap" in expanded
 
-    def test_synthesize_dynamic_photographic_prompt_llm_exception_fallback(self):
+    def test_synthesize_dynamic_photographic_prompt_llm_exception_fallback(self) -> None:
+        """Verifies synthesize dynamic photographic prompt llm exception fallback."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_client.models.generate_content.side_effect = RuntimeError("LLM Unavailable")
@@ -107,7 +116,8 @@ class TestImagenVisualizerService:
         assert "Hasselblad H6D-100c" in expanded
         assert "Royal Mandap" in expanded
 
-    def test_live_generation_gemini_flash_image_success(self):
+    def test_live_generation_gemini_flash_image_success(self) -> None:
+        """Verifies live generation gemini flash image success."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         # Mock LLM prompt expansion
@@ -136,7 +146,8 @@ class TestImagenVisualizerService:
         assert res["image_url"].startswith("data:image/png;base64,")
         assert res["theme_category"] == "Royal Rajput Heritage"
 
-    def test_live_generation_gemini_flash_image_exception_falls_back_to_imagen(self):
+    def test_live_generation_gemini_flash_image_exception_falls_back_to_imagen(self) -> None:
+        """Verifies live generation gemini flash image exception falls back to imagen."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_llm_response = MagicMock()
@@ -164,13 +175,15 @@ class TestImagenVisualizerService:
         assert res["model"] == "imagen-3.0-generate-002"
         assert res["image_url"].startswith("data:image/jpeg;base64,")
 
-    def test_extract_theme_info_custom_celebration(self):
+    def test_extract_theme_info_custom_celebration(self) -> None:
+        """Verifies extract theme info custom celebration."""
         service = ImagenVisualizerService()
         info = service._extract_theme_info("Futuristic Cyber Lunar Station 2099")
         assert info["theme_category"] == "Custom AI Celebration"
         assert "8K Hasselblad Lens" in info["cultural_elements"]
 
-    def test_live_generation_success(self):
+    def test_live_generation_success(self) -> None:
+        """Verifies live generation success."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_image_item = MagicMock()
@@ -191,7 +204,8 @@ class TestImagenVisualizerService:
         assert res["lighting_mood"] == "Royal Candlelight Night"
         assert "Grand Glasshouse" in res["prompt"]
 
-    def test_live_generation_empty_images_fallback(self):
+    def test_live_generation_empty_images_fallback(self) -> None:
+        """Verifies live generation empty images fallback."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_result = MagicMock()
@@ -209,7 +223,8 @@ class TestImagenVisualizerService:
         assert res["image_url"] == "/assets/theme_eco_harvest.jpg"
         assert res["theme_category"] == "Eco-Sustainable Botanical"
 
-    def test_live_generation_exception_fallback(self):
+    def test_live_generation_exception_fallback(self) -> None:
+        """Verifies live generation exception fallback."""
         service = ImagenVisualizerService()
         mock_client = MagicMock()
         mock_client.models.generate_images.side_effect = RuntimeError("QuotaExceeded")
@@ -225,7 +240,8 @@ class TestImagenVisualizerService:
         assert res["asset_url"] == "/assets/theme_ambani_luxury.jpg"
         assert res["image_url"] == "/assets/theme_ambani_luxury.jpg"
 
-    def test_procedural_lighting_moods(self):
+    def test_procedural_lighting_moods(self) -> None:
+        """Verifies procedural lighting moods."""
         service = ImagenVisualizerService()
         service._client = None
 
@@ -242,7 +258,8 @@ class TestImagenVisualizerService:
             assert res["image_url"].endswith(".jpg")
             assert "svg_data_url" in res
 
-    def test_procedural_cultural_palettes(self):
+    def test_procedural_cultural_palettes(self) -> None:
+        """Verifies procedural cultural palettes."""
         service = ImagenVisualizerService()
         service._client = None
 
@@ -271,7 +288,9 @@ class TestImagenVisualizerService:
 
 @pytest.mark.unit
 class TestVisualizationEndpoints:
-    def test_post_visualize_standalone(self, client):
+    """Test suite for Visualization Endpoints."""
+    def test_post_visualize_standalone(self, client) -> None:
+        """Verifies post visualize standalone."""
         payload = {
             "user_prompt": "Sunset open-air amphitheater with brass diyas",
             "lighting_mood": "Golden Hour Glow",
@@ -284,7 +303,8 @@ class TestVisualizationEndpoints:
         assert "image_url" in data
         assert data["lighting_mood"] == "Golden Hour Glow"
 
-    def test_post_visualize_with_event_context(self, client, sample_intake):
+    def test_post_visualize_with_event_context(self, client, sample_intake) -> None:
+        """Verifies post visualize with event context."""
         # 1. Create event first to populate storage (POST returns 201)
         create_resp = client.post("/api/v1/event/create", json=sample_intake.model_dump())
         assert create_resp.status_code == 201
@@ -303,7 +323,8 @@ class TestVisualizationEndpoints:
         assert data["theme_category"] == "Vedic Temple Muhurtham"
         assert data["image_url"] == "/assets/theme_tamil_brahmin.jpg"
 
-    def test_post_visualize_with_nonexistent_event(self, client):
+    def test_post_visualize_with_nonexistent_event(self, client) -> None:
+        """Verifies post visualize with nonexistent event."""
         payload = {
             "user_prompt": "Fairytale garden gazebo with fairy lights",
             "lighting_mood": "Royal Candlelight Night",
@@ -314,7 +335,7 @@ class TestVisualizationEndpoints:
         assert data["success"] is True
         assert "image_url" in data
 
-    def test_initialize_event_state_vibe_and_feast_branches(self, sample_intake):
+    def test_initialize_event_state_vibe_and_feast_branches(self, sample_intake) -> None:
         """Verifies all cultural vibe and feast summary branches in _initialize_event_state."""
         from backend.app.models.event import EventBlueprint
 

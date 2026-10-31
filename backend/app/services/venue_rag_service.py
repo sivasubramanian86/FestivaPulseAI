@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 
 class VenueHallItem(BaseModel):
+    """Grounded celebration venue item with pricing, capacity, and accessibility metadata."""
     id: str
     name: str
     city: str
@@ -375,6 +376,7 @@ class VenueRAGService:
     """Grounded RAG Retrieval engine for celebration party and wedding halls."""
 
     def __init__(self) -> None:
+        """Initializes venue registry from curated venue inventory."""
         self.registry = GROUNDED_VENUE_REGISTRY
 
     def search_halls(
@@ -421,6 +423,7 @@ class VenueRAGService:
 
         # Sort by grounded relevance: location match boost + capacity fit + grounding score
         def _score(h: VenueHallItem) -> float:
+            """Calculates composite ranking score based on location boost, capacity fit, and grounding."""
             city_low = h.city.lower()
             area_low = h.area.lower()
             name_low = h.name.lower()

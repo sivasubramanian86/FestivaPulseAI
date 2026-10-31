@@ -14,7 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class BlueprintAgent(FestivaAgent):
-    def __init__(self):
+    """Specialist agent synthesizing culturally grounded event blueprints and vendor SLAs."""
+
+    def __init__(self) -> None:
+        """Initialize BlueprintAgent with Gemini 2.5 Flash model and cultural instructions."""
         super().__init__(
             name="BlueprintSpecialistAgent",
             role="Celebration Architect & Cultural Synthesizer",
@@ -27,6 +30,7 @@ class BlueprintAgent(FestivaAgent):
         )
 
     async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
+        """Executes blueprint synthesis logic generating concepts, vendor SLAs, and catering breakdown."""
         intake = context.get("intake", {})
         event_name = intake.get("event_name", "Celebration")
         guests = intake.get("expected_guests", 250)

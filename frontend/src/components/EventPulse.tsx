@@ -177,11 +177,16 @@ export const EventPulse: React.FC<EventPulseProps> = ({
         {/* Live Attendance Slider */}
         <div className="mt-6 p-4 rounded-xl bg-amber-50/60 dark:bg-[#1D1630] border border-amber-200/80 dark:border-[#352952]">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">
-            <span>{t.pulse.simulateGate}</span>
+            <label htmlFor="live-attendance-gate-slider">{t.pulse.simulateGate}</label>
             <span className="text-amber-800 dark:text-amber-300 font-bold font-mono">{checkedIn} Checked-In</span>
           </div>
           <input
+            id="live-attendance-gate-slider"
             type="range"
+            aria-label="Simulate Gate Attendance Headcount"
+            aria-valuemin={10}
+            aria-valuemax={blueprint.max_venue_capacity}
+            aria-valuenow={checkedIn}
             min="10"
             max={blueprint.max_venue_capacity}
             value={checkedIn}

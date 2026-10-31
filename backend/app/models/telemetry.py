@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 
 class GenAITelemetryTrace(BaseModel):
+    """Real-time observability trace capturing prompt input, model output, and token latency."""
     trace_id: str
     timestamp: str
     active_agent: str
@@ -24,6 +25,7 @@ class GenAITelemetryTrace(BaseModel):
 
 
 class DecisionLedgerEntry(BaseModel):
+    """Cryptographic audit log entry capturing state mutations and Human-in-the-Loop approvals."""
     entry_id: str
     timestamp: str
     event_id: str

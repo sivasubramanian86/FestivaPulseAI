@@ -1,3 +1,9 @@
+/**
+ * FestivaPulseAI — Autonomous Day-of-Event Resilience Copilot Cockpit.
+ * Main single-page application orchestrating Blueprinting, Real-time Pulse,
+ * Rescue Studio, Immutable Decision Ledger, and Scenario Chaos Simulation.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { CelebrationBlueprint } from './components/CelebrationBlueprint';
@@ -287,6 +293,14 @@ const MainCockpit: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-transparent text-slate-900 dark:text-slate-100 transition-colors duration-300">
+      {/* Accessibility Skip Landmark */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-slate-950 focus:font-bold focus:rounded-md focus:shadow-xl focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Top Command Cockpit Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -334,6 +348,7 @@ const MainCockpit: React.FC = () => {
                 {/* 1-Click Live GPS Venue Detection Bar */}
                 <button
                   type="button"
+                  aria-label="Detect Live GPS Celebration Venue"
                   onClick={handleDetectGpsVenue}
                   disabled={gpsDetecting}
                   className="flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-rose-500/20 hover:from-amber-500/40 hover:to-rose-500/40 px-3 py-1 rounded-md border border-amber-400/50 hover:border-amber-300 text-amber-200 transition-all cursor-pointer shadow-sm active:scale-95"
@@ -359,6 +374,7 @@ const MainCockpit: React.FC = () => {
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3 self-start lg:self-center">
               <button
                 type="button"
+                aria-label="Launch 3D Transformation and 4DX Grounded Tour"
                 onClick={() => setTourOpen(true)}
                 className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#FBBF24] to-[#B8860B] text-slate-950 font-black text-sm tracking-wide shadow-xl hover:shadow-amber-500/30 flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5 active:translate-y-0 transition-all border border-amber-300"
               >
@@ -368,6 +384,7 @@ const MainCockpit: React.FC = () => {
 
               <button
                 type="button"
+                aria-label="Open GenAI Telemetry X-Ray Drawer"
                 onClick={() => setXrayOpen(true)}
                 className="px-5 py-2.5 rounded-2xl bg-black/50 hover:bg-black/70 backdrop-blur-md text-amber-200 hover:text-white border border-amber-400/40 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md"
               >
@@ -380,7 +397,7 @@ const MainCockpit: React.FC = () => {
       </section>
 
       {/* Main Operational Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 focus:outline-none">
         {activeTab === 'blueprint' && (
           <CelebrationBlueprint
             blueprint={blueprint}
@@ -445,7 +462,7 @@ const MainCockpit: React.FC = () => {
                 </h4>
               </div>
               <p className="text-slate-600 dark:text-slate-400 max-w-md leading-relaxed font-sans">
-                Engineered for Google Cloud APAC AI Builder Cup. Powered by Google ADK multi-agent swarm, Vertex AI Gemini 2.5 Flash, Cloud Firestore, and real-time Pub/Sub live event sensory streaming.
+                Engineered for Prompt Wars Virtual 2026 — [Challenge 5] Celebration & Event Planner Challenge. Powered by Google ADK multi-agent swarm, Vertex AI Gemini 2.5 Flash, Cloud Firestore, and real-time Pub/Sub live event sensory streaming.
               </p>
             </div>
 
@@ -480,6 +497,7 @@ const MainCockpit: React.FC = () => {
               <div className="flex flex-col gap-2">
                 <button
                   type="button"
+                  aria-label="Launch 3D & 4DX Experience"
                   onClick={() => setTourOpen(true)}
                   className="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-semibold text-left flex items-center gap-2 border border-amber-400/30 transition-colors"
                 >
@@ -488,6 +506,7 @@ const MainCockpit: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  aria-label="Run Automated QA Suite"
                   onClick={() => setQaModalOpen(true)}
                   className="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-semibold text-left flex items-center gap-2 border border-emerald-400/30 transition-colors"
                 >

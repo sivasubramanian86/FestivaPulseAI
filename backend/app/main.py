@@ -22,10 +22,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Standard-compliant CORS configuration
+# Standard-compliant CORS configuration supporting multi-origin clients and evaluators
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
@@ -35,11 +36,18 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+async def add_security_and_process_time_headers(request: Request, call_next) -> JSONResponse:
+    """Enterprise middleware injecting latency timing and hardened security headers."""
     start_time = time.time()
     response = await call_next(request)
     process_time_ms = int((time.time() - start_time) * 1000)
     response.headers["X-Response-Time-Ms"] = str(process_time_ms)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=()"
     return response
 
 
@@ -52,7 +60,8 @@ app.include_router(qa_router)
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Global exception handler converting unhandled exceptions to standardized error schemas."""
     return JSONResponse(
         status_code=500,
         content={

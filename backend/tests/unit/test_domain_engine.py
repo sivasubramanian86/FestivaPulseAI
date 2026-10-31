@@ -23,7 +23,8 @@ from backend.app.models.timeline import TimelineNode
 
 @pytest.mark.unit
 class TestBudgetEngine:
-    def test_calculate_budget_ledger_arithmetic(self):
+    """Test suite for Budget Engine."""
+    def test_calculate_budget_ledger_arithmetic(self) -> None:
         """Verifies that budget spent and committed amounts are never double-counted."""
         categories = [
             BudgetCategoryItem(
@@ -60,7 +61,7 @@ class TestBudgetEngine:
         assert ledger.variance == 0
         assert not ledger.is_in_deficit
 
-    def test_rebalance_budget_pareto_feasible_slash(self):
+    def test_rebalance_budget_pareto_feasible_slash(self) -> None:
         """Verifies that elastic line items are pruned while protecting anchor items."""
         categories = [
             BudgetCategoryItem(
@@ -93,7 +94,7 @@ class TestBudgetEngine:
         # Elastic decor planned is pruned from 150k down to 50k
         assert rebalance.rebalanced_categories[1].uncommitted_planned == 50000
 
-    def test_rebalance_budget_pareto_infeasible_deficit(self):
+    def test_rebalance_budget_pareto_infeasible_deficit(self) -> None:
         """Verifies that system says NOT FEASIBLE when cut exceeds all elastic funds."""
         categories = [
             BudgetCategoryItem(
@@ -122,7 +123,7 @@ class TestBudgetEngine:
         assert "NOT FEASIBLE" in rebalance.rationale
         assert rebalance.unresolved_deficit == 70000
 
-    def test_rebalance_budget_expansion(self):
+    def test_rebalance_budget_expansion(self) -> None:
         """Verifies budget expansion allocates surplus to contingency buffer."""
         categories = [
             BudgetCategoryItem(
@@ -142,7 +143,8 @@ class TestBudgetEngine:
 
 @pytest.mark.unit
 class TestFoodAndFSSAI:
-    def test_food_sufficiency_category_shortfall(self):
+    """Test suite for Food And F S S A I."""
+    def test_food_sufficiency_category_shortfall(self) -> None:
         """Verifies category-level shortfall detection (e.g., vegan shortage despite overall surplus)."""
         dietary = DietaryRequirement(
             general_veg_pct=60,
@@ -174,7 +176,7 @@ class TestFoodAndFSSAI:
         assert gen_veg_status.is_critical_shortage is False
         assert gen_veg_status.net_shortfall_or_surplus == 20
 
-    def test_fssai_surplus_manifest_standards(self):
+    def test_fssai_surplus_manifest_standards(self) -> None:
         """Verifies FSSAI regulatory compliance verification and ESG metric generation."""
         manifest = generate_fssai_surplus_manifest("EVT-001", 40.0, 68.0, 4.0)
         assert manifest.is_temperature_compliant is True
@@ -187,7 +189,8 @@ class TestFoodAndFSSAI:
 
 @pytest.mark.unit
 class TestTimelineDAG:
-    def test_propagate_timeline_delay_dag(self):
+    """Test suite for Timeline D A G."""
+    def test_propagate_timeline_delay_dag(self) -> None:
         """Verifies that delays propagate downstream and sound curfew (22:00) is flagged."""
         nodes = [
             TimelineNode(
@@ -228,7 +231,8 @@ class TestTimelineDAG:
         assert cascade.curfew_breached is True
         assert cascade.overtime_penalty_estimated > 0
 
-    def test_timeline_delay_node_not_found_raises(self):
+    def test_timeline_delay_node_not_found_raises(self) -> None:
+        """Verifies timeline delay node not found raises."""
         nodes = [
             TimelineNode(
                 node_id="N1",
@@ -243,7 +247,8 @@ class TestTimelineDAG:
         with pytest.raises(ValueError, match="not found in timeline DAG"):
             propagate_timeline_delay(nodes, "NON_EXISTENT", 20)
 
-    def test_timeline_delay_unaffected_nodes(self):
+    def test_timeline_delay_unaffected_nodes(self) -> None:
+        """Verifies timeline delay unaffected nodes."""
         nodes = [
             TimelineNode(
                 node_id="N1",
@@ -271,7 +276,8 @@ class TestTimelineDAG:
 
 @pytest.mark.unit
 class TestProposalFeasibilityRules:
-    def test_validate_proposal_feasibility_rules(self):
+    """Test suite for Proposal Feasibility Rules."""
+    def test_validate_proposal_feasibility_rules(self) -> None:
         """Verifies hard capacity and budget rejection checks."""
         feasible, msg = validate_proposal_feasibility("Add chairs", 250, 300, 20000, 50000)
         assert feasible is True

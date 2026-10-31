@@ -1,3 +1,7 @@
+/**
+ * FestivaPulseAI — Enterprise Resilience Error Boundary Component.
+ */
+
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 

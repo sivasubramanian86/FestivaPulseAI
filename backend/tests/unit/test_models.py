@@ -34,7 +34,9 @@ from backend.app.models.timeline import TimelineCascadeImpact, TimelineNode
 
 @pytest.mark.unit
 class TestEventModels:
-    def test_dietary_requirement_valid(self):
+    """Test suite for Event Models."""
+    def test_dietary_requirement_valid(self) -> None:
+        """Verifies dietary requirement valid."""
         diet = DietaryRequirement(
             general_veg_pct=50,
             vegan_pct=20,
@@ -47,7 +49,8 @@ class TestEventModels:
         assert diet.general_veg_pct == 50
         assert diet.vegan_pct + diet.jain_pct + diet.non_veg_pct + diet.general_veg_pct == 100
 
-    def test_dietary_requirement_sum_not_100_raises(self):
+    def test_dietary_requirement_sum_not_100_raises(self) -> None:
+        """Verifies dietary requirement sum not 100 raises."""
         with pytest.raises(ValidationError) as exc:
             DietaryRequirement(
                 general_veg_pct=50,
@@ -57,14 +60,16 @@ class TestEventModels:
             )
         assert "must sum to exactly 100%" in str(exc.value)
 
-    def test_event_preferences_defaults(self):
+    def test_event_preferences_defaults(self) -> None:
+        """Verifies event preferences defaults."""
         pref = EventPreferences()
         assert pref.elders_comfort_priority is True
         assert pref.healthy_lifestyle_focus is True
         assert pref.kids_activity_zone is True
         assert pref.sound_curfew_time == "22:00"
 
-    def test_event_intake_valid(self):
+    def test_event_intake_valid(self) -> None:
+        """Verifies event intake valid."""
         intake = EventIntakeRequest(
             event_name="Grand Coimbatore Wedding",
             event_type=EventType.WEDDING,
@@ -78,7 +83,8 @@ class TestEventModels:
         assert intake.event_name == "Grand Coimbatore Wedding"
         assert intake.currency == "INR"
 
-    def test_event_intake_invalid_date_format(self):
+    def test_event_intake_invalid_date_format(self) -> None:
+        """Verifies event intake invalid date format."""
         with pytest.raises(ValidationError) as exc:
             EventIntakeRequest(
                 event_name="Invalid Date Event",
@@ -92,7 +98,8 @@ class TestEventModels:
             )
         assert "YYYY-MM-DD format" in str(exc.value)
 
-    def test_event_intake_year_out_of_bounds(self):
+    def test_event_intake_year_out_of_bounds(self) -> None:
+        """Verifies event intake year out of bounds."""
         with pytest.raises(ValidationError) as exc:
             EventIntakeRequest(
                 event_name="Past Event",
@@ -106,7 +113,8 @@ class TestEventModels:
             )
         assert "between 2024 and 2035" in str(exc.value)
 
-    def test_event_intake_capacity_less_than_guests(self):
+    def test_event_intake_capacity_less_than_guests(self) -> None:
+        """Verifies event intake capacity less than guests."""
         with pytest.raises(ValidationError) as exc:
             EventIntakeRequest(
                 event_name="Overbooked Hall",
@@ -120,7 +128,8 @@ class TestEventModels:
             )
         assert "cannot be less than expected guests" in str(exc.value)
 
-    def test_event_intake_invalid_email(self):
+    def test_event_intake_invalid_email(self) -> None:
+        """Verifies event intake invalid email."""
         with pytest.raises(ValidationError):
             EventIntakeRequest(
                 event_name="Invalid Email Event",
@@ -133,7 +142,8 @@ class TestEventModels:
                 total_budget=100000,
             )
 
-    def test_event_blueprint_instantiation(self):
+    def test_event_blueprint_instantiation(self) -> None:
+        """Verifies event blueprint instantiation."""
         bp = EventBlueprint(
             id="EVT-001",
             event_name="Silver Jubilee",
@@ -171,7 +181,9 @@ class TestEventModels:
 
 @pytest.mark.unit
 class TestIncidentAndRecoveryModels:
-    def test_incident_submission(self):
+    """Test suite for Incident And Recovery Models."""
+    def test_incident_submission(self) -> None:
+        """Verifies incident submission."""
         inc = IncidentSubmission(
             event_id="EVT-001",
             incident_type=IncidentType.ATTENDANCE_SURGE,
@@ -181,7 +193,8 @@ class TestIncidentAndRecoveryModels:
         assert inc.incident_type == IncidentType.ATTENDANCE_SURGE
         assert inc.is_simulation is False
 
-    def test_recovery_proposal_and_comparison(self):
+    def test_recovery_proposal_and_comparison(self) -> None:
+        """Verifies recovery proposal and comparison."""
         p1 = RecoveryProposal(
             proposal_id="P1",
             strategy_type=RecoveryStrategyType.LOWEST_COST,
@@ -225,7 +238,9 @@ class TestIncidentAndRecoveryModels:
 
 @pytest.mark.unit
 class TestInventoryTelemetryTimelineModels:
-    def test_food_category_breakdown_and_radar(self):
+    """Test suite for Inventory Telemetry Timeline Models."""
+    def test_food_category_breakdown_and_radar(self) -> None:
+        """Verifies food category breakdown and radar."""
         status = CategoryPortionStatus(
             category=MealCategory.GENERAL_VEG,
             required_portions=180,
@@ -254,7 +269,8 @@ class TestInventoryTelemetryTimelineModels:
         assert radar.total_surplus_count == 20
         assert len(radar.categories) == 1
 
-    def test_fssai_manifest_model(self):
+    def test_fssai_manifest_model(self) -> None:
+        """Verifies fssai manifest model."""
         manifest = FSSAISurplusManifest(
             manifest_id="MAN-001",
             timestamp="2026-10-25T21:00:00",
@@ -274,7 +290,8 @@ class TestInventoryTelemetryTimelineModels:
         assert manifest.is_temperature_compliant is True
         assert manifest.carbon_emissions_prevented_kg == 125.0
 
-    def test_telemetry_model(self):
+    def test_telemetry_model(self) -> None:
+        """Verifies telemetry model."""
         t = GenAITelemetryTrace(
             trace_id="TR-01",
             timestamp="2026-10-25T19:00:00",
@@ -290,7 +307,8 @@ class TestInventoryTelemetryTimelineModels:
         assert t.latency_ms == 120
         assert t.is_live_call is False
 
-    def test_timeline_node_and_impact_models(self):
+    def test_timeline_node_and_impact_models(self) -> None:
+        """Verifies timeline node and impact models."""
         node = TimelineNode(
             node_id="N-1",
             task_name="Opening",

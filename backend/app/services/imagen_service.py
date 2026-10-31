@@ -283,12 +283,16 @@ SYSTEM_PROMPT_DIRECTOR = (
 
 
 class ImagenVisualizerService:
-    def __init__(self):
+    """Photorealistic generative venue and decor visualizer leveraging Google Imagen 3."""
+
+    def __init__(self) -> None:
+        """Initializes Imagen visualizer service with target image model and client."""
         self.model_name = settings.IMAGEN_MODEL
         self._client = None
         self._init_client()
 
-    def _init_client(self):
+    def _init_client(self) -> None:
+        """Connects to Google GenAI or Vertex AI client for live Imagen 3 visual synthesis."""
         if settings.is_live_gemini_enabled:
             try:
                 from google import genai

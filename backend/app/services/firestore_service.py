@@ -19,13 +19,15 @@ logger = logging.getLogger(__name__)
 class FirestoreService:
     """Manages enterprise persistence across Google Cloud Firestore and local storage."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize FirestoreService client if enabled in settings."""
         self._db = None
         self._is_connected = False
         if settings.ENABLE_FIRESTORE:
             self._init_firestore()
 
-    def _init_firestore(self):
+    def _init_firestore(self) -> None:
+        """Initialize asynchronous Google Cloud Firestore client."""
         try:
             from google.cloud import firestore
 
@@ -44,6 +46,7 @@ class FirestoreService:
 
     @property
     def is_connected(self) -> bool:
+        """Returns True if live Google Cloud Firestore connection is established."""
         return self._is_connected
 
     async def save_celebration(self, blueprint: EventBlueprint, intake: EventIntakeRequest) -> EventState:

@@ -12,7 +12,10 @@ from backend.app.core.engine import rebalance_budget_pareto
 
 
 class BudgetElasticityAgent(FestivaAgent):
-    def __init__(self):
+    """Specialist agent calculating Pareto reallocations and protecting sacred financial anchors."""
+
+    def __init__(self) -> None:
+        """Initialize BudgetElasticityAgent with financial elasticity rules and models."""
         super().__init__(
             name="BudgetElasticityAgent",
             role="Financial Elasticity & Pareto Re-Optimizer",
@@ -26,6 +29,7 @@ class BudgetElasticityAgent(FestivaAgent):
         )
 
     async def _run_logic(self, task: ADKTask, context: dict[str, Any]) -> dict[str, Any]:
+        """Executes Pareto elasticity rebalancing protecting anchors while scaling elastic categories."""
         ledger = context.get("ledger")
         revised_budget = context.get("revised_budget", 0)
 
