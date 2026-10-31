@@ -74,6 +74,7 @@ Thumbs.db
 *.mov
 *.avi
 *.mkv
+*.webm
 *.wav
 *.mp3
 *.zip
@@ -82,6 +83,11 @@ Thumbs.db
 *.dmg
 *.bin
 *.exe
+scratch/
+docs/demo/*.mp4
+docs/demo/*.webm
+docs/demo/*.wav
+docs/demo/demo_audio/
 
 # Databases & local logs
 *.sqlite3-journal

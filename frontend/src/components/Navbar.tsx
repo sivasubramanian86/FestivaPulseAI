@@ -50,6 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   xrayOpen,
   setXrayOpen,
+  onOpenQAModal,
   onOpenGuidedTour,
 }) => {
   const { language, setLanguage, t } = useTranslation();
@@ -176,6 +177,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Compass className="w-3.5 h-3.5 text-slate-950 font-bold" />
               <span>Guided Tour</span>
             </button>
+
+            {/* In-App Automated QA Trigger */}
+            {onOpenQAModal && (
+              <button
+                onClick={onOpenQAModal}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-emerald-400/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all shadow-sm"
+                title="Run Automated In-App QA Test Suite"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="hidden sm:inline">QA Suite</span>
+              </button>
+            )}
 
             {/* GenAI X-Ray Split-Pane Toggle */}
             <button

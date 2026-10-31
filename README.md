@@ -257,18 +257,24 @@ $env:GCP_PROJECT_ID = "your-gcp-project-id"
 
 ---
 
-## 10. Video Submission Guide & Timestamps (Target: 3:40)
+## 10. Official Hackathon Demo Video & Narration Walkthrough (4:02)
+
+> **Complete Video Artifacts:**  
+> - **Video File:** [`docs/demo/FestivaPulseAI_Official_Demo_Video_4Min.mp4`](docs/demo/README.md) (1080p Full HD, H.264/AAC, 60fps)  
+> - **Cover Artwork:** [`docs/demo/FestivaPulseAI_Official_Demo_Cover.jpg`](docs/demo/README.md)  
+> - **Voiceover Audio:** Gemini Live Native Audio (`Kore` female voice) on Vertex AI  
+> - **Automation Pipeline:** Playwright Headless Chromium + FFmpeg Synchronized Muxing (`scripts/record_demo_video.py`)
 
 | Timestamp | Screen / Action | Script & Pitch Focus |
 | :--- | :--- | :--- |
-| **0:00 - 0:25** | Celebration Blueprint | **Hook:** The chaos of celebration planning; demonstrate quick preset & elder/kid comfort. |
-| **0:25 - 0:45** | Blueprint Intake | Trigger **"Test Error State"** preset to prove strict red ARIA validation alerts on camera. |
-| **0:45 - 1:15** | Generate Master Plan | Generate blueprint; highlight 40/30/30 batch cooking, vendor SLAs, and budget breakdown. |
-| **1:15 - 1:55** | Event Pulse & Radar | Move attendance slider from 250 to 320; highlight category food radar and FSSAI rescue pass. |
-| **1:55 - 2:45** | Rescue Studio | Simulate rain & extra guests; compare 3 proposals and highlight the "NOT FEASIBLE" refusal card. |
-| **2:45 - 3:05** | Decision Ledger | Approve proposal; show immutable audit trail and budget reconciliation in Decision Ledger. |
-| **3:05 - 3:25** | Judge X-Ray Drawer | Open Live GenAI Telemetry X-Ray drawer; show exact prompt, schema, and latency counter. |
-| **3:25 - 3:40** | Live QA Runner Modal | Open QA modal; click "Run All Test Cases" showing 100% green pass rate in 12ms. Conclude pitch. |
+| **00:00 - 00:35** | Welcome & Multilingual Themes | **Hook:** Toggle between Midnight Velvet (dark) and Ivory Silk (light) modes; real-time localization across Tamil, Hindi, Kannada, Telugu, and English. |
+| **00:35 - 01:10** | Blueprint & Cultural Presets | Trigger **"Test Error State"** preset to prove strict red ARIA validation alerts on camera; select Kalyana Mandapam (₹18L) preset and generate plan. |
+| **01:10 - 01:42** | Google Cloud ADK Swarm | Step-by-step reasoning logs across 6 specialist agents with sub-200ms latencies; switch to Predictive Forecasting Dashboard (crowd velocity curve, 40/30/30 depletion). |
+| **01:42 - 02:12** | AI Event Imagination Studio | Vertex AI Gemini Flash & Imagen 3.0 dynamic prompt expansion; 1-click synthesis of royal mandaps, temple sanctums, and banquet halls. |
+| **02:12 - 02:40** | Event Pulse & 4DX Sensory Twin | Move attendance slider from 210 to 315; inspect Food Sufficiency Radar & SVG schematic; inject Crowd Surge shock (250 to 360 guests). |
+| **02:40 - 03:09** | Rescue Studio & Sign-Off | 3-way comparative recovery (Conservative, Balanced, Aggressive) with HSE fire capacity refusal; coordinator audits cost deltas and signs off on Strategy B. |
+| **03:09 - 03:33** | Immutable Ledger & QA Runner | Cryptographic audit trail stamped in Decision Ledger; inspect GenAI Telemetry X-Ray drawer; trigger in-app QA test runner with 100% green checkmarks. |
+| **03:33 - 04:02** | Enterprise Architecture & Impact | Google Cloud ADK, Cloud Run, Firebase Hosting, and Vertex AI Gemini 2.5 architecture summary; conclude pitch with zero food waste guarantee. |
 
 ---
 
