@@ -17,12 +17,13 @@ from backend.app.core.engine import (
     calculate_food_sufficiency,
 )
 from backend.app.models.budget import BudgetCategoryItem
-from backend.app.models.event import EventIntakeRequest
+from backend.app.models.event import EventIntakeRequest, MilestoneItem
 from backend.app.models.inventory import MealCategory
 from backend.app.models.telemetry import DecisionLedgerEntry
 from backend.app.models.timeline import TimelineNode
 from backend.app.services.firestore_service import firestore_service
 from backend.app.services.gemini_service import gemini_service
+from backend.app.services.imagen_service import imagen_service
 from backend.app.services.monitoring_service import monitoring_service
 from backend.app.services.storage_service import EventState, storage_service
 from backend.app.services.venue_rag_service import venue_rag_service
@@ -116,10 +117,30 @@ def _initialize_event_state(state: EventState) -> None:
     }
     state.food_radar = calculate_food_sufficiency(blueprint_id, intake.expected_guests, 0, intake.dietary, initial_inv)
 
+    curfew = intake.preferences.sound_curfew_time or "22:00"
+    vibe = intake.preferences.cultural_vibe
+    vibe_summary = "Auspicious Rituals"
+    if "carnatic" in vibe.lower():
+        vibe_summary = "Carnatic-Western Classical Fusion & Rituals"
+    elif "sangeet" in vibe.lower():
+        vibe_summary = "Sangeet Dance & Ring Ceremony"
+    elif "muhurtham" in vibe.lower():
+        vibe_summary = "Auspicious Vedic Muhurtham Ceremony"
+    elif "retro" in vibe.lower():
+        vibe_summary = "Retro Acoustic Lounge & Milestone Tribute"
+
+    feast_summary = "Traditional Feast & 40/30/30 Banquet Service"
+    if "millet" in vibe.lower() or "organic" in vibe.lower():
+        feast_summary = "Organic Millet Banquet & 40/30/30 Zero Waste Feast"
+    elif "sadya" in vibe.lower() or "chennai" in intake.location.lower():
+        feast_summary = "Authentic Plantain Leaf Sadya (40/30/30 Batch Cooking)"
+    elif "nikah" in vibe.lower() or "mughlai" in vibe.lower():
+        feast_summary = "Royal Shahi Dawat & Dum Biryani Banquet"
+
     state.timeline_nodes = [
         TimelineNode(
             node_id="T1",
-            title="Guest Arrival & Welcome Refreshments",
+            title=f"Guest Arrival & Welcome Refreshments ({intake.location[:35]})",
             owner="Hospitality Team",
             scheduled_start="17:00",
             scheduled_end="18:00",
@@ -128,8 +149,8 @@ def _initialize_event_state(state: EventState) -> None:
         ),
         TimelineNode(
             node_id="T2",
-            title="Main Celebration & Auspicious Rituals",
-            owner="Priest / Officiant",
+            title=f"Main Celebration & {vibe_summary}",
+            owner="Ceremony Lead / Officiant",
             scheduled_start="18:15",
             scheduled_end="19:45",
             duration_minutes=90,
@@ -137,8 +158,8 @@ def _initialize_event_state(state: EventState) -> None:
         ),
         TimelineNode(
             node_id="T3",
-            title="Traditional Feast & Banquet Service",
-            owner="Catering Head",
+            title=feast_summary,
+            owner="Catering Head (40/30/30 Kitchen)",
             scheduled_start="19:45",
             scheduled_end="21:15",
             duration_minutes=90,
@@ -146,13 +167,47 @@ def _initialize_event_state(state: EventState) -> None:
         ),
         TimelineNode(
             node_id="T4",
-            title="Musical Fusion & Farewell",
-            owner="AV Crew",
+            title=f"Musical Recital & Police Curfew Clearance ({curfew})",
+            owner="AV & Safety Crew",
             scheduled_start="21:15",
-            scheduled_end="22:00",
+            scheduled_end=curfew,
             duration_minutes=45,
             dependencies=["T3"],
             is_fixed_contractual_window=True,
+        ),
+    ]
+
+    target_dt = intake.target_date
+    state.blueprint.milestones = [
+        MilestoneItem(
+            phase="T-30 Days",
+            task_name=f"Lock {feast_summary[:35]} tasting & vendor contracts",
+            owner="Food & Hospitality Committee",
+            deadline="T-30 Days",
+        ),
+        MilestoneItem(
+            phase="T-15 Days",
+            task_name=f"Secure acoustic sound permit and {curfew} police curfew clearance",
+            owner="AV & Venue Liaison",
+            deadline="T-15 Days",
+        ),
+        MilestoneItem(
+            phase="T-7 Days",
+            task_name=f"Finalize elder wheelchair ramps, quiet dining & {vibe_summary[:28]}",
+            owner="Stage & Operations Captain",
+            deadline="T-7 Days",
+        ),
+        MilestoneItem(
+            phase="Day of Event",
+            task_name=f"Live gate check-in & 40/30/30 batch coordination for {intake.expected_guests} covers",
+            owner="Lead Event Coordinator",
+            deadline=target_dt,
+        ),
+        MilestoneItem(
+            phase="Post-Event",
+            task_name="FSSAI surplus food dispatch to cold-chain NGO & final vendor clearing",
+            owner="ESG Sustainability Officer",
+            deadline=f"{target_dt} +1d",
         ),
     ]
     state.latest_rescue_comparison = None
@@ -475,3 +530,31 @@ async def apply_venue_selection(event_id: str, venue_id: str) -> dict[str, Any]:
         "blueprint": state.blueprint.model_dump(),
         "ledger": state.ledger.model_dump(),
     }
+
+
+class VisualizationRequest(BaseModel):
+    user_prompt: str = Field(..., min_length=3, max_length=500, description="Visual description of celebration decor")
+    lighting_mood: str = Field(default="Golden Hour Glow", description="Atmospheric lighting setting")
+    aspect_ratio: str = Field(default="16:9", description="Aspect ratio for image generation")
+
+
+@router.post("/visualize")
+@router.post("/{event_id}/visualize")
+async def generate_celebration_visualization(
+    payload: VisualizationRequest,
+    event_id: str | None = None,
+) -> dict[str, Any]:
+    """Generates an architectural visualization using Vertex AI Imagen 3.0 / Nano Procedural Engine."""
+    context_prefix = ""
+    if event_id:
+        state = storage_service.get_event(event_id)
+        if state:
+            context_prefix = f"Celebration at {state.blueprint.location} for {state.blueprint.expected_guests} guests. "
+
+    full_prompt = f"{context_prefix}{payload.user_prompt}".strip()
+    result = imagen_service.generate_visualization(
+        prompt=full_prompt,
+        lighting_mood=payload.lighting_mood,
+        aspect_ratio=payload.aspect_ratio,
+    )
+    return result

@@ -14,6 +14,8 @@ Production-grade, mobile-responsive React web application for **FestivaPulseAI â
 - **Theming:** Persistent Light and Dark modes with high-contrast WCAG 2.1 AAA accessible color palettes
 - **Notifications:** Enterprise non-blocking `ToastContext` with zero blocking browser alerts
 - **Error Resilience:** Top-level and modular `ErrorBoundary` catching render-time exceptions
+- **Visual Intelligence:** AI Event Imagination Studio utilizing Google Vertex AI Imagen 3.0 (`imagen-3.0-generate-002`) and Nano Procedural Engine for real-time celebration decor visualization
+- **Dynamic Itinerary & Menus:** Reactive multi-course banquet planner automatically matching regional cuisines (Sadya, Oota, Dawat, Thali) and timeline DAGs to selected celebration parameters
 
 ---
 
@@ -106,3 +108,4 @@ The frontend is deployed to **Firebase Hosting**:
 ## ðŸ“– Component Documentation
 
 For comprehensive specifications of all components, props, state flows, and architectural design tokens, see [`docs/frontend_component_catalog.md`](../docs/frontend_component_catalog.md).
+

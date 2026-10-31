@@ -32,10 +32,14 @@ import {
   Truck,
   Check,
   Music,
+  Palette,
+  Wand2,
+  Download,
 } from 'lucide-react';
 import { EventIntakeRequest, EventBlueprint, EventType, ADKSwarmOutput } from '../types';
 import { useTranslation } from '../i18n/I18nContext';
 import { useToast } from '../context/ToastContext';
+import { api } from '../services/api';
 import { DynamicItineraryMenu } from './DynamicItineraryMenu';
 import { GroundedVenueMapExplorer, GroundedHall } from './GroundedVenueMapExplorer';
 
@@ -80,6 +84,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   const { t } = useTranslation();
   const toast = useToast();
   const outcomeRef = useRef<HTMLDivElement>(null);
+  const itinerarySectionRef = useRef<HTMLDivElement>(null);
   const [justGenerated, setJustGenerated] = useState<boolean>(false);
   const [adkViewMode, setAdkViewMode] = useState<'swarm' | 'predictions'>('swarm');
   const [showVenueRadar, setShowVenueRadar] = useState<boolean>(true);
@@ -89,6 +94,42 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
     'Lock catering menu & tasting session': true,
   });
 
+  // AI Event Imagination Studio (Imagen 3.0 & Nano Visualizer)
+  const [visualPrompt, setVisualPrompt] = useState<string>('');
+  const [lightingMood, setLightingMood] = useState<string>('Golden Hour Glow');
+  const [generatingVisual, setGeneratingVisual] = useState<boolean>(false);
+  const [visualResult, setVisualResult] = useState<{
+    imageUrl: string;
+    model: string;
+    prompt: string;
+    lightingMood: string;
+    latencyMs: number;
+    isLive: boolean;
+  } | null>(null);
+
+  const handleGenerateVisualization = async (customPrompt?: string) => {
+    const promptToUse = (customPrompt || visualPrompt || culturalVibe || 'Opulent royal celebration mandap with golden marigold arches and candlelight lanterns').trim();
+    if (!promptToUse) return;
+    setGeneratingVisual(true);
+    try {
+      const res = await api.generateVisualization(blueprint?.id || null, promptToUse, lightingMood);
+      setVisualResult({
+        imageUrl: res.image_url,
+        model: res.model,
+        prompt: res.prompt,
+        lightingMood: res.lighting_mood,
+        latencyMs: res.latency_ms,
+        isLive: res.is_live,
+      });
+      toast.success(res.is_live ? 'Visual synthesized via Vertex AI Imagen 3.0!' : 'Visual synthesized via Nano Procedural Visualizer!');
+    } catch (err: any) {
+      console.error('Visualization error:', err);
+      toast.error('Visualization failed: ' + (err.message || 'Unknown error'));
+    } finally {
+      setGeneratingVisual(false);
+    }
+  };
+
   const handleRefineSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!refinePrompt.trim() || !onRefineBlueprint) return;
@@ -96,7 +137,10 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
     try {
       await onRefineBlueprint(refinePrompt.trim());
       setRefinePrompt('');
-      toast.success('Blueprint refined and re-synchronized with Google ADK swarm!');
+      toast.success('Blueprint & Itinerary refined and re-synchronized with Google ADK swarm!');
+      setTimeout(() => {
+        itinerarySectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400);
     } catch (err: any) {
       console.error('Refinement error:', err);
       toast.error('Refinement error: ' + (err.message || 'Unknown error'));
@@ -1240,7 +1284,182 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
                 >
                   Live Fusion Band & Drones
                 </button>
+                <button
+                  type="button"
+                  onClick={() => itinerarySectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-600/20 text-emerald-800 dark:text-emerald-300 border border-emerald-400/40 hover:bg-emerald-600/30 font-bold transition-colors ml-auto cursor-pointer flex items-center gap-1"
+                >
+                  <span>👇 View Dynamic Itinerary & Milestones</span>
+                </button>
               </div>
+            </div>
+          </div>
+
+          {/* AI Event Imagination Studio (Imagen 3.0 & Nano Visualizer) */}
+          <div className="tactical-card border-amber-400/40 dark:border-amber-600/40 bg-gradient-to-br from-amber-950/15 via-slate-900/30 to-purple-950/20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-amber-300/30 dark:border-amber-700/30 gap-2 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-600 text-slate-950 font-bold shadow-md">
+                  <Palette className="w-5 h-5 text-slate-950" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="heading-section text-amber-950 dark:text-amber-200">
+                      AI Event Imagination Studio
+                    </h3>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      Google Vertex AI Imagen 3.0 + Nano Engine
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-sans mt-0.5">
+                    Programmatically visualize the decor, mandap architecture, and lighting directly from your natural language imagination.
+                  </p>
+                </div>
+              </div>
+              {visualResult && (
+                <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 self-start sm:self-auto">
+                  {visualResult.model} • {visualResult.latencyMs}ms
+                </span>
+              )}
+            </div>
+
+            {/* Prompt input and lighting mood selector */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={visualPrompt}
+                  onChange={(e) => setVisualPrompt(e.target.value)}
+                  placeholder="e.g. Royal Palace Glasshouse with marigold floral canopies, brass diya chandeliers & live stage..."
+                  className="tactical-input flex-1 text-xs"
+                  disabled={generatingVisual}
+                />
+                <select
+                  value={lightingMood}
+                  onChange={(e) => setLightingMood(e.target.value)}
+                  aria-label="Lighting Mood Setting"
+                  className="tactical-input sm:w-56 text-xs bg-white dark:bg-slate-900 border-amber-300/60 dark:border-amber-600/50"
+                  disabled={generatingVisual}
+                >
+                  <option value="Golden Hour Glow">🌅 Golden Hour Glow</option>
+                  <option value="Muhurtham Twilight">🔮 Muhurtham Twilight</option>
+                  <option value="Royal Candlelight Night">🕯 Royal Candlelight Night</option>
+                  <option value="Sunlit Morning">☀️ Sunlit Morning</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => handleGenerateVisualization()}
+                  disabled={generatingVisual}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer flex-shrink-0 disabled:opacity-50"
+                >
+                  {generatingVisual ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" />
+                      <span>Synthesizing via Imagen 3...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-3.5 h-3.5 text-slate-950" />
+                      <span>Visualize with Imagen 3</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Inspiration Pills */}
+              <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Try Prompts:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = 'Palace Grounds botanical glasshouse with marigold torans, brass oil lamps & Carnatic fusion stage';
+                    setVisualPrompt(p);
+                    handleGenerateVisualization(p);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300/40 transition-colors"
+                >
+                  Karnataka Palace Glasshouse
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = 'Amer Fort royal Rajput courtyard with torchlit stone arches, marigold curtains and candlelit dining';
+                    setVisualPrompt(p);
+                    handleGenerateVisualization(p);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-800 dark:text-rose-300 border border-rose-300/40 transition-colors"
+                >
+                  Amer Fort Rajput Palace
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = 'Eco-friendly bamboo canopy with hanging fairy lights, cascading jasmine garlands and organic dining tables';
+                    setVisualPrompt(p);
+                    handleGenerateVisualization(p);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40 transition-colors"
+                >
+                  Eco-Bamboo Botanical
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = 'Modern Bollywood luxury ballroom with crystal chandeliers, LED tunnel, and illuminated mandap';
+                    setVisualPrompt(p);
+                    handleGenerateVisualization(p);
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-800 dark:text-indigo-300 border border-indigo-300/40 transition-colors"
+                >
+                  Billionaire Crystal Ballroom
+                </button>
+              </div>
+
+              {/* Rendered Visual Outcome */}
+              {visualResult && (
+                <div className="mt-4 p-3 rounded-2xl bg-slate-950 border border-amber-400/40 shadow-2xl space-y-3 animate-fadeIn">
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-amber-300/30 group">
+                    <img
+                      src={visualResult.imageUrl}
+                      alt={visualResult.prompt}
+                      className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+                    
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-mono font-bold text-amber-300 border border-amber-400/40">
+                        {visualResult.lightingMood}
+                      </span>
+                      {visualResult.isLive && (
+                        <span className="px-2.5 py-1 rounded-md bg-emerald-950/80 backdrop-blur-md text-[10px] font-mono font-bold text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          LIVE IMAGEN 3.0 OUTPUT
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+                      <div className="max-w-xl">
+                        <p className="text-xs font-bold text-white drop-shadow">
+                          "{visualResult.prompt}"
+                        </p>
+                        <p className="text-[10px] text-amber-200/80 font-mono mt-0.5">
+                          Synthesized with Vertex AI Imagen 3.0 in {visualResult.latencyMs}ms
+                        </p>
+                      </div>
+                      <a
+                        href={visualResult.imageUrl}
+                        download="FestivaPulseAI_Event_Visualization.jpg"
+                        className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] shadow flex items-center gap-1.5 transition-all cursor-pointer flex-shrink-0"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Save Image</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1382,7 +1601,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
           </div>
 
           {/* Pre-Event Planning & Countdown Itinerary Checklist (T-30 to T-0) */}
-          <div className="tactical-card">
+          <div ref={itinerarySectionRef} className="tactical-card scroll-mt-20">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#E8DFD1]/60 dark:border-[#352952]/60 gap-2 mb-4">
               <div>
                 <h3 className="heading-section flex items-center gap-2">
@@ -1480,6 +1699,9 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
           <div className="pt-4">
             <DynamicItineraryMenu
               initialGuests={blueprint.expected_guests}
+              blueprint={blueprint}
+              location={blueprint.location}
+              culturalVibe={culturalVibe}
             />
           </div>
 

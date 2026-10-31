@@ -68,7 +68,9 @@ graph TD
   - Predictive forecasting sub-view: Crowd arrival curve, 40/30/30 catering depletion forecast, acoustic curfew DAG risk, and budget elasticity.
   - Smooth auto-scrolling ref (`outcomeRef`) to instantly glide viewport to generated results upon submission.
   - Non-blocking confirmation banner with instant jump action and tab-navigation shortcuts (`🚀 Live Event Pulse`, `🚨 Rescue Studio`, `📜 Decision Ledger`, `🧪 Scenario Lab`).
-  - Integrated Natural Language AI Plan Refinement Copilot.
+  - Integrated Natural Language AI Plan Refinement Copilot with dynamic milestone updates.
+  - **AI Event Imagination Studio (Imagen 3.0 & Nano Visualizer)**: Programmatic celebration visual synthesis (`POST /api/v1/event/{id}/visualize`) with customizable lighting moods (Golden Hour, Muhurtham Twilight, Royal Candlelight, Sunlit Morning) and instant 16:9 vector SVG / photorealistic render preview.
+  - Countdown itinerary checklist auto-scrolling ref (`itinerarySectionRef`) linked to dynamic ADK timeline synthesizers.
 - **Props:**
   | Property | Type | Required | Description |
   |---|---|---|---|
@@ -175,8 +177,18 @@ graph TD
 ### 3.8 DynamicItineraryMenu (`frontend/src/components/DynamicItineraryMenu.tsx`)
 - **Role:** Authentic Pan-Indian multi-course banquet planner and countdown checklist.
 - **Key Features:**
-  - Region-specific menus (Tamil Sadya, Karnataka Royal Oota, Hyderabadi Dawat, Mughlai Gala, Rajasthani Thali, Kerala Sadhya).
+  - Reactive synchronization with active `blueprint`, `location`, and `culturalVibe` props.
+  - 8 regional banquet cuisines (Mylapore Tamil Sadya, Karnataka Royal Oota, Hyderabadi Dawat, Mughlai Gala, Rajasthani Thali, Kerala Sadhya, Mumbai Maharashtrian Pangat, Dubai Destination).
+  - Deterministic per-plate budgeting across Economy, Royal, and Imperial tiers with live GPS geolocation detection.
   - Day-of-event countdown checklist (Pre-event vendor setup, Day-of muhurtham execution, Post-event vendor final settlements).
+- **Props:**
+  | Property | Type | Required | Description |
+  |---|---|---|---|
+  | `initialGuests` | `number` | No | Initial guest count baseline (defaults to 250). |
+  | `dietary` | `DietaryRequirement` | No | Dietary percentages breakdown. |
+  | `blueprint` | `EventBlueprint` | No | Active celebration blueprint for reactive sync. |
+  | `location` | `string` | No | City or regional location identifier. |
+  | `culturalVibe` | `string` | No | Cultural tradition and vibe string. |
 
 ---
 
@@ -238,3 +250,4 @@ graph TD
 - **Pass Rate:** 23 / 23 tests passing (100%).
 - **Verification Command:** `npm test -- --run`
 - **Build Command:** `npm run build` (Clean TypeScript `tsc` check + Vite bundle).
+

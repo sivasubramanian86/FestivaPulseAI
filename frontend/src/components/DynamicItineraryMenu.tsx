@@ -9,7 +9,7 @@
  * @version 2.0.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Clock,
   MapPin,
@@ -20,7 +20,7 @@ import {
   CheckCircle2,
   RefreshCw,
 } from 'lucide-react';
-import { DietaryRequirement } from '../types';
+import { DietaryRequirement, EventBlueprint } from '../types';
 
 export interface LocationProfile {
   id: string;
@@ -176,11 +176,17 @@ export type BudgetTier = 'economy' | 'standard' | 'royal' | 'ambani_luxury';
 interface DynamicItineraryMenuProps {
   initialGuests?: number;
   dietary?: DietaryRequirement;
+  blueprint?: EventBlueprint | null;
+  location?: string;
+  culturalVibe?: string;
 }
 
 export const DynamicItineraryMenu: React.FC<DynamicItineraryMenuProps> = ({
   initialGuests = 250,
   dietary,
+  blueprint,
+  location,
+  culturalVibe,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<LocationProfile>(
     REGIONAL_LOCATIONS.find((l) => l.id === 'bangalore') || REGIONAL_LOCATIONS[3]
@@ -191,6 +197,37 @@ export const DynamicItineraryMenu: React.FC<DynamicItineraryMenuProps> = ({
   const [gpsDetecting, setGpsDetecting] = useState<boolean>(false);
   const [gpsStatus, setGpsStatus] = useState<string | null>(null);
   const [activeMealTab, setActiveMealTab] = useState<'breakfast' | 'lunch' | 'hiTea' | 'dinner'>('lunch');
+
+  // Reactively synchronize with incoming blueprint or location changes
+  useEffect(() => {
+    if (blueprint?.expected_guests) {
+      setGuestCount(blueprint.expected_guests);
+    } else if (initialGuests) {
+      setGuestCount(initialGuests);
+    }
+  }, [blueprint?.expected_guests, initialGuests]);
+
+  useEffect(() => {
+    const loc = (location || blueprint?.location || '').toLowerCase();
+    const vibe = (culturalVibe || blueprint?.personalized_themes?.join(' ') || '').toLowerCase();
+    if (loc.includes('chennai') || loc.includes('tamil') || loc.includes('mylapore') || vibe.includes('carnatic') || vibe.includes('tamil') || vibe.includes('sadya') || vibe.includes('south')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'chennai') || REGIONAL_LOCATIONS[0]);
+    } else if (loc.includes('mumbai') || loc.includes('maharashtra') || loc.includes('pune') || vibe.includes('marathi') || vibe.includes('bollywood')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'mumbai') || REGIONAL_LOCATIONS[1]);
+    } else if (loc.includes('delhi') || loc.includes('punjab') || loc.includes('ncr') || vibe.includes('punjabi') || vibe.includes('dhol')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'delhi') || REGIONAL_LOCATIONS[2]);
+    } else if (loc.includes('bengaluru') || loc.includes('bangalore') || loc.includes('palace grounds') || loc.includes('karnataka') || vibe.includes('karnataka') || vibe.includes('mysore')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'bangalore') || REGIONAL_LOCATIONS[3]);
+    } else if (loc.includes('hyderabad') || loc.includes('telangana') || loc.includes('andhra') || vibe.includes('nizami') || vibe.includes('biryani')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'hyderabad') || REGIONAL_LOCATIONS[4]);
+    } else if (loc.includes('kochi') || loc.includes('kerala') || loc.includes('trivandrum') || vibe.includes('kerala') || vibe.includes('chenda')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'kerala') || REGIONAL_LOCATIONS[5]);
+    } else if (loc.includes('jaipur') || loc.includes('rajasthan') || loc.includes('udaipur') || vibe.includes('marwari') || vibe.includes('rajput')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'jaipur') || REGIONAL_LOCATIONS[6]);
+    } else if (loc.includes('dubai') || loc.includes('uae') || vibe.includes('destination') || vibe.includes('arabian')) {
+      setSelectedLocation(REGIONAL_LOCATIONS.find((l) => l.id === 'dubai') || REGIONAL_LOCATIONS[7]);
+    }
+  }, [location, blueprint?.location, culturalVibe, blueprint?.personalized_themes]);
 
   // Multiplier Matrix
   const durationMultipliers: Record<DurationTier, { label: string; timeSpan: string; baseFactor: number; meals: number }> = {
@@ -336,6 +373,11 @@ export const DynamicItineraryMenu: React.FC<DynamicItineraryMenuProps> = ({
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 font-sans mt-0.5">
                 Venue: <span className="font-semibold text-amber-800 dark:text-amber-300">{selectedLocation.defaultVenue}</span> · Sound Curfew: <span className="font-mono font-bold">{selectedLocation.curfewTime}</span>
+                {culturalVibe && (
+                  <span className="ml-2 px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-800 dark:text-purple-300 font-medium">
+                    Vibe: {culturalVibe}
+                  </span>
+                )}
               </p>
             </div>
           </div>

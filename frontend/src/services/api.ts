@@ -180,4 +180,22 @@ export const api = {
     }
     return res.json();
   },
+
+  async generateVisualization(eventId: string | null, prompt: string, lightingMood: string = 'Golden Hour Glow'): Promise<any> {
+    const url = eventId ? `${API_BASE}/event/${eventId}/visualize` : `${API_BASE}/event/visualize`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_prompt: prompt,
+        lighting_mood: lightingMood,
+        aspect_ratio: '16:9',
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to generate celebration visualization');
+    }
+    return res.json();
+  },
 };

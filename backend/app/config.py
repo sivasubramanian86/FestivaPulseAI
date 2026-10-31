@@ -11,6 +11,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     GEMINI_API_KEY: str = "demo_mode_key"
     GEMINI_MODEL: str = "gemini-2.5-flash"
+    IMAGEN_MODEL: str = "imagen-3.0-generate-002"
     ENVIRONMENT: str = "development"
     PORT: int = 8000
     HOST: str = "127.0.0.1"
