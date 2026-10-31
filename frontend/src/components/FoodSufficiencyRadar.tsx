@@ -1,3 +1,13 @@
+/**
+ * @file FoodSufficiencyRadar.tsx
+ * @description Food Sufficiency & 40/30/30 Batch Kitchen Radar Component.
+ * Tracks batch preparation covers, buffer thresholds, predicted surplus vs deficit,
+ * and handles 1-click FSSAI certified cold-chain manifest generation for NGO food recovery networks.
+ *
+ * @module components/FoodSufficiencyRadar
+ * @version 2.0.0
+ */
+
 import React, { useState } from 'react';
 import {
   UtensilsCrossed,

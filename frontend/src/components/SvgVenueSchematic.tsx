@@ -1,3 +1,13 @@
+/**
+ * @file SvgVenueSchematic.tsx
+ * @description Dynamic Vector Floorplan & HSE Crowd Safety Density Schematic Component.
+ * Visualizes zone-by-zone occupancy (Mandap Stage, Dining Hall, Acoustic Lawn, Emergency Exit)
+ * with dynamic density heat coloring and HSE compliance ratings.
+ *
+ * @module components/SvgVenueSchematic
+ * @version 2.0.0
+ */
+
 import React from 'react';
 import { ShieldCheck, MapPin } from 'lucide-react';
 import { useTranslation } from '../i18n/I18nContext';

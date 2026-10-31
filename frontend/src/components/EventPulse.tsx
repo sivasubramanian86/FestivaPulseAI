@@ -1,3 +1,13 @@
+/**
+ * @file EventPulse.tsx
+ * @description Day-of-Event Operational Field Cockpit Component.
+ * Ingests live sensory streams, check-in arrival velocities, 40/30/30 catering batch consumption,
+ * FSSAI food surplus cold-chain dispatch manifests, and live acoustic curfew decibel telemetry.
+ *
+ * @module components/EventPulse
+ * @version 2.0.0
+ */
+
 import React, { useState } from 'react';
 import {
   Activity,
@@ -12,11 +22,19 @@ import { FoodSufficiencyRadar } from './FoodSufficiencyRadar';
 import { SvgVenueSchematic } from './SvgVenueSchematic';
 import { useTranslation } from '../i18n';
 
+/**
+ * Properties for the EventPulse operational cockpit.
+ */
 interface EventPulseProps {
+  /** Active celebration blueprint reference */
   blueprint: EventBlueprint | null;
+  /** Current food sufficiency radar metrics (surplus/deficit, batch covers, FSSAI window) */
   foodRadar: FoodRadarType | null;
+  /** Live budget ledger tracking allocated vs actual operational burn */
   ledger: BudgetLedger | null;
+  /** Critical path timeline DAG nodes with delays and curfew constraints */
   timeline?: TimelineNode[];
+  /** Asynchronous mutation callback to push field sensory updates */
   onUpdatePulse: (data: {
     actual_checked_in: number;
     revised_expected_guests: number;
@@ -24,11 +42,17 @@ interface EventPulseProps {
     delayed_node_id?: string;
     delay_minutes?: number;
   }) => Promise<void>;
+  /** Asynchronous callback to generate certified FSSAI food rescue manifest */
   onGenerateFssaiManifest: (surplusKg: number, hotTemp: number, coldTemp: number) => Promise<void>;
+  /** Trigger operational crisis incident into Rescue Studio */
   onTriggerRescueIncident: (type: string, values: Record<string, any>) => void;
+  /** Global asynchronous operation state */
   loading: boolean;
 }
 
+/**
+ * EventPulse - Real-time sensory monitoring and live adjustment cockpit.
+ */
 export const EventPulse: React.FC<EventPulseProps> = ({
   blueprint,
   foodRadar,

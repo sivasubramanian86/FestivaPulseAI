@@ -1,12 +1,29 @@
+/**
+ * @file DecisionLedger.tsx
+ * @description Immutable Audit Ledger & Version History Component.
+ * Visualizes cryptographic or sequential audit records of every plan update, approved proposal,
+ * version bump, and coordinator sign-off for enterprise compliance and post-event post-mortems.
+ *
+ * @module components/DecisionLedger
+ * @version 2.0.0
+ */
+
 import React from 'react';
 import { History, CheckCircle2, Clock, Award } from 'lucide-react';
 import { DecisionLedgerEntry } from '../types';
 import { useTranslation } from '../i18n';
 
+/**
+ * Properties for the DecisionLedger audit component.
+ */
 interface DecisionLedgerProps {
+  /** Array of chronological decision and proposal approval records */
   entries: DecisionLedgerEntry[];
 }
 
+/**
+ * DecisionLedger - Immutable compliance timeline and audit trail viewer.
+ */
 export const DecisionLedger: React.FC<DecisionLedgerProps> = ({ entries }) => {
   const { t } = useTranslation();
 

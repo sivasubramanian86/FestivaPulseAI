@@ -10,6 +10,7 @@ import { QATestRunnerModal } from './components/QATestRunnerModal';
 import { ImmersiveVenueTourModal } from './components/ImmersiveVenueTourModal';
 import { ThemeProvider } from './context/ThemeContext';
 import { I18nProvider } from './i18n/I18nContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import { api } from './services/api';
 import { Sparkles, Compass, ShieldCheck, Calendar, MapPin, Eye, CheckCircle2 } from 'lucide-react';
 import {
@@ -25,6 +26,7 @@ import {
 } from './types';
 
 const MainCockpit: React.FC = () => {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState<'blueprint' | 'pulse' | 'rescue' | 'ledger' | 'scenario'>('blueprint');
   const [xrayOpen, setXrayOpen] = useState(false);
   const [qaModalOpen, setQaModalOpen] = useState(false);
@@ -46,7 +48,7 @@ const MainCockpit: React.FC = () => {
 
   const handleDetectGpsVenue = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      toast.warning('Geolocation is not supported by your browser.');
       return;
     }
     setGpsDetecting(true);
@@ -145,7 +147,7 @@ const MainCockpit: React.FC = () => {
       // Keep main view on the generated blueprint so user immediately sees their plan
       setXrayOpen(false);
     } catch (err: any) {
-      alert(`Generation failed: ${err.message}`);
+      toast.error(`Generation failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -167,7 +169,7 @@ const MainCockpit: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Failed to refine blueprint:', err);
-      alert(`Refinement failed: ${err.message}`);
+      toast.error(`Refinement failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -210,8 +212,9 @@ const MainCockpit: React.FC = () => {
       });
       const refreshed = await api.getEvent(blueprint.id);
       if (refreshed.food_radar) setFoodRadar(refreshed.food_radar);
+      toast.success(`FSSAI Manifest Generated: ${surplusKg}kg safely routed with cold-chain chain of custody.`);
     } catch (err: any) {
-      alert(`FSSAI Manifest failed: ${err.message}`);
+      toast.error(`FSSAI Manifest failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -233,8 +236,9 @@ const MainCockpit: React.FC = () => {
       setLatestTelemetry(res.telemetry);
       setActiveTab('rescue');
       setXrayOpen(true);
+      toast.info(`Rescue Studio engaged: AI synthesized counter-mitigations for ${incidentType}.`);
     } catch (err: any) {
-      alert(`Rescue synthesis failed: ${err.message}`);
+      toast.error(`Rescue synthesis failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -250,10 +254,10 @@ const MainCockpit: React.FC = () => {
       const updated = await api.getEvent(blueprint.id);
       setBlueprint(updated.blueprint);
       if (updated.ledger) setLedger(updated.ledger);
-      alert(`Plan updated to Version v${res.new_version}.0! Stamped into Decision Ledger.`);
+      toast.success(`Plan updated to Version v${res.new_version}.0! Stamped into Decision Ledger.`);
       setActiveTab('ledger');
     } catch (err: any) {
-      alert(`Approval error: ${err.message}`);
+      toast.error(`Approval error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -272,10 +276,10 @@ const MainCockpit: React.FC = () => {
       if (res.hall?.latitude && res.hall?.longitude) {
         setGpsCoords(`${res.hall.latitude}° N, ${res.hall.longitude}° E`);
       }
-      alert(`Applied Grounded Venue: ${res.hall.name}! Itinerary & budget re-calibrated.`);
+      toast.success(`Applied Grounded Venue: ${res.hall.name}! Itinerary & budget re-calibrated.`);
     } catch (err: any) {
       console.error('Failed to apply venue:', err);
-      alert(`Could not apply venue: ${err.message}`);
+      toast.error(`Could not apply venue: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -386,6 +390,7 @@ const MainCockpit: React.FC = () => {
             onApplyVenue={handleApplyVenue}
             onOpenTelemetry={() => setXrayOpen(true)}
             adkSwarmOutput={adkSwarmOutput}
+            onNavigateTab={(tab) => setActiveTab(tab as any)}
           />
         )}
 
@@ -537,7 +542,9 @@ export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <I18nProvider>
-        <MainCockpit />
+        <ToastProvider>
+          <MainCockpit />
+        </ToastProvider>
       </I18nProvider>
     </ThemeProvider>
   );

@@ -1,3 +1,14 @@
+/**
+ * @file GroundedVenueMapExplorer.tsx
+ * @description Spatial RAG Grounded Venue Radar & Interactive Map Explorer.
+ * Connects 14+ verified wedding halls and royal convention centers across 8 Indian metros
+ * with live Google Maps deep links, spatial distance calculation, wheelchair accessibility,
+ * HSE capacity ratings, and 1-click dynamic itinerary recalibration.
+ *
+ * @module components/GroundedVenueMapExplorer
+ * @version 2.0.0
+ */
+
 import React, { useState, useEffect } from 'react';
 import {
   MapPin,

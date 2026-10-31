@@ -1,3 +1,13 @@
+/**
+ * @file GenAIXRayDrawer.tsx
+ * @description Dockable GenAI X-Ray Telemetry Inspector Component.
+ * Surfaces transparent model prompts, token consumption, latency breakdowns, and
+ * raw response payloads for Vertex AI Gemini 2.5 Flash and Google ADK swarm consensus.
+ *
+ * @module components/GenAIXRayDrawer
+ * @version 2.0.0
+ */
+
 import React from 'react';
 import { Eye, X, Terminal, Clock, Cpu, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { GenAITelemetryTrace } from '../types';

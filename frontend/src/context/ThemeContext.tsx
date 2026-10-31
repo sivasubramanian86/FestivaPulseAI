@@ -1,3 +1,12 @@
+/**
+ * @file ThemeContext.tsx
+ * @description Theme Provider for Dark/Light Mode with High-Contrast WCAG 2.1 AAA Palettes.
+ * Manages localStorage theme persistence and document root CSS class bindings.
+ *
+ * @module context/ThemeContext
+ * @version 2.0.0
+ */
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'dark' | 'light';

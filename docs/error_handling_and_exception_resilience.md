@@ -64,3 +64,4 @@ The FastAPI backend strictly enforces layered, typed exception boundaries:
 | Frontend Test Suite | `vitest run` | 23 passed across 9 suites | 100% pass |
 | Production Dependency Audit | `npm audit --omit=dev` | 0 vulnerabilities | 0 vulnerabilities |
 | Repository Size Gate | `git count-objects -v` | 7.30 MB | strictly < 10 MB |
+

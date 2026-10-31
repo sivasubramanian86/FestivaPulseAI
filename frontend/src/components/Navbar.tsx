@@ -1,3 +1,14 @@
+/**
+ * @file Navbar.tsx
+ * @description Command Cockpit Top Navigation Header Component.
+ * Hosts primary navigation tabs (Master Blueprint, Live Event Pulse, Rescue Studio, Decision Ledger, Scenario Lab),
+ * quick accelerators (GenAI X-Ray Telemetry Drawer, In-App Automated QA Modal, 4DX Grand Tour),
+ * dynamic light/dark theme switcher, and 10 Indian & global language internationalization selector.
+ *
+ * @module components/Navbar
+ * @version 2.0.0
+ */
+
 import React from 'react';
 import {
   Sparkles,

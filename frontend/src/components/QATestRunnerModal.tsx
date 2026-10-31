@@ -1,3 +1,13 @@
+/**
+ * @file QATestRunnerModal.tsx
+ * @description In-App Automated QA & Enterprise Verification Modal Component.
+ * Triggers backend automated pytest execution directly from the GUI, reporting
+ * real-time pass/fail rates, latency SLAs, zero-hallucination gates, and code coverage.
+ *
+ * @module components/QATestRunnerModal
+ * @version 2.0.0
+ */
+
 import React, { useState } from 'react';
 import { PlayCircle, CheckCircle2, X, ShieldCheck, Clock, RefreshCw } from 'lucide-react';
 import { api } from '../services/api';

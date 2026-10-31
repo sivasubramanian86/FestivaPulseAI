@@ -1,3 +1,14 @@
+/**
+ * @file DynamicItineraryMenu.tsx
+ * @description Dynamic Pan-Indian Cultural Itinerary & Authentic Banquet Planner.
+ * Generates region-specific auspicious timelines, curfew compliance profiles, authentic multi-course
+ * banquets across 8 Indian regions (Chennai, Bengaluru, Mumbai, Delhi, Kolkata, Hyderabad, Kochi, Jaipur),
+ * and pre/post event settlement checklists.
+ *
+ * @module components/DynamicItineraryMenu
+ * @version 2.0.0
+ */
+
 import React, { useState } from 'react';
 import {
   Clock,

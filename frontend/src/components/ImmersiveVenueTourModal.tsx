@@ -1,3 +1,14 @@
+/**
+ * @file ImmersiveVenueTourModal.tsx
+ * @description 4DX Sensory Digital Twin & Immersive Indian Royal Venue Tour Modal.
+ * Provides high-fidelity theme visualization (Rajput Grandeur, Carnatic Heritage, Bollywood Royal,
+ * Kerala Sadya, etc.), lighting simulation (Golden Hour, Royal Night, Muhurtham Twilight),
+ * spatial audio recitals, and interactive zone inspections.
+ *
+ * @module components/ImmersiveVenueTourModal
+ * @version 2.0.0
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   X,

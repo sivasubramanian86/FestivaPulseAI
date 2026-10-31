@@ -1,4 +1,17 @@
-import React, { useState } from 'react';
+/**
+ * @file CelebrationBlueprint.tsx
+ * @description Master Intake and AI Blueprint Atelier Component for FestivaPulseAI.
+ * Orchestrates celebration specifications, live Google ADK specialist multi-agent swarm
+ * telemetry, predictive forecasting (Crowd arrival velocity, 40/30/30 catering depletion,
+ * acoustic curfew DAG compliance, budget Pareto elasticity), Grounded Spatial RAG venue
+ * explorer, interactive itinerary menus, and natural language plan refinement copilot.
+ *
+ * @module components/CelebrationBlueprint
+ * @version 2.0.0
+ * @author FestivaPulseAI Engineering Team
+ */
+
+import React, { useState, useRef } from 'react';
 import {
   Sparkles,
   AlertTriangle,
@@ -22,19 +35,38 @@ import {
 } from 'lucide-react';
 import { EventIntakeRequest, EventBlueprint, EventType, ADKSwarmOutput } from '../types';
 import { useTranslation } from '../i18n/I18nContext';
+import { useToast } from '../context/ToastContext';
 import { DynamicItineraryMenu } from './DynamicItineraryMenu';
 import { GroundedVenueMapExplorer, GroundedHall } from './GroundedVenueMapExplorer';
 
+/**
+ * Properties for the CelebrationBlueprint component.
+ */
 interface CelebrationBlueprintProps {
+  /** The currently loaded or generated event blueprint, or null if uninitialized */
   blueprint: EventBlueprint | null;
+  /** Asynchronous callback to trigger celebration synthesis via backend engine */
   onGenerateBlueprint: (intake: EventIntakeRequest) => Promise<void>;
+  /** Global loading state indicator during asynchronous agent coordination */
   loading: boolean;
+  /** Optional callback to apply grounded hall selection from Spatial RAG */
   onApplyVenue?: (hall: GroundedHall, investmentPlan?: any) => void;
+  /** Optional callback to refine blueprint using natural language prompt */
   onRefineBlueprint?: (userPrompt: string) => Promise<void>;
+  /** Optional callback to open GenAI X-Ray Telemetry drawer */
   onOpenTelemetry?: () => void;
+  /** Live Google ADK swarm multi-agent reasoning stream and predictive forecasts */
   adkSwarmOutput?: ADKSwarmOutput | null;
+  /** Optional navigation callback to transition between cockpit tabs */
+  onNavigateTab?: (tab: string) => void;
 }
 
+/**
+ * CelebrationBlueprint - Primary architectural intake and agent swarm visualizer.
+ * Renders the intake form with preset accelerators (Diwali, Wedding, Birthday, Error State),
+ * real-time input validation, live Google ADK swarm consensus console, predictive dashboards,
+ * grounded venue explorer with Google Maps deep links, and pre/post-event settlement hubs.
+ */
 export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   blueprint,
   onGenerateBlueprint,
@@ -43,8 +75,12 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
   onRefineBlueprint,
   onOpenTelemetry,
   adkSwarmOutput,
+  onNavigateTab,
 }) => {
   const { t } = useTranslation();
+  const toast = useToast();
+  const outcomeRef = useRef<HTMLDivElement>(null);
+  const [justGenerated, setJustGenerated] = useState<boolean>(false);
   const [adkViewMode, setAdkViewMode] = useState<'swarm' | 'predictions'>('swarm');
   const [showVenueRadar, setShowVenueRadar] = useState<boolean>(true);
   const [refinePrompt, setRefinePrompt] = useState<string>('');
@@ -60,8 +96,10 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
     try {
       await onRefineBlueprint(refinePrompt.trim());
       setRefinePrompt('');
+      toast.success('Blueprint refined and re-synchronized with Google ADK swarm!');
     } catch (err: any) {
       console.error('Refinement error:', err);
+      toast.error('Refinement error: ' + (err.message || 'Unknown error'));
     } finally {
       setRefining(false);
     }
@@ -96,7 +134,7 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
 
   const handleAutoDetectGPS = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      toast.warning('Geolocation is not supported by your browser.');
       return;
     }
     setGpsDetecting(true);
@@ -171,37 +209,45 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
     return errors.length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateInputs()) return;
 
-    onGenerateBlueprint({
-      event_name: eventName,
-      event_type: eventType,
-      organizer_email: organizerEmail,
-      target_date: targetDate,
-      location,
-      expected_guests: expectedGuests,
-      max_venue_capacity: maxCapacity,
-      total_budget: totalBudget,
-      currency: 'INR',
-      dietary: {
-        general_veg_pct: vegPct,
-        vegan_pct: veganPct,
-        jain_pct: jainPct,
-        non_veg_pct: nonVegPct,
-        allergy_specific_count: 5,
-        children_meals_count: 20,
-        staff_vendor_meals_count: 20,
-      },
-      preferences: {
-        cultural_vibe: culturalVibe,
-        elders_comfort_priority: eldersPriority,
-        healthy_lifestyle_focus: healthyLifestyle,
-        kids_activity_zone: kidsZone,
-        sound_curfew_time: soundCurfew,
-      },
-    });
+    try {
+      await onGenerateBlueprint({
+        event_name: eventName,
+        event_type: eventType,
+        organizer_email: organizerEmail,
+        target_date: targetDate,
+        location,
+        expected_guests: expectedGuests,
+        max_venue_capacity: maxCapacity,
+        total_budget: totalBudget,
+        currency: 'INR',
+        dietary: {
+          general_veg_pct: vegPct,
+          vegan_pct: veganPct,
+          jain_pct: jainPct,
+          non_veg_pct: nonVegPct,
+          allergy_specific_count: 5,
+          children_meals_count: 20,
+          staff_vendor_meals_count: 20,
+        },
+        preferences: {
+          cultural_vibe: culturalVibe,
+          elders_comfort_priority: eldersPriority,
+          healthy_lifestyle_focus: healthyLifestyle,
+          kids_activity_zone: kidsZone,
+          sound_curfew_time: soundCurfew,
+        },
+      });
+      setJustGenerated(true);
+      setTimeout(() => {
+        outcomeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 250);
+    } catch (err: any) {
+      console.error('Error generating blueprint:', err);
+    }
   };
 
   // Preset loaders for live video test
@@ -531,12 +577,21 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
           </div>
 
           {/* Submit Action */}
-          <div className="flex justify-end">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+            {blueprint && (
+              <button
+                type="button"
+                onClick={() => outcomeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
+              >
+                <span>👇 Jump to Generated Swarm Blueprint ({blueprint.id})</span>
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
               aria-label="Generate Celebration Blueprint"
-              className="btn-gold px-8 py-3 text-sm rounded-xl shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+              className="btn-gold px-8 py-3 text-sm rounded-xl shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 ml-auto"
             >
               {loading ? (
                 <>
@@ -552,11 +607,82 @@ export const CelebrationBlueprint: React.FC<CelebrationBlueprintProps> = ({
             </button>
           </div>
         </form>
+
+        {/* Immediate visual confirmation banner right below form */}
+        {blueprint && (
+          <div className={`mt-4 p-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-950 dark:text-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md ${justGenerated ? 'ring-2 ring-emerald-500 animate-pulse' : 'animate-fade-in'}`}>
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+              <div>
+                <p className="text-xs sm:text-sm font-bold flex items-center gap-2">
+                  <span>✨ Celebration Blueprint Synchronized with Google ADK Swarm!</span>
+                  <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-400/30">
+                    {blueprint.id}
+                  </span>
+                  {justGenerated && (
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-600 text-white font-bold uppercase tracking-wider animate-bounce">
+                      Updated Live
+                    </span>
+                  )}
+                </p>
+                <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 mt-0.5">
+                  6 Specialist AI Agents have finalized the dynamic itinerary, food allocations & budget ledger.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => outcomeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition-all cursor-pointer flex-shrink-0 flex items-center justify-center gap-1.5"
+            >
+              <span>View Generated Outcome 👇</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Rendered Blueprint Presentation */}
       {blueprint && (
-        <div className="space-y-6">
+        <div ref={outcomeRef} className="space-y-6 pt-2">
+          {/* Quick-Nav Workflow Bar to Other Cockpit Modules */}
+          {onNavigateTab && (
+            <div className="p-3 rounded-xl bg-[#F7F2EA] dark:bg-[#1A1428] border border-amber-300/40 dark:border-amber-700/30 flex flex-wrap items-center justify-between gap-2 text-xs shadow-sm">
+              <span className="font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Next Lifecycle Steps:</span>
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('pulse')}
+                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <span>🚀 Open Event Pulse</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('rescue')}
+                  className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <span>🚨 Open Rescue Studio</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('ledger')}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs shadow transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <span>📜 Open Decision Ledger</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('scenario')}
+                  className="px-3 py-1.5 rounded-lg bg-purple-700 hover:bg-purple-600 text-white font-semibold text-xs shadow transition-all cursor-pointer flex items-center gap-1"
+                >
+                  <span>🧪 Open Scenario Lab</span>
+                </button>
+              </div>
+            </div>
+          )}
           {/* Live Google ADK Multi-Agent Swarm Orchestrator Console */}
           <div className="tactical-card border-indigo-400/40 dark:border-indigo-600/40 bg-gradient-to-br from-indigo-950/20 via-slate-900/30 to-amber-950/20">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-indigo-500/20 gap-3">

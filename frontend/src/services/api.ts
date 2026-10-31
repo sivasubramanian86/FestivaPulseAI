@@ -9,7 +9,13 @@ import {
   ADKSwarmOutput,
 } from '../types';
 
-const API_BASE = typeof window !== 'undefined' ? '/api/v1' : 'http://localhost:8000/api/v1';
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null') {
+    return `${window.location.origin}/api/v1`;
+  }
+  return '/api/v1';
+};
+const API_BASE = getApiBase();
 
 export const api = {
   async health(): Promise<any> {

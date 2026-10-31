@@ -1,3 +1,14 @@
+/**
+ * @file ScenarioLab.tsx
+ * @description What-If Stress Testing & Predictive Simulation Sandbox Component.
+ * Enables event coordinators to simulate stochastic stresses (crowd surge/drop, budget cuts,
+ * ritual timeline delays, sudden monsoons) and verify mathematical resilience against
+ * zero-hallucination arithmetic gates before committing changes to production.
+ *
+ * @module components/ScenarioLab
+ * @version 2.0.0
+ */
+
 import React, { useState } from 'react';
 import { 
   FlaskConical, 
@@ -14,10 +25,17 @@ import {
 import { EventBlueprint } from '../types';
 import { useTranslation } from '../i18n/I18nContext';
 
+/**
+ * Properties for ScenarioLab stress test sandbox.
+ */
 interface ScenarioLabProps {
+  /** The baseline blueprint subjected to stress testing */
   blueprint: EventBlueprint | null;
 }
 
+/**
+ * ScenarioLab - Interactive predictive simulation and what-if sandbox.
+ */
 export const ScenarioLab: React.FC<ScenarioLabProps> = ({ blueprint }) => {
   const { t } = useTranslation();
   const [attendanceDelta, setAttendanceDelta] = useState(0);
