@@ -89,6 +89,11 @@ docs/demo/*.webm
 docs/demo/*.wav
 docs/demo/demo_audio/
 
+# Demo video & audio generation scripts (local automation only)
+scripts/generate_demo_audio.py
+scripts/record_demo_video.py
+scripts/*demo*
+
 # Databases & local logs
 *.sqlite3-journal
 *.log

@@ -8,7 +8,7 @@
  * @version 2.0.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PlayCircle, CheckCircle2, X, ShieldCheck, Clock, RefreshCw } from 'lucide-react';
 import { api } from '../services/api';
 import { QATestSuiteResponse } from '../types';
@@ -23,6 +23,15 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [suiteResult, setSuiteResult] = useState<QATestSuiteResponse | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -43,6 +52,9 @@ export const QATestRunnerModal: React.FC<QATestRunnerModalProps> = ({ isOpen, on
       role="dialog"
       aria-modal="true"
       aria-labelledby="qa-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
       className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
     >
       <div className="bg-white/95 dark:bg-[#140F22]/95 backdrop-blur-xl rounded-2xl w-full max-w-2xl border border-[#E8DFD1] dark:border-[#352952] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
