@@ -34,8 +34,9 @@ class PubSubService:
     def _init_cloud_pubsub(self) -> None:
         """Initialize Google Cloud Pub/Sub PublisherClient."""
         try:
-            from google.cloud import pubsub_v1
+            import importlib
 
+            pubsub_v1 = importlib.import_module("google.cloud.pubsub_v1")
             self._publisher = pubsub_v1.PublisherClient()
             self._is_cloud_enabled = True
             logger.info(f"[PUBSUB] Connected to Google Cloud Pub/Sub (Project: {settings.GCP_PROJECT_ID})")

@@ -21,7 +21,7 @@ class CloudMonitoringService:
 
     def __init__(self) -> None:
         """Initialize CloudMonitoringService and telemetry history buffer."""
-        self._metric_client = None
+        self._metric_client: Any = None
         self._is_enabled = False
         self._telemetry_history: list[dict[str, Any]] = []
 
@@ -31,8 +31,9 @@ class CloudMonitoringService:
     def _init_client(self) -> None:
         """Initialize Google Cloud Monitoring v3 MetricServiceClient."""
         try:
-            from google.cloud import monitoring_v3
+            import importlib
 
+            monitoring_v3 = importlib.import_module("google.cloud.monitoring_v3")
             self._metric_client = monitoring_v3.MetricServiceClient()
             self._is_enabled = True
             logger.info(f"[MONITORING] Google Cloud Monitoring active (Project: {settings.GCP_PROJECT_ID})")
