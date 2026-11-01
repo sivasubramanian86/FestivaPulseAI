@@ -68,6 +68,10 @@ jobs:
           ruff check backend/
           ruff format --check backend/
 
+      - name: Run Mypy Strict Type Check
+        run: |
+          mypy backend/app backend/tests
+
       - name: Run Unit Tests
         run: |
           pytest backend/tests/unit -v -m unit
@@ -101,6 +105,12 @@ jobs:
       - name: Install Frontend Dependencies
         working-directory: frontend
         run: npm ci
+
+      - name: Run Frontend Typecheck and ESLint
+        working-directory: frontend
+        run: |
+          npm run typecheck
+          npm run lint
 
       - name: Run Classified Vitest Suite (Unit, Integration, E2E)
         working-directory: frontend

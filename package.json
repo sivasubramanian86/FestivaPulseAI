@@ -1,0 +1,13 @@
+{
+  "name": "festivapulse-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FestivaPulseAI — Autonomous Event Resilience Copilot & Day-of-Event Operating System",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test -- --run",
+    "lint": "npm --prefix frontend run lint",
+    "typecheck": "npm --prefix frontend run typecheck"
+  }
+}

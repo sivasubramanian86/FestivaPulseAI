@@ -273,18 +273,18 @@ FestivaPulseAI directly solves **Prompt Wars Virtual 2026 — [Challenge 5] Cele
 
 ---
 
-## 11. 🏅 Evaluation criteria & Verification Matrix
+## 🏅 Evaluation criteria
 
 FestivaPulseAI directly addresses and exceeds every criterion scored by the Hackathon AI Evaluator:
 
 | Criterion | How it is addressed in FestivaPulseAI | Where to look |
 | :--- | :--- | :--- |
-| **Code Quality** | Strict Python 3.12 & TypeScript, Mypy strict mode with **zero errors across all 46 source files**, pure Python domain engine separate from UI and API, thin FastAPI handlers, Pydantic v2 schemas, `.editorconfig`, `.prettierrc`. | [`backend/app/core/engine.py`](backend/app/core/engine.py), [`backend/app/models/`](backend/app/models/), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| **Code Quality** | Strict Python 3.12 & TypeScript, typescript-eslint with zero errors/warnings, Mypy strict mode with **zero errors across all 46 source files**, Ruff lint & format clean, pure Python domain engine separate from UI and API, thin FastAPI handlers, Pydantic v2 schemas, `.editorconfig`, `.prettierrc`, `.prettierignore`. | [`backend/app/core/engine.py`](backend/app/core/engine.py), [`backend/app/models/`](backend/app/models/), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
 | **Security** | Server-only secrets, least-privilege IAM, strict CORS with credential guards (no wildcards), strict CSP with no unsafe-inline (`default-src 'none'; frame-ancestors 'none'; sandbox`), HSTS, prompt-injection defense, Google SAIF compliance, no HTML injection. | [`SECURITY.md`](SECURITY.md), [`backend/app/main.py`](backend/app/main.py), [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
 | **Efficiency** | Pure deterministic calculation engine (**zero LLM math**), Gemini context caching (up to 75% token reduction), sub-second latencies, model failovers, memoization, under 130 kB gzipped frontend bundle. | [`backend/app/core/engine.py`](backend/app/core/engine.py), [`backend/app/services/cache_service.py`](backend/app/services/cache_service.py) |
 | **Testing** | **134 backend pytest tests with 100% line & statement coverage**, 23 frontend Vitest tests (100% green), real-browser E2E, in-app automated QA test runner modal, GitHub Actions CI. | [`docs/TESTING.md`](docs/TESTING.md), [`backend/tests/`](backend/tests/), [`frontend/src/test/`](frontend/src/test/) |
 | **Accessibility** | **WCAG 2.1 AA compliant**: Ivory Silk light mode & Midnight Velvet dark mode with 4.5:1+ contrast, skip link, accessible names on all inputs & sliders, live regions, 10 Indian & global languages. | [`docs/ACCESSIBILITY.md`](docs/ACCESSIBILITY.md), [`frontend/src/context/ThemeContext.tsx`](frontend/src/context/ThemeContext.tsx) |
-| **Problem Statement Alignment** | Comprehensive coverage of weddings, birthdays, and community festivals; dynamic budgets, timeline cascades, vendor checklists & SLAs, personalized ideas, multi-agent copilot that plans and rescues live events. | See Section 10 Problem Alignment Table below |
+| **Problem Statement Alignment** | Comprehensive coverage of weddings, birthdays, and community festivals; dynamic budgets, timeline cascades, vendor checklists & SLAs, personalized ideas, multi-agent copilot that plans and rescues live events. | See Section 12 Problem Alignment Table below |
 
 ---
 
@@ -301,7 +301,35 @@ FestivaPulseAI directly addresses and exceeds every criterion scored by the Hack
 
 ---
 
+## 📚 Docs
+
+[Architecture](docs/ARCHITECTURE.md) · [Testing](docs/TESTING.md) · [Accessibility](docs/ACCESSIBILITY.md) · [Deployment](docs/DEPLOYMENT.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+
+---
+
+## 🗂️ Project layout
+
+```text
+backend/
+  app/
+    core/             Pure deterministic calculation engines (budget, timeline, Pareto reallocation)
+    models/           Pydantic v2 domain schemas (Event, Budget, Timeline, Rescue, DecisionLedger)
+    routers/          FastAPI REST API routes (event, pulse, rescue, qa, multimodal)
+    services/         Cloud integrations (Gemini 2.5 Flash, Imagen 3.0, Firestore, SQLite)
+    agents/           Google Cloud ADK autonomous multi-agent swarm
+  tests/              134 unit, integration, and E2E lifecycle tests (100% line coverage)
+frontend/
+  src/
+    components/       Accessible UI components (Blueprint, Pulse, Rescue Studio, Decision Ledger, 4DX Tour)
+    context/          Theme (Ivory Silk & Midnight Velvet) and Toast providers
+    i18n/             10 Indian & global languages (en, hi, ta, te, kn, ml, es)
+    services/         Type-safe REST API client
+    test/             23 Vitest unit, integration, and E2E tests
+docs/                 Architecture, Testing, Accessibility, and Deployment blueprints
+```
+
+---
+
 ## 13. License & Governance
 
-Licensed under the **Apache License 2.0** — see [LICENSE](LICENSE) for details.  
-- [Architecture](docs/ARCHITECTURE.md) · [Testing](docs/TESTING.md) · [Accessibility](docs/ACCESSIBILITY.md) · [Deployment](docs/DEPLOYMENT.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+Licensed under the **Apache License 2.0** — see [LICENSE](LICENSE) for details.

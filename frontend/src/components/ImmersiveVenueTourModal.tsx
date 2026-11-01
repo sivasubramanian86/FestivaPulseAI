@@ -380,14 +380,18 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
         try {
           osc.stop();
           osc.disconnect();
-        } catch {}
+        } catch {
+          // Audio oscillator already stopped or disconnected
+        }
       });
       oscNodesRef.current = [];
       if (audioCtxRef.current) {
         audioCtxRef.current.close().catch(() => {});
         audioCtxRef.current = null;
       }
-    } catch {}
+    } catch {
+      // Audio context cleanup fallback
+    }
     setAudioPlaying(false);
   };
 

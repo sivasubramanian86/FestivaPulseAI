@@ -1,0 +1,17 @@
+dist
+coverage
+node_modules
+frontend/dist
+frontend/node_modules
+package-lock.json
+frontend/package-lock.json
+.venv
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.agent_state
+.agents
+.codegraph
+*.log
+README.md
+PROMPTS.md
