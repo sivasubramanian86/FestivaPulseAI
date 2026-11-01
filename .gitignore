@@ -87,7 +87,9 @@ scratch/
 docs/demo/*.mp4
 docs/demo/*.webm
 docs/demo/*.wav
+docs/demo/*.json
 docs/demo/demo_audio/
+docs/demo/reel_audio/
 
 # Demo video & audio generation scripts (local automation only)
 scripts/generate_demo_audio.py
@@ -97,6 +99,9 @@ scripts/*demo*
 # Social media & LinkedIn cover assets
 docs/*LinkedIn*
 docs/*linkedin*
+docs/*Reel*
+docs/*reel*
+scripts/*reel*
 
 # Databases & local logs
 *.sqlite3-journal
