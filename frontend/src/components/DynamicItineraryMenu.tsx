@@ -526,6 +526,7 @@ export const DynamicItineraryMenu: React.FC<DynamicItineraryMenuProps> = ({
               <span className="text-xs text-slate-600 dark:text-slate-400 font-sans">Simulate Attendance:</span>
               <input
                 type="range"
+                aria-label="Simulate Attendance Range Slider"
                 min="50"
                 max="1500"
                 step="25"

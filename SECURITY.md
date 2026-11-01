@@ -71,3 +71,19 @@ FestivaPulseAI implements the 6 core pillars of Google SAIF:
   - Hot foods must be maintained at **$\ge 63^\circ\text{C}$**.
   - Cold/chilled foods must be maintained at **$\le 5^\circ\text{C}$**.
 - Food held in the ambient danger zone ($5^\circ\text{C} - 63^\circ\text{C}$) for more than 120 minutes is marked as **Compost Only / Unsafe for Human Ingestion**.
+
+---
+
+## 6. How FestivaPulseAI Protects Users, Data, and AI Operations
+
+| Layer | Security Measure Enforced in Code | Evidence Location |
+| :--- | :--- | :--- |
+| **Secrets** | `GEMINI_API_KEY` and Google Cloud credentials exist strictly in server environments. Never sent to the client, logged, or committed (`.env` gitignored). | `backend/app/config.py`, `.gitignore` |
+| **API Access** | Strict CORS with explicit origin whitelist (`settings.cors_origin_list`), no credentials wildcards, JSON-only endpoints, payload length bounds. | `backend/app/main.py` |
+| **Input Validation** | Every incoming request payload validated strictly via Pydantic v2 schemas with field-level boundary validators. | `backend/app/models/` |
+| **AI Output Validation** | Gemini calls enforce structured JSON schema validation. Malformed outputs are rejected before leaving the server. | `backend/app/services/gemini_service.py` |
+| **Prompt Injection Defense** | Input payloads sanitized; user prompts wrapped as data; system prompts strictly forbid inventing prices or hallucinating math. | `backend/app/agents/` |
+| **Browser Hardening** | Strict CSP headers without unsafe-inline, HSTS (`max-age=31536000`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, Referrer & Permissions policies. | `backend/app/main.py` |
+| **Dependencies & Audit** | Zero vulnerabilities: `bandit` SAST and automated dependency vulnerability scans enforced in CI on every push. | `backend/tests/`, `.github/workflows/ci.yml` |
+| **Human-in-the-Loop** | Irreversible actions (budget reallocations, vendor cancellations) require explicit human coordinator approval before updating state. | `backend/app/routers/rescue_routes.py`, `frontend/src/components/RescueStudio.tsx` |
+

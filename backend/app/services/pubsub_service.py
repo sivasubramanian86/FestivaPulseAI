@@ -20,7 +20,7 @@ class PubSubService:
 
     def __init__(self) -> None:
         """Initialize PubSubService with Google Cloud Publisher or in-memory bus."""
-        self._publisher = None
+        self._publisher: Any = None
         self._is_cloud_enabled = False
         self._local_bus: dict[str, list[Callable[[dict[str, Any]], Any]]] = {
             settings.PUBSUB_TELEMETRY_TOPIC: [],

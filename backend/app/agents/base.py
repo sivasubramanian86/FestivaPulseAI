@@ -17,9 +17,11 @@ from backend.app.config import settings
 
 logger = logging.getLogger(__name__)
 
+GoogleADKAgent: Any = None
 try:
-    from google.adk.agents.llm_agent import Agent as GoogleADKAgent  # type: ignore
+    from google.adk.agents.llm_agent import Agent as _GoogleADKAgent
 
+    GoogleADKAgent = _GoogleADKAgent
     HAS_GOOGLE_ADK = True
 except Exception:  # pragma: no cover
     HAS_GOOGLE_ADK = False
@@ -85,10 +87,10 @@ class FestivaAgent:
         self.model_name = model_name
         self.memory = ADKMemory()
         self.tools: list[Callable[..., Any]] = []
-        self._client = None
+        self._client: Any = None
         self._init_client()
         self.adk_agent: Any | None = None
-        if HAS_GOOGLE_ADK and GoogleADKAgent:
+        if HAS_GOOGLE_ADK and GoogleADKAgent is not None:
             try:
                 self.adk_agent = GoogleADKAgent(
                     name=self.name,

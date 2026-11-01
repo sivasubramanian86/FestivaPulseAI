@@ -81,6 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden md:flex items-center space-x-1" aria-label="Main Navigation">
             <button
               onClick={() => setActiveTab('blueprint')}
+              data-testid="tab-blueprint"
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 activeTab === 'blueprint'
                   ? 'bg-amber-100/80 dark:bg-[#1D1630] text-amber-900 dark:text-[#FBBF24] border border-amber-300/80 dark:border-amber-500/40 shadow-sm'
@@ -91,6 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('pulse')}
+              data-testid="tab-pulse"
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeTab === 'pulse'
                   ? 'bg-emerald-100/80 dark:bg-[#1D1630] text-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-500/40 shadow-sm'
@@ -102,6 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('rescue')}
+              data-testid="tab-rescue"
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeTab === 'rescue'
                   ? 'bg-rose-100/80 dark:bg-[#1D1630] text-rose-900 dark:text-rose-300 border border-rose-300/80 dark:border-rose-500/40 shadow-sm'
@@ -113,6 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('ledger')}
+              data-testid="tab-ledger"
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeTab === 'ledger'
                   ? 'bg-indigo-100/80 dark:bg-[#1D1630] text-indigo-900 dark:text-indigo-300 border border-indigo-300/80 dark:border-indigo-500/40 shadow-sm'
@@ -124,6 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('scenario')}
+              data-testid="tab-scenario"
               className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 activeTab === 'scenario'
                   ? 'bg-purple-100/80 dark:bg-[#1D1630] text-purple-900 dark:text-purple-300 border border-purple-300/80 dark:border-purple-500/40 shadow-sm'
@@ -206,6 +211,78 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Mobile Secondary Navigation Row (Touch & Mobile Accessible) */}
+      <nav
+        className="md:hidden flex items-center justify-start overflow-x-auto px-3 py-2 border-t border-[#E8DFD1] dark:border-[#352952] bg-white/95 dark:bg-[#140F22]/95 space-x-2 scrollbar-none shadow-inner"
+        aria-label="Mobile Secondary Navigation"
+      >
+        <button
+          onClick={() => setActiveTab('blueprint')}
+          aria-label={`Mobile ${t.nav.blueprintTab}`}
+          data-testid="mobile-tab-blueprint"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            activeTab === 'blueprint'
+              ? 'bg-amber-100/90 dark:bg-[#1D1630] text-amber-900 dark:text-[#FBBF24] border border-amber-300 dark:border-amber-500/40 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-[#1D1630]/50'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          <span aria-hidden="true">{t.nav.blueprintTab}</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('pulse')}
+          aria-label={`Mobile ${t.nav.pulseTab}`}
+          data-testid="mobile-tab-pulse"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            activeTab === 'pulse'
+              ? 'bg-emerald-100/90 dark:bg-[#1D1630] text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-[#1D1630]/50'
+          }`}
+        >
+          <Activity className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span aria-hidden="true">{t.nav.pulseTab}</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('rescue')}
+          aria-label={`Mobile ${t.nav.rescueTab}`}
+          data-testid="mobile-tab-rescue"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            activeTab === 'rescue'
+              ? 'bg-rose-100/90 dark:bg-[#1D1630] text-rose-900 dark:text-rose-300 border border-rose-300 dark:border-rose-500/40 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-[#1D1630]/50'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+          <span aria-hidden="true">{t.nav.rescueTab}</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('ledger')}
+          aria-label={`Mobile ${t.nav.ledgerTab}`}
+          data-testid="mobile-tab-ledger"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            activeTab === 'ledger'
+              ? 'bg-indigo-100/90 dark:bg-[#1D1630] text-indigo-900 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-500/40 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-[#1D1630]/50'
+          }`}
+        >
+          <ScrollText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+          <span aria-hidden="true">{t.nav.ledgerTab}</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('scenario')}
+          aria-label={`Mobile ${t.nav.scenarioTab}`}
+          data-testid="mobile-tab-scenario"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            activeTab === 'scenario'
+              ? 'bg-purple-100/90 dark:bg-[#1D1630] text-purple-900 dark:text-purple-300 border border-purple-300 dark:border-purple-500/40 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-[#1D1630]/50'
+          }`}
+        >
+          <FlaskConical className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+          <span aria-hidden="true">{t.nav.scenarioTab}</span>
+        </button>
+      </nav>
     </header>
   );
 };

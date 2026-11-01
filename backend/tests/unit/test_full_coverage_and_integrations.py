@@ -178,6 +178,7 @@ class TestEdgeCaseBranches:
         event_id = create_resp.json()["event_id"]
 
         state = storage_service.get_event(event_id)
+        assert state is not None
         state.latest_rescue_comparison = None
         approve_resp = client.post(
             f"/api/v1/event/{event_id}/rescue/approve",
@@ -205,10 +206,8 @@ class TestEdgeCaseBranches:
             incident_id="INC-1",
             event_id=event_id,
             timestamp="2026-10-25T20:00:00",
-            incident_type=IncidentType.ATTENDANCE_SURGE,
             incident_summary="Attendance Surge Inflow",
             system_advisory="Advisory Alert",
-            original_state_summary="Baseline",
             candidate_lowest_cost=infeasible_proposal,
             candidate_best_experience=infeasible_proposal,
             candidate_lowest_disruption=infeasible_proposal,

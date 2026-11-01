@@ -156,22 +156,22 @@ describe('App End-to-End User Flow Tests', () => {
     });
 
     // 2. Navigate to Live Pulse tab
-    const pulseTab = screen.getByRole('button', { name: /Live Event Pulse/i });
+    const pulseTab = screen.getAllByRole('button', { name: /Live Event Pulse/i })[0];
     fireEvent.click(pulseTab);
     expect(screen.getByText(/Event Pulse & Live Field Cockpit/i)).toBeInTheDocument();
 
     // 3. Navigate to Rescue Studio tab
-    const rescueTab = screen.getByRole('button', { name: /Rescue Studio/i });
+    const rescueTab = screen.getAllByRole('button', { name: /Rescue Studio/i })[0];
     fireEvent.click(rescueTab);
     expect(screen.getByText('Rescue Studio Ready')).toBeInTheDocument();
 
     // 4. Navigate to Decision Ledger tab
-    const ledgerTab = screen.getByRole('button', { name: /Decision Ledger/i });
+    const ledgerTab = screen.getAllByRole('button', { name: /Decision Ledger/i })[0];
     fireEvent.click(ledgerTab);
     expect(screen.getByText('Decision Ledger Empty')).toBeInTheDocument();
 
     // 5. Navigate to Scenario Lab tab
-    const scenarioTab = screen.getByRole('button', { name: /Stress Lab|Scenario Lab/i });
+    const scenarioTab = screen.getAllByRole('button', { name: /Stress Lab|Scenario Lab/i })[0];
     fireEvent.click(scenarioTab);
     expect(screen.getByText(/Scenario Lab: Reversible What-If Sandbox/i)).toBeInTheDocument();
 

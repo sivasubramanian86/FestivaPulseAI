@@ -34,7 +34,7 @@ class GeminiOrchestratorService:
         """Initializes Gemini orchestration client, setting target models and API credentials."""
         self.api_key = settings.GEMINI_API_KEY
         self.model_name = settings.GEMINI_MODEL
-        self._client = None
+        self._client: Any = None
         self._init_client()
 
     def _init_client(self) -> None:

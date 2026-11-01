@@ -314,7 +314,7 @@ class TestInventoryTelemetryTimelineModels:
         """Verifies timeline node and impact models."""
         node = TimelineNode(
             node_id="N-1",
-            task_name="Opening",
+            title="Opening",
             scheduled_start="10:00",
             scheduled_end="11:00",
         )

@@ -288,7 +288,7 @@ class ImagenVisualizerService:
     def __init__(self) -> None:
         """Initializes Imagen visualizer service with target image model and client."""
         self.model_name = settings.IMAGEN_MODEL
-        self._client = None
+        self._client: Any = None
         self._init_client()
 
     def _init_client(self) -> None:

@@ -38,7 +38,7 @@ describe('Navbar Component Unit Tests', () => {
     expect(screen.queryByText('GCP RUN READY')).not.toBeInTheDocument();
 
     // Verify navigation tabs
-    const pulseTab = screen.getByRole('button', { name: /Live Event Pulse/i });
+    const pulseTab = screen.getAllByRole('button', { name: /Live Event Pulse/i })[0];
     expect(pulseTab).toBeInTheDocument();
     fireEvent.click(pulseTab);
     expect(setActiveTab).toHaveBeenCalledWith('pulse');

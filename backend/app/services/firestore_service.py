@@ -21,7 +21,7 @@ class FirestoreService:
 
     def __init__(self) -> None:
         """Initialize FirestoreService client if enabled in settings."""
-        self._db = None
+        self._db: Any = None
         self._is_connected = False
         if settings.ENABLE_FIRESTORE:
             self._init_firestore()

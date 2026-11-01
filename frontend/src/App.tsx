@@ -447,7 +447,9 @@ const MainCockpit: React.FC = () => {
         <div className="absolute inset-0 opacity-10 dark:opacity-15 pointer-events-none flex justify-center items-center">
           <img
             src="/assets/royal_footer_mandala.jpg"
-            alt="Decorative Mandala"
+            alt=""
+            role="presentation"
+            aria-hidden="true"
             className="w-full h-full object-cover object-bottom"
           />
         </div>

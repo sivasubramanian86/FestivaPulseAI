@@ -437,6 +437,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
               <button
                 type="button"
                 onClick={toggleAudio}
+                aria-label="Toggle Live Theme-Matched Ambient Soundscape"
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
                   audioPlaying
                     ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-400 shadow-sm animate-pulse'
@@ -581,7 +582,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                         <div className="relative h-14 w-full rounded-xl overflow-hidden mb-2 bg-slate-950">
                           <img
                             src={theme.imageSrc}
-                            alt=""
+                            alt={theme.name}
                             className="w-full h-full object-cover object-center filter brightness-95 group-hover:scale-105 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -874,6 +875,7 @@ export const ImmersiveVenueTourModal: React.FC<ImmersiveVenueTourModalProps> = (
                   <span className="text-xs font-mono font-bold text-slate-500">Bare Hall (0%)</span>
                   <input
                     type="range"
+                    aria-label="3D Venue Transformation Progress Slider"
                     min="0"
                     max="100"
                     value={transformSlider}

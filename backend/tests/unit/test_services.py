@@ -347,7 +347,9 @@ class TestStorageAndCacheServices:
 
         # Record telemetry
         storage.record_telemetry(bp.id, tel)
-        assert len(storage.get_event(bp.id).telemetry_traces) >= 1
+        evt_st = storage.get_event(bp.id)
+        assert evt_st is not None
+        assert len(evt_st.telemetry_traces) >= 1
 
     def test_storage_service_missing_event_raises(self) -> None:
         """Verifies storage service missing event raises."""
@@ -460,8 +462,6 @@ class TestStorageAndCacheServices:
             observation_time="14:00",
             incident_type=IncidentType.BUDGET_CUT,
             entered_values={"reduction_inr": 50000},
-            severity="Medium",
-            reported_by="Coordinator",
         )
         comp, _ = gemini_service.synthesize_recovery_options(intake, incident, state)
         state.latest_rescue_comparison = comp
@@ -493,7 +493,7 @@ class TestStorageAndCacheServices:
         assert loaded.latest_rescue_comparison is not None
         assert len(loaded.decision_ledger) == 1
         assert len(loaded.telemetry_traces) == 1
-        assert loaded.adk_swarm_output["consensus"] == "approved"
+        assert loaded.adk_swarm_output is not None and loaded.adk_swarm_output["consensus"] == "approved"
         assert loaded.version == 2
 
     def test_storage_service_sqlite_error_fallbacks(self, tmp_path) -> None:

@@ -93,9 +93,11 @@ def pantry_rag_search(query: str, required_portions: int = 40) -> dict[str, Any]
 
     for item in PANTRY_INVENTORY_KB:
         score = 0
-        if any(term in q_lower for term in item["name"].lower().split()):
+        item_name = str(item.get("name", "")).lower()
+        item_category = str(item.get("category", "")).lower()
+        if any(term in q_lower for term in item_name.split()):
             score += 2
-        if any(term in q_lower for term in item["category"].lower().split()):
+        if any(term in q_lower for term in item_category.split()):
             score += 1
         if score > 0 or "food" in q_lower or "shortage" in q_lower or "batch" in q_lower:
             matches.append(item)
@@ -104,13 +106,14 @@ def pantry_rag_search(query: str, required_portions: int = 40) -> dict[str, Any]
         matches = [PANTRY_INVENTORY_KB[0], PANTRY_INVENTORY_KB[1]]
 
     top_match = matches[0]
+    yield_portions = float(str(top_match.get("yield_portions_per_kg", "10.0")))
     return {
         "recommended_recipe": top_match["name"],
         "category": top_match["category"],
         "prep_time_minutes": top_match["prep_time_minutes"],
         "instructions": top_match["instructions"],
         "compatible_diets": top_match["compatibility"],
-        "required_raw_kg": round(required_portions / top_match["yield_portions_per_kg"], 1),
+        "required_raw_kg": round(float(required_portions) / max(yield_portions, 1.0), 1),
         "estimated_ingredient_cost_inr": int(required_portions * 75),
     }
 

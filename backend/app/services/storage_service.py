@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Any
 
 from backend.app.models.budget import BudgetLedger
-from backend.app.models.event import EventBlueprint, EventIntakeRequest
+from backend.app.models.event import EventBlueprint, EventIntakeRequest, EventType
 from backend.app.models.incident import RescueStudioComparison
 from backend.app.models.inventory import FoodSufficiencyRadar
 from backend.app.models.telemetry import DecisionLedgerEntry, GenAITelemetryTrace
@@ -154,7 +154,7 @@ class StorageService:
         """Create and persist a default celebration state for valid session tokens."""
         intake = EventIntakeRequest(
             event_name="Grand Heritage Celebration",
-            event_type="Wedding",
+            event_type=EventType.WEDDING,
             organizer_email="coordinator@festivapulse.ai",
             target_date=datetime.now().strftime("%Y-%m-%d"),
             location="Bengaluru Palace Grounds",

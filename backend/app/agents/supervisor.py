@@ -38,7 +38,7 @@ class EventSupervisorAgent:
         self.spatial_agent = SpatialCrowdAgent()
         self.budget_agent = BudgetElasticityAgent()
         self.timeline_agent = TimelineCascadeAgent()
-        self._client = None
+        self._client: Any = None
         self._init_client()
 
     def _init_client(self) -> None:
