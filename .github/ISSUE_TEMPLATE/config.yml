@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions & Hackathon Community
+    url: https://github.com/sivasubramanian86/FestivaPulseAI/discussions
+    about: Ask questions, share event blueprints, and discuss cultural planning nuances.
+  - name: 🛡️ Security Vulnerability Reporting
+    url: https://github.com/sivasubramanian86/FestivaPulseAI/security/policy
+    about: Report sensitive security vulnerabilities under our Responsible Disclosure policy.
